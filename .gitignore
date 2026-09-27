@@ -1,0 +1,19 @@
+# Course brief (not ours to redistribute)
+project_requirements.pdf
+
+# Local agent config — personal, not shared
+AGENTS.md
+
+# Secrets — never commit. Commit .env.example instead.
+.env
+.env*.local
+
+# Dependencies
+node_modules/
+
+# Build output
+.next/
+out/
+dist/
+*.tsbuildinfo
+next-env.d.ts

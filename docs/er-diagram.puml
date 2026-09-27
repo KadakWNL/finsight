@@ -1,0 +1,219 @@
+@startuml
+' ============================================================
+' STALE — DO NOT TRUST. This is the original 10-entity draft.
+' It does NOT contain: SEMANTIC_DOCUMENT (pgvector), CASE_EVENT,
+' PERSONAL_DATA_REDACTION, lat/long, or exchange_rate.
+' Authoritative sources: er-diagram.mmd / er-diagram.md
+' Regenerate or delete this file.
+' ============================================================
+' FinSight — UML class diagram
+' True UML notation with crow's foot multiplicities and PK/FK/UK stereotypes.
+' Render: plantuml.com, VS Code "PlantUML" extension, or IntelliJ.
+
+skinparam shadowing false
+skinparam linetype ortho
+skinparam classAttributeIconSize 0
+hide circle
+
+title FinSight — Relational Schema (UML Class Diagram)
+
+package "Identity" {
+  class app_user {
+    +uuid user_id <<PK>>
+    --
+    +varchar email <<UK>>
+    +varchar password_hash
+    +varchar display_name
+    +varchar role <<CK: analyst|admin>>
+    +boolean is_active
+    +timestamptz last_login_at
+  }
+
+  class customer {
+    +uuid customer_id <<PK>>
+    --
+    +uuid user_id <<FK, UK, nullable>>
+    +varchar full_name
+    +date date_of_birth
+    +varchar email
+    +varchar phone
+    +char country_code
+    +varchar status <<CK: active|dormant|closed>>
+    +date kyc_verified_on
+  }
+
+  class address {
+    +uuid address_id <<PK>>
+    --
+    +uuid customer_id <<FK>>
+    +varchar line1
+    +varchar city
+    +varchar state
+    +varchar postal_code
+    +char country_code
+    +boolean is_primary
+  }
+}
+
+package "Banking" {
+  class account {
+    +uuid account_id <<PK>>
+    --
+    +uuid customer_id <<FK>>
+    +varchar account_number <<UK>>
+    +varchar account_type <<CK: savings|current|wallet>>
+    +char currency_code
+    +numeric balance <<CK: balance >= 0>>
+    +varchar status <<CK: active|frozen|closed|dormant>>
+    +date opened_at
+  }
+
+  class payment_method {
+    +uuid method_id <<PK>>
+    --
+    +uuid account_id <<FK>>
+    +varchar method_type <<CK: card|bank_transfer|wallet|upi>>
+    +varchar token
+    +char last4
+    +date expiry_date
+    +varchar status <<CK: active|expired|blocked>>
+  }
+
+  class merchant {
+    +uuid merchant_id <<PK>>
+    --
+    +varchar merchant_name
+    +varchar category_code
+    +char country_code
+    +varchar city
+    +varchar risk_tier <<CK: low|medium|high>>
+    +boolean is_watchlisted
+  }
+}
+
+package "Transactions" {
+  class transaction {
+    +uuid transaction_id <<PK>>
+    --
+    +uuid account_id <<FK>>
+    +uuid method_id <<FK, nullable>>
+    +uuid merchant_id <<FK>>
+    +uuid device_id <<FK>>
+    +numeric amount <<CK: amount > 0>>
+    +char currency_code
+    +varchar direction <<CK: debit|credit>>
+    +varchar txn_type <<CK>>
+    +varchar status <<CK: posted|pending|reversed|blocked>>
+    +timestamptz occurred_at
+    +char merchant_country_code
+    +varchar merchant_city
+    +numeric latitude
+    +numeric longitude
+    +text description
+  }
+
+  class device_fingerprint {
+    +uuid device_id <<PK>>
+    --
+    +char device_hash <<UK>>
+    +char os_family
+    +varchar first_seen_country
+    +timestamptz first_seen_at
+  }
+}
+
+package "Risk Engine" {
+  class risk_rule {
+    +uuid rule_id <<PK>>
+    --
+    +varchar rule_code <<UK>>
+    +varchar rule_name
+    +varchar dimension <<CK: amount|location|device|time|frequency|merchant>>
+    +numeric weight
+    +numeric threshold_value
+    +boolean is_active
+    +integer version
+  }
+
+  class risk_signal {
+    +uuid signal_id <<PK>>
+    --
+    +uuid transaction_id <<FK>>
+    +uuid rule_id <<FK>>
+    +numeric observed_value
+    +numeric score_contribution
+    +text evidence
+    +timestamptz triggered_at
+    note right
+      UNIQUE (transaction_id, rule_id)
+      Stops a rule double-counting.
+      Aggregate score is a VIEW, not
+      a stored column.
+    end note
+  }
+
+  class fraud_scenario {
+    +uuid scenario_id <<PK>>
+    --
+    +varchar scenario_code <<UK>>
+    +varchar scenario_name
+    +text description
+  }
+
+  class transaction_label {
+    +uuid transaction_id <<PK,FK>>
+    --
+    +uuid scenario_id <<FK>>
+    +boolean is_suspicious
+  }
+}
+
+package "Investigation" {
+  class investigation_case {
+    +uuid case_id <<PK>>
+    --
+    +varchar case_ref <<UK>>
+    +uuid transaction_id <<FK>>
+    +uuid assigned_to_user_id <<FK>>
+    +varchar status <<CK: open|in_review|escalated|closed|dismissed>>
+    +varchar priority <<CK: low|medium|high>>
+    +varchar resolution_code
+    +text resolution_notes
+    +timestamptz opened_at
+    +timestamptz due_at
+    +timestamptz closed_at
+  }
+
+  class case_event {
+    +bigint event_id <<PK>>
+    --
+    +uuid case_id <<FK>>
+    +uuid actor_user_id <<FK>>
+    +varchar event_type
+    +jsonb from_state
+    +jsonb to_state
+    +timestamptz occurred_at
+    note bottom
+      Written by trigger.
+      Append-only: no UPDATE/DELETE grant.
+    end note
+  }
+}
+
+app_user "0..1" -- "0..*" customer : logs in as >
+customer "1" *-- "0..*" address
+customer "1" *-- "0..*" account
+account "1" *-- "0..*" payment_method
+account "1" *-- "0..*" transaction
+payment_method "0..1" -- "0..*" transaction : instrument >
+merchant "1" *-- "0..*" transaction : receives
+device_fingerprint "1" *-- "0..*" transaction : initiated on
+transaction "1" *-- "0..*" risk_signal : raises
+risk_rule "1" *-- "0..*" risk_signal : fires
+transaction "0..1" -- "0..*" investigation_case : subject of
+app_user "0..1" -- "0..*" investigation_case : assigned to
+investigation_case "1" *-- "0..*" case_event : history
+transaction "1" -- "0..1" transaction_label
+fraud_scenario "1" -- "0..*" transaction_label
+
+@enduml

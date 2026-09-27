@@ -1,0 +1,209 @@
+%% FinSight — ER diagram (full, single source of truth)
+%% Renders on GitHub, mermaid.live, VS Code, Notion.
+%% For the report, use the three split figures in er-diagram.md instead.
+%% Notation: || = exactly one, o{ = zero or more, o| = zero or one
+%% PK/FK/UK/CK. Indexes, triggers, views and privileges CANNOT be drawn here —
+%% see the "DDL objects" section of er-diagram.md.
+
+erDiagram
+    APP_USER o|--o| CUSTOMER : "logs in as"
+    CUSTOMER ||--o{ ADDRESS : "resides at"
+    CUSTOMER ||--o{ ACCOUNT : "holds"
+    CUSTOMER ||--o{ PERSONAL_DATA_REDACTION : "requests"
+    ACCOUNT ||--o{ PAYMENT_METHOD : "can pay via"
+    ACCOUNT ||--o{ TRANSACTION : "performs"
+    PAYMENT_METHOD o|--o| TRANSACTION : "instrument for"
+    MERCHANT ||--o{ TRANSACTION : "receives"
+    DEVICE_FINGERPRINT ||--o{ TRANSACTION : "initiated on"
+    TRANSACTION ||--o{ RISK_SIGNAL : "raises"
+    RISK_RULE ||--o{ RISK_SIGNAL : "fires"
+    TRANSACTION o|--o| SEMANTIC_DOCUMENT : "indexed as"
+    TRANSACTION o|--o{ INVESTIGATION_CASE : "subject of"
+    APP_USER o|--o{ INVESTIGATION_CASE : "assigned to"
+    INVESTIGATION_CASE ||--o{ CASE_EVENT : "history"
+    TRANSACTION ||--o| TRANSACTION_LABEL : "ground truth"
+    FRAUD_SCENARIO ||--o{ TRANSACTION_LABEL : "defines"
+
+    APP_USER {
+        uuid user_id PK
+        varchar email UK
+        varchar password_hash "bcrypt/argon2, never plaintext"
+        varchar display_name
+        varchar role "CK: analyst|admin|system"
+        boolean is_active
+        timestamptz last_login_at
+        timestamptz created_at
+    }
+
+    CUSTOMER {
+        uuid customer_id PK
+        uuid user_id FK "UK, nullable"
+        varchar full_name "nulled by redaction request"
+        date date_of_birth
+        varchar email "nulled by redaction request"
+        varchar phone "nulled by redaction request"
+        char country_code
+        varchar status "CK: active|dormant|closed"
+        date kyc_verified_on
+        timestamptz updated_at
+    }
+
+    ADDRESS {
+        uuid address_id PK
+        uuid customer_id FK
+        varchar line1
+        varchar city
+        varchar state
+        varchar postal_code
+        char country_code
+        numeric latitude "geocoded, for distance-from-home"
+        numeric longitude
+        boolean is_primary
+    }
+
+    ACCOUNT {
+        uuid account_id PK
+        uuid customer_id FK
+        varchar account_number UK
+        varchar account_type "CK: savings|current|wallet"
+        char currency_code "ISO 4217"
+        numeric balance "denormalised, maintained under row lock"
+        varchar status "CK: active|frozen|closed|dormant"
+        date opened_at
+        timestamptz updated_at
+    }
+
+    PAYMENT_METHOD {
+        uuid method_id PK
+        uuid account_id FK
+        varchar method_type "CK: card|bank_transfer|wallet|upi"
+        varchar token "tokenised, never a PAN"
+        char last4 "display only"
+        date expiry_date
+        varchar status "CK: active|expired|blocked"
+        timestamptz updated_at
+    }
+
+    MERCHANT {
+        uuid merchant_id PK
+        varchar merchant_name
+        varchar category_code "MCC"
+        char country_code
+        varchar city
+        numeric latitude "for geo-velocity vs home"
+        numeric longitude
+        varchar risk_tier "CK: low|medium|high"
+        boolean is_watchlisted
+        timestamptz updated_at
+    }
+
+    DEVICE_FINGERPRINT {
+        uuid device_id PK
+        char device_hash UK "hashed, never raw"
+        char os_family
+        varchar first_seen_country
+        timestamptz first_seen_at
+    }
+
+    TRANSACTION {
+        uuid transaction_id PK
+        uuid account_id FK
+        uuid method_id FK "nullable"
+        uuid merchant_id FK
+        uuid device_id FK
+        numeric amount "CK: amount > 0"
+        char currency_code "denormalised, rate at txn time"
+        numeric exchange_rate "base currency per 1 unit"
+        numeric amount_base "amount * exchange_rate, for summing"
+        varchar direction "CK: debit|credit"
+        varchar txn_type "CK: card_payment|transfer|atm|withdrawal|refund"
+        varchar status "CK: posted|pending|reversed|blocked"
+        timestamptz occurred_at
+        char merchant_country_code
+        varchar merchant_city
+        numeric latitude
+        numeric longitude
+        text description
+        tsvector search_vector "generated from description, GIN indexed"
+    }
+
+    RISK_RULE {
+        uuid rule_id PK
+        varchar rule_code UK
+        varchar rule_name
+        varchar dimension "CK: amount|location|device|time|frequency|merchant"
+        numeric weight
+        numeric threshold_value
+        boolean is_active
+        integer version
+    }
+
+    RISK_SIGNAL {
+        uuid signal_id PK
+        uuid transaction_id FK
+        uuid rule_id FK "UK with transaction_id"
+        numeric observed_value
+        numeric score_contribution
+        text evidence "why this rule fired"
+        timestamptz triggered_at
+    }
+
+    SEMANTIC_DOCUMENT {
+        uuid document_id PK
+        uuid transaction_id FK "nullable, XOR mongo_note_id"
+        varchar mongo_note_id "nullable, XOR transaction_id, no FK possible"
+        varchar doc_type "CK: transaction_summary|case_note|merchant_profile"
+        text content "exact text that was embedded"
+        char content_hash "UK with doc_type, idempotent re-embed"
+        vector embedding "vector(384), pgvector, HNSW indexed"
+        varchar embedding_model "which model produced this vector"
+        timestamptz embedded_at
+    }
+
+    INVESTIGATION_CASE {
+        uuid case_id PK
+        varchar case_ref UK
+        uuid transaction_id FK
+        uuid assigned_to_user_id FK "nullable, must be role=analyst"
+        varchar status "CK: open|in_review|escalated|closed|dismissed"
+        varchar priority "CK: low|medium|high"
+        varchar resolution_code
+        text resolution_notes
+        timestamptz opened_at
+        timestamptz due_at
+        timestamptz closed_at
+        timestamptz updated_at
+    }
+
+    CASE_EVENT {
+        bigint event_id PK
+        uuid case_id FK
+        uuid actor_user_id FK "role=system for auto-escalation"
+        varchar event_type "CK: created|assigned|status_change|note_added|auto_escalated"
+        jsonb from_state
+        jsonb to_state
+        timestamptz occurred_at
+    }
+
+    PERSONAL_DATA_REDACTION {
+        uuid request_id PK
+        uuid customer_id FK
+        uuid processed_by_user_id FK
+        text scope "which columns were nulled"
+        varchar status "CK: pending|completed|rejected"
+        timestamptz requested_at
+        timestamptz completed_at
+    }
+
+    FRAUD_SCENARIO {
+        uuid scenario_id PK
+        varchar scenario_code UK
+        varchar scenario_name
+        text description
+    }
+
+    TRANSACTION_LABEL {
+        uuid transaction_id PK,FK
+        uuid scenario_id FK
+        boolean is_suspicious "ground truth for precision/recall"
+    }
