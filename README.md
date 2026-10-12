@@ -46,7 +46,15 @@ database migrations and Next.js app are in place.
 
 ## Documentation
 
-PDF item #14 requires: problem statement, objectives, scope, functional requirements, ER
+PDF item #13 requires: problem statement, objectives, scope, functional requirements, ER
 diagram, relational schema, database choice justification, data dictionary, implementation
 details, important queries, system architecture, screenshots, testing results, and conclusion.
-Only the database design artefacts exist so far.
+Database design and application planning documents exist; application implementation is pending.
+
+Planning documents for review before implementation:
+
+- [Product workflows](docs/product-workflows.md): scope, roles, permissions, and investigation journeys.
+- [Information architecture](docs/information-architecture.md): navigation, page inventory, and screen relationships.
+- [UI/UX specification](docs/ui-ux-specification.md): design system, wireframes, interactions, and states.
+- [Requirements traceability](docs/requirements-traceability.md): backend/data contracts, acceptance criteria, and academic coverage.
+- [Architecture gaps](docs/architecture-gaps.md): inspected evidence, missing capabilities, decisions, and implementation order.
