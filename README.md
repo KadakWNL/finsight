@@ -59,3 +59,5 @@ Planning documents for review before implementation:
 - [Requirements traceability](docs/requirements-traceability.md): backend/data contracts, acceptance criteria, and academic coverage.
 - [Architecture gaps](docs/architecture-gaps.md): inspected evidence, missing capabilities, decisions, and implementation order.
 - [Minimum risk contract](docs/risk-formula-contract.md): proposed deterministic formulas, synthetic scenarios, and formula approval gate.
+- [Authentication and case commands](docs/case-auth-contracts.md): session persistence, authorization, version checks, and command/event integrity.
+- [Development and testing contract](docs/development-and-testing-contract.md): migration ownership, isolated roles, test allocation, and academic scope gates.
