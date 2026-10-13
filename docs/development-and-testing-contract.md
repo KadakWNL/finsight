@@ -151,14 +151,14 @@ This is a proposal for issue #17's owner/reviewer to accept, not an implemented 
 
 ## 7. Safe DDL/DML decision gate
 
-**Meaningful `DELETE` remains an explicit academic acceptance question.** Never delete financial transactions, risk evidence, investigation cases, or immutable events as a demonstration.
+The project owner approved [expired-session cleanup](session-cleanup-contract.md) as the meaningful application SQL `DELETE` scope. Implementation and final academic evidence remain required. Never delete financial transactions, risk evidence, investigation cases, or immutable events as a demonstration.
 
 - **Safe `DROP`:** only a disposable table/schema created in an isolated test database, with a clear setup/cleanup script.
 - **`ALTER`:** demonstrated through reviewed forward-only migrations adding deferred foreign keys/constraints, not manual edits to a shared database.
 - **`INSERT`/`UPDATE`/`SELECT`:** demonstrated through deterministic synthetic seeds, guarded case commands, and real bounded queries.
-- **`DELETE`:** a seed-reset operation alone may not satisfy the course if it expects a meaningful application DML `DELETE`. Before marking issue #4 Done, confirm the instructor/project owner's interpretation. If runtime `DELETE` is required, open/re-scope a separate task for an approved nonfinancial synthetic-retention workload with preview, authorization, durable audit, retry, and proof that financial/case/event rows are untouched. Do not silently add a cleanup/delete endpoint to the MVP or implement it ahead of review.
+- **`DELETE`:** use the approved session-cleanup contract after MVP acceptance. Reserve migration 060 for the cleanup record and protected writer. Bounded preview, admin authorization, idempotent atomic deletion/audit and retention tests are required before enabling the action.
 
-Until this interpretation is confirmed, record it as an unresolved completion blocker rather than claiming compliance.
+This scope decision resolves the pre-work gate. Final academic verification must retain actual DELETE results and confirm instructor acceptance; scope approval alone is no execution evidence.
 
 ## 8. Branch and pull-request rules
 
@@ -177,6 +177,6 @@ Until this interpretation is confirmed, record it as an unresolved completion bl
 - [ ] Vitest, Playwright, database roles, and safe-reset guard are accepted before implementation.
 - [ ] VS01–VS16 owner/reviewer allocation is accepted.
 - [ ] The Mongo telemetry aggregation scope is accepted and remains gated behind MVP acceptance.
-- [ ] Instructor/project owner resolves the academic `DELETE` interpretation; otherwise issue #4 remains open.
+- [x] Project owner selects expired-session cleanup as the SQL `DELETE` scope; actual implementation and instructor acceptance remain final verification gates.
 - [ ] Both contributors have identifiable database, application, and test evidence for the final report.
 - [ ] Issue #4 is marked Done only after cross-review and the open academic gate is resolved.

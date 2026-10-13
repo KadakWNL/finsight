@@ -149,6 +149,7 @@ These are server-enforced enablement prerequisites, not optional warnings. An un
 | Mongo notes | Investigation expansion | Defined collection/validator/indexes, durable intent, reauthorization at confirmation, typed `note_added.metadata`, idempotent event path, partial-failure tests |
 | Semantic retrieval | Retrieval milestone | Model selected and benchmarked, compatible dimension migration, source-aware uniqueness/provenance, confirmed-source authorization, stale/missing source handling |
 | Telemetry cleanup/export/automated escalation | Later explicit scope | Previously documented retention/export/policy constraints, durable audit and failure/retry evidence; no shortcut from admin role |
+| Expired-session cleanup | Academic completion after MVP acceptance | [Session cleanup contract](session-cleanup-contract.md), session/auth foundation, migration 060, bounded admin preview, atomic DELETE/audit, idempotency and retention tests |
 
 An admin resolving or reopening a case is within the approved guarded case lifecycle and uses `CASE_EVENT`. Operator account edits, rule configuration, and redaction are separate admin mutations requiring general audit/integrity work. The first slice cannot enable those features just because an admin session exists.
 
