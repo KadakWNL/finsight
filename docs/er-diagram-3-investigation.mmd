@@ -1,0 +1,81 @@
+erDiagram
+    APP_USER ||--o{ CASE_COMMAND_RECEIPT : "issued command"
+    INVESTIGATION_CASE ||--o{ CASE_COMMAND_RECEIPT : "command result"
+    TRANSACTION ||--o{ INVESTIGATION_CASE : "subject of"
+    APP_USER o|--o{ INVESTIGATION_CASE : "assigned to"
+    INVESTIGATION_CASE ||--o{ CASE_EVENT : "history"
+    APP_USER ||--o{ CASE_EVENT : "event actor"
+
+    APP_USER {
+        uuid user_id PK
+        varchar email UK
+        varchar password_hash "Argon2id encoded hash; no system sign-in"
+        varchar display_name
+        varchar role "CK: analyst|admin|system"
+        boolean is_active
+        timestamptz last_login_at
+        timestamptz created_at
+    }
+
+    TRANSACTION {
+        uuid transaction_id PK
+        uuid account_id FK
+        uuid method_id FK "nullable"
+        uuid merchant_id FK
+        uuid device_id FK
+        numeric amount "numeric(20,2), positive finite original amount"
+        char currency_code "INR or USD, original transaction currency"
+        numeric exchange_rate "numeric(20,8), positive INR per unit; INR rate 1"
+        numeric amount_base "numeric(20,2), generated round(amount*rate,2), INR"
+        varchar direction "CK: debit|credit"
+        varchar txn_type "CK: card_payment|transfer|atm|withdrawal|refund"
+        varchar status "CK: posted|pending|reversed|blocked"
+        timestamptz occurred_at
+        char merchant_country_code
+        varchar merchant_city
+        numeric latitude
+        numeric longitude
+        text description
+        tsvector search_vector "generated from description, GIN indexed"
+    }
+
+    INVESTIGATION_CASE {
+        uuid case_id PK
+        varchar case_ref UK
+        uuid transaction_id FK "NOT NULL, one subject, restrictive deletion"
+        uuid assigned_to_user_id FK "nullable, active analyst guard under lock"
+        varchar status "CK: open|in_review|escalated|closed|dismissed"
+        varchar priority "CK: low|medium|high"
+        varchar resolution_code "terminal mapping; otherwise null"
+        text resolution_notes "trimmed 1-5000 terminal rationale; otherwise null"
+        timestamptz opened_at
+        timestamptz due_at
+        timestamptz closed_at
+        timestamptz updated_at
+        bigint version "positive, default 1; compare expected_version and increment"
+    }
+
+    CASE_EVENT {
+        bigint event_id PK
+        uuid case_id FK "NOT NULL, restrictive deletion"
+        uuid actor_user_id FK "NOT NULL, trusted actor; system automation deferred"
+        varchar event_type "created|assigned|status_change|priority_changed|note_added|auto_escalated"
+        jsonb from_state "allowlisted changed fields; creation null; no rationale"
+        jsonb to_state "allowlisted changed fields; no rationale"
+        text reason "event-specific rationale; terminal copies resolution_notes"
+        jsonb metadata "NOT NULL default empty object; allowlisted provenance"
+        uuid operation_id "NOT NULL, UK with event_ordinal"
+        integer event_ordinal "positive canonical order within operation"
+        timestamptz occurred_at
+    }
+
+    CASE_COMMAND_RECEIPT {
+        uuid operation_id PK "server command identity"
+        uuid actor_user_id FK "NOT NULL, UK with idempotency_key"
+        uuid idempotency_key "client retry key"
+        varchar command_type "allowlisted semantic command"
+        char request_hash "canonical payload digest; no raw request body"
+        uuid case_id FK "NOT NULL, result case, restrictive deletion"
+        integer response_status "committed successful response status"
+        timestamptz completed_at "atomic with case and events"
+    }

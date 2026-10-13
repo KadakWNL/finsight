@@ -1,4 +1,4 @@
-%% FinSight — ER diagram (full, single source of truth)
+%% FinSight ER design: full structural source; no applied database.
 %% Renders on GitHub, mermaid.live, VS Code, Notion.
 %% For the report, use the three split figures in er-diagram.md instead.
 %% Notation: || = exactly one, o{ = zero or more, o| = zero or one
@@ -6,28 +6,33 @@
 %% see the "DDL objects" section of er-diagram.md.
 
 erDiagram
-    APP_USER o|--o| CUSTOMER : "logs in as"
+    APP_USER o|--o| CUSTOMER : "optional operator link"
+    APP_USER ||--o{ APP_SESSION : "has sessions"
+    APP_USER ||--o{ CASE_COMMAND_RECEIPT : "issued command"
+    INVESTIGATION_CASE ||--o{ CASE_COMMAND_RECEIPT : "command result"
     CUSTOMER ||--o{ ADDRESS : "resides at"
     CUSTOMER ||--o{ ACCOUNT : "holds"
     CUSTOMER ||--o{ PERSONAL_DATA_REDACTION : "requests"
     ACCOUNT ||--o{ PAYMENT_METHOD : "can pay via"
     ACCOUNT ||--o{ TRANSACTION : "performs"
-    PAYMENT_METHOD o|--o| TRANSACTION : "instrument for"
+    PAYMENT_METHOD o|--o{ TRANSACTION : "instrument for"
     MERCHANT ||--o{ TRANSACTION : "receives"
     DEVICE_FINGERPRINT ||--o{ TRANSACTION : "initiated on"
     TRANSACTION ||--o{ RISK_SIGNAL : "raises"
     RISK_RULE ||--o{ RISK_SIGNAL : "fires"
-    TRANSACTION o|--o| SEMANTIC_DOCUMENT : "indexed as"
-    TRANSACTION o|--o{ INVESTIGATION_CASE : "subject of"
+    TRANSACTION o|--o{ SEMANTIC_DOCUMENT : "indexed as - deferred"
+    TRANSACTION ||--o{ INVESTIGATION_CASE : "subject of"
     APP_USER o|--o{ INVESTIGATION_CASE : "assigned to"
     INVESTIGATION_CASE ||--o{ CASE_EVENT : "history"
+    APP_USER ||--o{ CASE_EVENT : "event actor"
+    APP_USER o|--o{ PERSONAL_DATA_REDACTION : "processor - deferred"
     TRANSACTION ||--o| TRANSACTION_LABEL : "ground truth"
     FRAUD_SCENARIO ||--o{ TRANSACTION_LABEL : "defines"
 
     APP_USER {
         uuid user_id PK
         varchar email UK
-        varchar password_hash "bcrypt/argon2, never plaintext"
+        varchar password_hash "Argon2id encoded hash; no system sign-in"
         varchar display_name
         varchar role "CK: analyst|admin|system"
         boolean is_active
@@ -66,8 +71,8 @@ erDiagram
         uuid customer_id FK
         varchar account_number UK
         varchar account_type "CK: savings|current|wallet"
-        char currency_code "ISO 4217"
-        numeric balance "denormalised, maintained under row lock"
+        char currency_code "INR or USD in scoped fixtures"
+        numeric balance "numeric(20,2), own currency, nonnegative, row lock"
         varchar status "CK: active|frozen|closed|dormant"
         date opened_at
         timestamptz updated_at
@@ -111,10 +116,10 @@ erDiagram
         uuid method_id FK "nullable"
         uuid merchant_id FK
         uuid device_id FK
-        numeric amount "CK: amount > 0"
-        char currency_code "denormalised, rate at txn time"
-        numeric exchange_rate "base currency per 1 unit"
-        numeric amount_base "amount * exchange_rate, for summing"
+        numeric amount "numeric(20,2), positive finite original amount"
+        char currency_code "INR or USD, original transaction currency"
+        numeric exchange_rate "numeric(20,8), positive INR per unit; INR rate 1"
+        numeric amount_base "numeric(20,2), generated round(amount*rate,2), INR"
         varchar direction "CK: debit|credit"
         varchar txn_type "CK: card_payment|transfer|atm|withdrawal|refund"
         varchar status "CK: posted|pending|reversed|blocked"
@@ -152,10 +157,10 @@ erDiagram
         uuid document_id PK
         uuid transaction_id FK "nullable, XOR mongo_note_id"
         varchar mongo_note_id "nullable, XOR transaction_id, no FK possible"
-        varchar doc_type "CK: transaction_summary|case_note|merchant_profile"
+        varchar doc_type "deferred: transaction_summary|case_note; merchant_profile gated"
         text content "exact text that was embedded"
-        char content_hash "UK with doc_type, idempotent re-embed"
-        vector embedding "vector(384), pgvector, HNSW indexed"
+        char content_hash "deferred source-aware uniqueness needs retrieval review"
+        vector embedding "deferred model/dimensions/index selection; no foundation dependency"
         varchar embedding_model "which model produced this vector"
         timestamptz embedded_at
     }
@@ -163,32 +168,59 @@ erDiagram
     INVESTIGATION_CASE {
         uuid case_id PK
         varchar case_ref UK
-        uuid transaction_id FK
-        uuid assigned_to_user_id FK "nullable, must be role=analyst"
+        uuid transaction_id FK "NOT NULL, one subject, restrictive deletion"
+        uuid assigned_to_user_id FK "nullable, active analyst guard under lock"
         varchar status "CK: open|in_review|escalated|closed|dismissed"
         varchar priority "CK: low|medium|high"
-        varchar resolution_code
-        text resolution_notes
+        varchar resolution_code "terminal mapping; otherwise null"
+        text resolution_notes "trimmed 1-5000 terminal rationale; otherwise null"
         timestamptz opened_at
         timestamptz due_at
         timestamptz closed_at
         timestamptz updated_at
+        bigint version "positive, default 1; compare expected_version and increment"
     }
 
     CASE_EVENT {
         bigint event_id PK
-        uuid case_id FK
-        uuid actor_user_id FK "role=system for auto-escalation"
-        varchar event_type "CK: created|assigned|status_change|note_added|auto_escalated"
-        jsonb from_state
-        jsonb to_state
+        uuid case_id FK "NOT NULL, restrictive deletion"
+        uuid actor_user_id FK "NOT NULL, trusted actor; system automation deferred"
+        varchar event_type "created|assigned|status_change|priority_changed|note_added|auto_escalated"
+        jsonb from_state "allowlisted changed fields; creation null; no rationale"
+        jsonb to_state "allowlisted changed fields; no rationale"
+        text reason "event-specific rationale; terminal copies resolution_notes"
+        jsonb metadata "NOT NULL default empty object; allowlisted provenance"
+        uuid operation_id "NOT NULL, UK with event_ordinal"
+        integer event_ordinal "positive canonical order within operation"
         timestamptz occurred_at
+    }
+
+    APP_SESSION {
+        uuid session_id PK "opaque ID, never cookie or JWT"
+        uuid user_id FK "NOT NULL, restrictive deletion"
+        timestamptz created_at
+        timestamptz last_seen_at
+        timestamptz idle_expires_at "30-minute idle, capped at absolute expiry"
+        timestamptz absolute_expires_at "8 hours from sign-in"
+        timestamptz revoked_at "nullable"
+        varchar revocation_reason "nullable allowlisted code"
+    }
+
+    CASE_COMMAND_RECEIPT {
+        uuid operation_id PK "server command identity"
+        uuid actor_user_id FK "NOT NULL, UK with idempotency_key"
+        uuid idempotency_key "client retry key"
+        varchar command_type "allowlisted semantic command"
+        char request_hash "canonical payload digest; no raw request body"
+        uuid case_id FK "NOT NULL, result case, restrictive deletion"
+        integer response_status "committed successful response status"
+        timestamptz completed_at "atomic with case and events"
     }
 
     PERSONAL_DATA_REDACTION {
         uuid request_id PK
         uuid customer_id FK
-        uuid processed_by_user_id FK
+        uuid processed_by_user_id FK "nullable until processed; deferred workflow"
         text scope "which columns were nulled"
         varchar status "CK: pending|completed|rejected"
         timestamptz requested_at

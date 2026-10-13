@@ -7,11 +7,11 @@ DBMS Level 3 Project · 2 people · 2 months.
 
 ## Status
 
-Early. Database design is settled; the application is not scaffolded yet.
+Database design is under review; the application is not scaffolded yet.
 
 | Area | State |
 |---|---|
-| Relational schema + ER diagram | Done — see [`docs/er-diagram.md`](./docs/er-diagram.md) |
+| Relational schema + ER diagram | Reconciled design awaiting peer review; no applied schema. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
 | DDL migrations | Not started |
 | Seed data generator | Not started |
 | Next.js application | Not started |
@@ -20,9 +20,9 @@ Early. Database design is settled; the application is not scaffolded yet.
 ## Stack
 
 - **Next.js** (App Router) + TypeScript + Tailwind + shadcn/ui
-- **PostgreSQL** + pgvector — hand-written SQL, no ORM
-- **MongoDB** — device telemetry and analyst notes
-- **Auth.js** + bcrypt/argon2, roles `analyst` and `admin`
+- **PostgreSQL**: hand-written SQL, no ORM; pgvector deferred until retrieval
+- **MongoDB**: synthetic telemetry reads/aggregation after MVP; analyst notes deferred
+- **Auth.js** + Argon2id, encrypted-cookie sessions backed by `APP_SESSION`; human roles `analyst` and `admin`
 
 ## Design
 
@@ -33,11 +33,11 @@ The schema is documented in [`docs/er-diagram.md`](./docs/er-diagram.md), which 
 - Full-text and vector retrieval strategies
 - The MongoDB ↔ PostgreSQL boundary
 - Deliberate denormalisations and the reason each one is accepted
-- A change log recording what was corrected and why
+- A field dictionary, relational mapping, and explicit implementation/review gates
 
-Editable diagram sources: [`docs/er-diagram.mmd`](./docs/er-diagram.mmd) (Mermaid) and
-[`docs/er-diagram.puml`](./docs/er-diagram.puml) (UML). The Mermaid version renders directly on
-GitHub. Rendered PNG/SVG output is in `docs/`.
+The canonical source is [`docs/er-diagram.mmd`](./docs/er-diagram.mmd). Split sources, SVGs and JPGs
+are derived with [`scripts/render_er.py`](./scripts/render_er.py); reproduction commands are in the ER mapping.
+[`docs/er-diagram.puml`](./docs/er-diagram.puml) is a stale historical draft excluded from implementation/report use.
 
 ## Setup
 

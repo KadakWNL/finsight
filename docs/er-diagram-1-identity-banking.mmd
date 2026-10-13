@@ -1,0 +1,89 @@
+erDiagram
+    APP_USER o|--o| CUSTOMER : "optional operator link"
+    APP_USER ||--o{ APP_SESSION : "has sessions"
+    CUSTOMER ||--o{ ADDRESS : "resides at"
+    CUSTOMER ||--o{ ACCOUNT : "holds"
+    CUSTOMER ||--o{ PERSONAL_DATA_REDACTION : "requests"
+    ACCOUNT ||--o{ PAYMENT_METHOD : "can pay via"
+    APP_USER o|--o{ PERSONAL_DATA_REDACTION : "processor - deferred"
+
+    APP_USER {
+        uuid user_id PK
+        varchar email UK
+        varchar password_hash "Argon2id encoded hash; no system sign-in"
+        varchar display_name
+        varchar role "CK: analyst|admin|system"
+        boolean is_active
+        timestamptz last_login_at
+        timestamptz created_at
+    }
+
+    CUSTOMER {
+        uuid customer_id PK
+        uuid user_id FK "UK, nullable"
+        varchar full_name "nulled by redaction request"
+        date date_of_birth
+        varchar email "nulled by redaction request"
+        varchar phone "nulled by redaction request"
+        char country_code
+        varchar status "CK: active|dormant|closed"
+        date kyc_verified_on
+        timestamptz updated_at
+    }
+
+    ADDRESS {
+        uuid address_id PK
+        uuid customer_id FK
+        varchar line1
+        varchar city
+        varchar state
+        varchar postal_code
+        char country_code
+        numeric latitude "geocoded, for distance-from-home"
+        numeric longitude
+        boolean is_primary
+    }
+
+    ACCOUNT {
+        uuid account_id PK
+        uuid customer_id FK
+        varchar account_number UK
+        varchar account_type "CK: savings|current|wallet"
+        char currency_code "INR or USD in scoped fixtures"
+        numeric balance "numeric(20,2), own currency, nonnegative, row lock"
+        varchar status "CK: active|frozen|closed|dormant"
+        date opened_at
+        timestamptz updated_at
+    }
+
+    PAYMENT_METHOD {
+        uuid method_id PK
+        uuid account_id FK
+        varchar method_type "CK: card|bank_transfer|wallet|upi"
+        varchar token "tokenised, never a PAN"
+        char last4 "display only"
+        date expiry_date
+        varchar status "CK: active|expired|blocked"
+        timestamptz updated_at
+    }
+
+    APP_SESSION {
+        uuid session_id PK "opaque ID, never cookie or JWT"
+        uuid user_id FK "NOT NULL, restrictive deletion"
+        timestamptz created_at
+        timestamptz last_seen_at
+        timestamptz idle_expires_at "30-minute idle, capped at absolute expiry"
+        timestamptz absolute_expires_at "8 hours from sign-in"
+        timestamptz revoked_at "nullable"
+        varchar revocation_reason "nullable allowlisted code"
+    }
+
+    PERSONAL_DATA_REDACTION {
+        uuid request_id PK
+        uuid customer_id FK
+        uuid processed_by_user_id FK "nullable until processed; deferred workflow"
+        text scope "which columns were nulled"
+        varchar status "CK: pending|completed|rejected"
+        timestamptz requested_at
+        timestamptz completed_at
+    }

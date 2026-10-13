@@ -1,0 +1,123 @@
+erDiagram
+    ACCOUNT ||--o{ PAYMENT_METHOD : "can pay via"
+    ACCOUNT ||--o{ TRANSACTION : "performs"
+    PAYMENT_METHOD o|--o{ TRANSACTION : "instrument for"
+    MERCHANT ||--o{ TRANSACTION : "receives"
+    DEVICE_FINGERPRINT ||--o{ TRANSACTION : "initiated on"
+    TRANSACTION ||--o{ RISK_SIGNAL : "raises"
+    RISK_RULE ||--o{ RISK_SIGNAL : "fires"
+    TRANSACTION o|--o{ SEMANTIC_DOCUMENT : "indexed as - deferred"
+    TRANSACTION ||--o| TRANSACTION_LABEL : "ground truth"
+    FRAUD_SCENARIO ||--o{ TRANSACTION_LABEL : "defines"
+
+    ACCOUNT {
+        uuid account_id PK
+        uuid customer_id FK
+        varchar account_number UK
+        varchar account_type "CK: savings|current|wallet"
+        char currency_code "INR or USD in scoped fixtures"
+        numeric balance "numeric(20,2), own currency, nonnegative, row lock"
+        varchar status "CK: active|frozen|closed|dormant"
+        date opened_at
+        timestamptz updated_at
+    }
+
+    PAYMENT_METHOD {
+        uuid method_id PK
+        uuid account_id FK
+        varchar method_type "CK: card|bank_transfer|wallet|upi"
+        varchar token "tokenised, never a PAN"
+        char last4 "display only"
+        date expiry_date
+        varchar status "CK: active|expired|blocked"
+        timestamptz updated_at
+    }
+
+    MERCHANT {
+        uuid merchant_id PK
+        varchar merchant_name
+        varchar category_code "MCC"
+        char country_code
+        varchar city
+        numeric latitude "for geo-velocity vs home"
+        numeric longitude
+        varchar risk_tier "CK: low|medium|high"
+        boolean is_watchlisted
+        timestamptz updated_at
+    }
+
+    DEVICE_FINGERPRINT {
+        uuid device_id PK
+        char device_hash UK "hashed, never raw"
+        char os_family
+        varchar first_seen_country
+        timestamptz first_seen_at
+    }
+
+    TRANSACTION {
+        uuid transaction_id PK
+        uuid account_id FK
+        uuid method_id FK "nullable"
+        uuid merchant_id FK
+        uuid device_id FK
+        numeric amount "numeric(20,2), positive finite original amount"
+        char currency_code "INR or USD, original transaction currency"
+        numeric exchange_rate "numeric(20,8), positive INR per unit; INR rate 1"
+        numeric amount_base "numeric(20,2), generated round(amount*rate,2), INR"
+        varchar direction "CK: debit|credit"
+        varchar txn_type "CK: card_payment|transfer|atm|withdrawal|refund"
+        varchar status "CK: posted|pending|reversed|blocked"
+        timestamptz occurred_at
+        char merchant_country_code
+        varchar merchant_city
+        numeric latitude
+        numeric longitude
+        text description
+        tsvector search_vector "generated from description, GIN indexed"
+    }
+
+    RISK_RULE {
+        uuid rule_id PK
+        varchar rule_code UK
+        varchar rule_name
+        varchar dimension "CK: amount|location|device|time|frequency|merchant"
+        numeric weight
+        numeric threshold_value
+        boolean is_active
+        integer version
+    }
+
+    RISK_SIGNAL {
+        uuid signal_id PK
+        uuid transaction_id FK
+        uuid rule_id FK "UK with transaction_id"
+        numeric observed_value
+        numeric score_contribution
+        text evidence "why this rule fired"
+        timestamptz triggered_at
+    }
+
+    SEMANTIC_DOCUMENT {
+        uuid document_id PK
+        uuid transaction_id FK "nullable, XOR mongo_note_id"
+        varchar mongo_note_id "nullable, XOR transaction_id, no FK possible"
+        varchar doc_type "deferred: transaction_summary|case_note; merchant_profile gated"
+        text content "exact text that was embedded"
+        char content_hash "deferred source-aware uniqueness needs retrieval review"
+        vector embedding "deferred model/dimensions/index selection; no foundation dependency"
+        varchar embedding_model "which model produced this vector"
+        timestamptz embedded_at
+    }
+
+    FRAUD_SCENARIO {
+        uuid scenario_id PK
+        varchar scenario_code UK
+        varchar scenario_name
+        text description
+    }
+
+    TRANSACTION_LABEL {
+        uuid transaction_id PK,FK
+        uuid scenario_id FK
+        boolean is_suspicious "ground truth for precision/recall"
+    }
