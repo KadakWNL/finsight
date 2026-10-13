@@ -58,3 +58,4 @@ Planning documents for review before implementation:
 - [UI/UX specification](docs/ui-ux-specification.md): design system, wireframes, interactions, and states.
 - [Requirements traceability](docs/requirements-traceability.md): backend/data contracts, acceptance criteria, and academic coverage.
 - [Architecture gaps](docs/architecture-gaps.md): inspected evidence, missing capabilities, decisions, and implementation order.
+- [Minimum risk contract](docs/risk-formula-contract.md): proposed deterministic formulas, synthetic scenarios, and formula approval gate.
