@@ -69,8 +69,8 @@ Exact column and index DDL belongs in migration `020`. Do not store a single ses
 | Read case detail/events | Own assigned case only | All cases for oversight | Explicitly scoped job only |
 | Read unassigned queue row | Minimal summary (case ref, subject, priority, status, due) only | Full allowed summary | Job scope only |
 | Create investigation case | Any visible transaction; assigned to self by server | Admin-specific creation/assignment deferred from first slice | Automated case creation deferred |
-| Start review | Own assigned open case | Only where the approved case policy permits; admin gains no implicit analyst ownership | No interactive transition |
-| Escalate | Own `in_review` case; reason required | Oversight follows the documented admin transition policy | Automatic due-time escalation deferred |
+| Start review | Own assigned open case | Open case with an active analyst assignee | No interactive transition |
+| Escalate | Own `in_review` case; reason required | `in_review` case; reason required | Automatic due-time escalation deferred |
 | Resolve/dismiss | Own `in_review` case | `in_review` or `escalated` case | Not permitted |
 | Return escalated case to review | No | Yes, with reason | No |
 | Reopen terminal case | No | Yes, with reason and active-case conflict check | No |
@@ -85,9 +85,9 @@ Terminal status is derived from the resolution code; the client cannot send an i
 | Command | Who may invoke it | Preconditions | Result |
 |---|---|---|---|
 | Create | Active analyst | Visible transaction; no competing nonterminal case; valid priority and trimmed reason | New open case owned by the signed-in analyst |
-| Start review | Assigned analyst | Case is open and assigned to an active analyst | `in_review` |
-| Escalate | Assigned analyst | Case is `in_review`; trimmed reason required | `escalated` |
-| Return to review | Admin | Case is `escalated`; trimmed reason required | `in_review` |
+| Start review | Assigned analyst or admin | Case is open and assigned to an active analyst | `in_review` |
+| Escalate | Assigned analyst or admin | Case is `in_review`; trimmed reason required | `escalated` |
+| Return to review | Admin | Case is `escalated` with an active analyst assignee; trimmed reason required | `in_review` |
 | Resolve | Assigned analyst in `in_review`; admin in `in_review` or `escalated` | `resolution_notes` required; code is `confirmed_suspicious` | `closed` |
 | Dismiss | Same authority as outcome policy | `resolution_notes` required; code is `false_positive` or `insufficient_evidence` | `dismissed` |
 | Reopen | Admin | Case is `closed`/`dismissed`; no competing nonterminal case for the transaction; reason required | Same case reopens as `open` |
@@ -102,7 +102,7 @@ Creation, escalation, return-to-review, and reopening require a trimmed operatio
 
 Reopen preserves `case_id`, case reference, original `opened_at`, and the historical terminal event. It clears the current `resolution_code`, `resolution_notes`, `closed_at`, and `due_at`. Keep the assignee only if they are still an active analyst; otherwise clear assignment and append an `assigned` event for the reset. If another nonterminal case exists for the transaction, return a conflict and make no change.
 
-**Proposed concurrency design:** Add `version BIGINT NOT NULL DEFAULT 1` to the case table. This is a proposed schema and behavior pending teammate cross-review, not an implemented database column. Case responses return the current `version`. Every lifecycle command that successfully modifies a case must require `expected_version`, compare it with the database value under the case row lock, and increment the stored `version` atomically. `updated_at` remains an informational timestamp and is not the concurrency-control token. A stale `expected_version` returns HTTP `409 Conflict` without changing the case, creating events, or recording a successful command receipt.
+**Proposed concurrency design:** Add `version BIGINT NOT NULL DEFAULT 1 CHECK (version > 0)` to the case table. This is a proposed schema and behavior pending teammate cross-review, not an implemented database column. Creation initializes version 1 without an expected prior version. Case responses return the current `version`. Every command that modifies an existing case, including assignment and priority changes when enabled, must require `expected_version`, compare it with the database value under the case row lock, and increment the stored `version` atomically. `updated_at` remains an informational timestamp and is not the concurrency-control token. A stale `expected_version` returns HTTP `409 Conflict` without changing the case, creating events, or recording a successful command receipt.
 
 ## 6. Event, idempotency, and concurrency contract
 
@@ -111,7 +111,7 @@ Reopen preserves `case_id`, case reference, original `opened_at`, and the histor
 The baseline ER diagram does not yet fully reflect the workflow contract. Before migration `020`/`050`, synchronize the ER source and data dictionary. These are required additions to review, not claims about the current database:
 
 - `reason`: dedicated operational rationale; never embedded in `from_state`/`to_state`.
-- `metadata`: nullable typed JSONB for explicitly approved event-specific supporting data. The MVP does not expose arbitrary metadata writes.
+- `metadata`: nonnull typed JSONB, default empty object, for explicitly approved event-specific supporting data. MVP lifecycle events use `{}`; arbitrary metadata writes are rejected.
 - `operation_id`: non-null UUID grouping the effects of one accepted command and supporting replay diagnosis.
 
 The actor is derived from the authenticated server session or scoped service identity. The client cannot submit `actor_user_id`, arbitrary `event_type`, arbitrary state snapshots, or event timestamps.
@@ -120,13 +120,13 @@ State snapshots contain only allowlisted field changes (for example status, prio
 
 | Event | Required behavior |
 |---|---|
-| `created` | First event for the case; `reason` contains the creation rationale; `from_state` is absent/null and `to_state` contains initial case fields. |
+| `created` | First event for the case; `reason` contains the creation rationale; `from_state` is null and `to_state` contains initial case fields with an unassigned owner. The subsequent `assigned` event records initial self-assignment. |
 | `assigned` | Emitted when case ownership is set; only assignment fields appear in state diffs. Creation and initial self-assignment occur in one transaction and share an `operation_id`. |
 | `status_change` | Permitted lifecycle transition; state diffs list only changed case fields. Rationale is in `reason`. |
 | `note_added` | Not writable in the first slice. Future confirmed Mongo notes require typed metadata and durable cross-store recovery before this event is enabled. |
 | `priority_changed` | Deferred until the event type/writer and priority policy are approved. |
 
-A command may emit more than one event (creation emits `created` then `assigned`). Add a proposed non-null `event_ordinal` that starts at 1 within each operation and enforce `UNIQUE(operation_id, event_ordinal)`. This identifies each logical event precisely, prevents duplicate event records during replay, and still permits a legitimate command to emit multiple events, including multiple events of the same type if a later approved workflow requires that. The protected database writer is the only runtime path allowed to mutate case state and emit events.
+The detailed [event-shape contract](product-workflows.md#case-event-contract) owns allowed keys, types, rationale rules and snapshots. A command may emit more than one event (creation emits `created` then `assigned`). Add a proposed non-null `event_ordinal` with a positive-integer check that starts at 1 within each operation and enforce `UNIQUE(operation_id, event_ordinal)`. The protected writer binds each operation to one case and assigns contiguous ordinals in canonical order: creation is `created` then `assigned`; reopening is `status_change` then optional `assigned`. This identifies each logical event precisely, prevents duplicate event records during replay, and still permits a legitimate command to emit multiple events, including multiple events of the same type if a later approved workflow requires that. The protected database writer is the only runtime path allowed to mutate case state and emit events.
 
 Command idempotency and event identity are separate guarantees: the command receipt ensures that the same accepted command does not execute twice, while `(operation_id, event_ordinal)` ensures that duplicate records for one logical event are rejected. The proposed runtime security boundary must ensure that the application runtime role cannot arbitrarily insert, update, or delete `CASE_EVENT` records and cannot bypass the approved database functions to modify case state. Protected functions should use `SECURITY DEFINER` where appropriate, rather than requiring it automatically for every function. Any `SECURITY DEFINER` function must use a fixed safe `search_path`, schema-qualified references where appropriate, restricted `EXECUTE` grants, and no unnecessary `PUBLIC` execution privileges. The migrator/owner role and least-privilege application runtime role remain separate. These are proposed requirements for later migration and implementation work, not existing controls or tested behavior.
 

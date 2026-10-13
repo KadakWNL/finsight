@@ -109,7 +109,7 @@ Case creation locks/validates the subject, checks actor permissions, enforces th
 
 The analyst opens an owned case, reviews signals and related transactions, starts review, and appends notes. The analyst chooses an outcome with resolution notes or escalates with a reason. Admins dispatch unassigned work and handle escalations. Events show who changed what, with stable ordering by `occurred_at,event_id`.
 
-Every mutation supplies an expected `updated_at` token. The backend locks the case and compares the token before applying authorization and state checks. A mismatch returns conflict and the current permitted state. Keep the draft and ask the operator to review changes; never silently overwrite a colleague's work.
+Every mutation of an existing case supplies `expected_version`. The backend checks current authority, locks the case, and compares its positive integer `version` before applying state changes. A successful command increments `version` atomically; a mismatch returns conflict with no mutation, events, or successful receipt. Creation initializes `version` to 1 and requires no prior version. `updated_at` remains informational. Keep the draft on conflict and ask the operator to review changes.
 
 ### Case state contract
 
@@ -160,7 +160,7 @@ Terminal transitions require trimmed, nonempty `resolution_notes` of at most 5,0
 
 Nonterminal cases have null `resolution_code`, `resolution_notes`, and `closed_at`. Terminal cases have the exact allowed code/state combination, nonempty notes, and a server timestamp in `closed_at`. The terminal `status_change` event preserves the code and time in state diffs and the resolution rationale in its dedicated `reason` field.
 
-Only an active admin may reopen `closed` or `dismissed`, with a trimmed reason of 1-2,000 characters and the expected update token. Under the case/subject locks, reject reopening if another nonterminal case exists for that transaction. An unsuccessful attempt changes neither the case nor its events.
+Only an active admin may reopen `closed` or `dismissed`, with a trimmed reason of 1-2,000 characters and `expected_version`. Under the case/subject locks, reject reopening if another nonterminal case exists for that transaction. An unsuccessful attempt changes neither the case nor its events.
 
 A successful reopen retains `case_id`, `case_ref`, `transaction_id`, `priority`, and original `opened_at`. It sets status to `open`, clears all current resolution fields and `closed_at`, clears `due_at` to null, and advances `updated_at`. A new due time requires a separate future governed action; the reopen form has no due-time input.
 
@@ -180,6 +180,7 @@ The baseline ER defines `CASE_EVENT.event_id`, `case_id`, `actor_user_id`, `even
 | `reason` | Required addition: nullable text | Human/service rationale for this event, governed by the event-specific rules below |
 | `metadata` | Required addition: nonnull JSONB, default empty object | Allowlisted event-specific provenance, such as a confirmed Mongo note reference; no unrestricted payload |
 | `operation_id` | Required addition: nonnull UUID | Server-issued mutation identity; same ID for events emitted by one case command |
+| `event_ordinal` | Required addition: nonnull positive integer | Starts at 1 within each operation; protected writer assigns canonical event order |
 | `occurred_at` | Baseline timestamptz, require NOT NULL | Server event time, never client-controlled |
 
 `from_state` and `to_state` use matching keys for changed fields: `status`, `priority`, `assigned_to_user_id`, `resolution_code`, `closed_at`, or `due_at`. Creation is the only full initial snapshot and may include `case_ref`, `transaction_id`, and `opened_at`. Exclude `resolution_notes` from state JSON because narrative rationale is stored in `reason`. The fields remain ordinary `INVESTIGATION_CASE` fields; this projection does not redefine case state.
@@ -202,7 +203,7 @@ Creation inserts an unassigned case and emits `created`; assigning the requested
 
 One guarded database mutation function emits events; the application never accepts arbitrary event inserts or writes the same events again. The documented generic `trg_case_audit` must be redesigned or omitted in favor of that single writer. Append-only protection still uses the immutability trigger and revoked update/delete privileges. Note confirmation later uses the same protected event-writing path.
 
-Unique `(case_id, operation_id, event_type)` prevents duplicate event types within an operation. The server validates canonical event ordering: `created` then `assigned`, or reopen `status_change` then an optional `assigned`. Case-command idempotency also needs a persisted command receipt, keyed by actor/idempotency key and validated payload digest; it is a required proposed structure, separate from state snapshots and audit reasons.
+Unique `(operation_id, event_ordinal)` prevents duplicate logical events within an operation. The protected writer binds each operation to one case and assigns contiguous positive ordinals: `created` then `assigned`, or reopen `status_change` then an optional `assigned`. Case-command idempotency also needs a persisted command receipt, keyed by actor/idempotency key and validated payload digest; it is a required proposed structure, separate from state snapshots and audit reasons.
 
 All rationale text is an operational justification, with instructions forbidding direct customer identifiers, credentials, and copied raw note bodies. History is access-controlled and immutable. The later redaction capability must define how accidental PII in immutable rationale is handled before that capability is enabled; the current design cannot promise arbitrary history erasure.
 

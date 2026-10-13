@@ -58,8 +58,9 @@ Migration files do not include their own `BEGIN`/`COMMIT` wrappers because the r
 
 - **Migrator role:** DDL and controlled schema/seed work; credentials used only by scripts/CI.
 - **Runtime application role:** least privilege; not owner/superuser; no direct arbitrary `CASE_EVENT` writes and no bypass of protected case commands.
+- **Service role:** separate non-owner, non-superuser connection for approved synthetic ingestion/evaluation jobs. Grant only scoped ingestion/function access; deny operator/session administration, arbitrary case/event writes, and retained financial/history deletion. Record the provisioned system actor for approved job effects; service credentials cannot authenticate through human sign-in.
 - **Test setup role:** builds a fresh isolated test database and permits negative privilege tests using the runtime role.
-- Use separate app/migrator/test connection variables. Runtime connection credentials never reach client bundles.
+- Use separate app/service/migrator/test connection variables. Runtime and service connection credentials never reach client bundles. Negative permission tests exercise each role separately.
 - A reset script may run only against an explicitly named test database with a clear `_test` suffix and an explicit opt-in flag. Refuse ambiguous names and fail if the connection appears to target production. No reset helper is used on a shared database.
 - Synthetic seeds have stable identifiers and deterministic scenarios; reruns are safe and never import real customer/bank data.
 
