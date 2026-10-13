@@ -26,7 +26,7 @@ This document defines proposed requirements, backend contracts, database operati
 
 ## Workflow-to-data matrix
 
-Entities and fields below are names from [ER source](er-diagram.mmd), unless explicitly marked proposed. SQL examples in [ER documentation](er-diagram.md#ddl-objects-an-er-diagram-cannot-show) are design evidence, not migrations.
+Entities and fields below are names from [ER source](er-diagram.mmd), unless explicitly marked proposed. SQL examples in [ER documentation](er-diagram.md#sql-objects-outside-the-er) are design evidence, not migrations.
 
 | Workflow/action | User role | Data/entities involved | Read/write operations | Validation and constraints | Authorization | Audit/event requirements |
 |---|---|---|---|---|---|---|
