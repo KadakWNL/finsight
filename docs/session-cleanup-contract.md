@@ -1,0 +1,41 @@
+# Admin cleanup of expired sessions
+
+The project owner approved expired-session cleanup as the application SQL `DELETE` workload. This is an academic-completion feature after MVP acceptance, with no implemented table, endpoint or UI yet. Instructor acceptance and actual execution evidence remain part of final academic verification.
+
+This contract owns the cleanup policy. The [authentication contract](case-auth-contracts.md#2-session-design) owns session validation and the proposed `APP_SESSION` fields. Cleanup requires that foundation, current-role authorization and isolated database tests before implementation.
+
+## Eligibility and bounded preview
+
+An active admin may remove sessions that have been unusable for more than seven days. Define `unusable_at` as the earliest of `idle_expires_at`, `absolute_expires_at` and a nonnull `revoked_at`. Eligibility requires `unusable_at < cutoff`, where the server captures `cutoff = preview_time - interval '7 days'`. Equality is ineligible. Null revocation does not affect the two required expiry timestamps.
+
+The server previews at most 100 eligible rows, ordered by `unusable_at, session_id`. Return the count, cutoff and opaque operation reference, with no cookie, JWT, password, email or session identifiers exposed. The administrator confirms that specific preview; never run an unrestricted table wipe. A preview expires after ten minutes and cannot expand its candidate set on confirmation.
+
+Propose a dedicated `APP_SESSION_CLEANUP` record containing a server operation UUID, authenticated admin ID, preview time, cutoff, expiry, bounded candidate session IDs, confirmation idempotency key, canonical request hash, completion time and deleted count. Enforce unique `(admin_id, idempotency_key)` for confirmed operations. Only the protected cleanup writer can mutate it; completion facts remain retained. It is separate from case history and general operator-account mutations.
+
+## Atomic deletion and permissions
+
+Confirmation uses an idempotency key and checks the current admin and operation ownership. Within one PostgreSQL transaction, lock the operation and candidate sessions in a stable order, recheck eligibility against the captured cutoff, delete only the still-eligible previewed rows with `DELETE ... RETURNING`, and commit the deleted count/completion record together. Missing candidates may reduce the actual count. A failed delete or audit write rolls back the entire operation.
+
+Same-key retries return the committed permitted result; a changed request conflicts. A new key for an already completed operation also returns its result without another deletion or completion record. Preview records are never successful deletion evidence. Session validation/refresh must reject expired sessions under coordinated locking, so a concurrent refresh cannot revive an eligible candidate.
+
+The runtime role receives narrowly granted cleanup-function execution, with current admin checks in the trusted writer. It has no direct session-table DELETE privilege. Service and analyst callers are denied. Restrictive foreign keys must reject or exclude referenced candidates; cascading deletion is prohibited. Cleanup never deletes users, financial records, risk signals, cases, events, command receipts or cleanup audit records.
+
+The protected function follows the existing safe `SECURITY DEFINER` and search-path requirements where needed. Proposed APIs are `POST /api/v1/session-cleanups/preview` and `POST /api/v1/session-cleanups/{operation_id}/confirm`. UI belongs in the admin maintenance area and remains gated until this feature passes its tests.
+
+## Delivery and verification
+
+Reserve migration `060_session_cleanup.sql`, owned by ShrikarDesai07 and reviewed by KadakWNL, after migrations 010-050. The same owner implements the bounded API, admin preview/confirmation UI and database/API tests. The estimate is provisional: three relative points including review, not a guaranteed duration. Added scope competes with the October 23 deadline and needs same-day escalation if it spills over.
+
+| Test | Expected evidence |
+|---|---|
+| Active session; earliest expiry/revocation less than seven days old; exact cutoff | No deletion |
+| Idle expiry, absolute expiry or revocation more than seven days old | Eligible synthetic rows deleted; exact SQL returned count recorded |
+| More than 100 eligible rows | Preview and deletion limited to the same 100 candidates |
+| Preview older than ten minutes; newly eligible row after preview | Expired preview rejected; newly eligible row excluded |
+| Analyst/service/disabled/demoted admin; forged operation ownership | Denial with no deletion or completed audit |
+| Replayed confirmation; changed request; concurrent confirmation | One deletion/completion result; changed request conflicts |
+| Concurrent session refresh/sign-out | Expired sessions never revived; active/recent sessions retained |
+| Failure after DELETE before audit completion; restrictive FK failure | Full rollback; no partial deletion or false success |
+| Protected-table counts before/after | User, financial, risk, case, event and receipt records unchanged |
+
+Retain real SQL results, API denial/idempotency results and browser evidence for academic verification. The preview and successful cleanup demonstrate a meaningful application DELETE; naming this feature or writing its contract does not complete that requirement. Mongo telemetry reads/aggregation remain the separate NoSQL workload. Telemetry deletion, general admin mutations, rule editing and redaction remain deferred.
