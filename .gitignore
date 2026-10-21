@@ -14,3 +14,9 @@ out/
 dist/
 *.tsbuildinfo
 next-env.d.ts
+
+# Local reports and course brief
+playwright-report/
+test-results/
+coverage/
+docs/DBMS Level 3 Project Requirements.pdf
