@@ -1,6 +1,6 @@
 # FinSight ER design and relational mapping
 
-The [full Mermaid source](er-diagram.mmd) defines the structural inventory. This document maps it to the reviewed workflow contracts and report figures. All tables, constraints and SQL below are designs; no migrations or database implementation exist in this checkout.
+The [full Mermaid source](er-diagram.mmd) defines the structural inventory. This document maps it to the workflow contracts and report figures. The [financial baseline](financial-baseline.md) records the implemented migration 010 boundary; operational tables, behavior and deferred entities below remain designs.
 
 ## Authority, scope and review
 

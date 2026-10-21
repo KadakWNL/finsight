@@ -7,15 +7,15 @@ DBMS Level 3 Project · 2 people · 2 months.
 
 ## Status
 
-The reconciled ER design is merged. The financial baseline migration is available for isolated PostgreSQL verification; application and operational-schema implementation remain separate work.
+The Next.js scaffold serves a landing page and process-health endpoint. Financial migration 010 is available for isolated PostgreSQL verification; operational tables, authentication and investigation features remain pending.
 
 | Area | State |
 |---|---|
 | Relational schema + ER diagram | Reconciled design merged. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
 | DDL migrations | Financial migration 010 and [SQL verification](docs/financial-baseline.md); no operational tables |
 | Seed data generator | Not started |
-| Next.js application | Not started |
-| Setup instructions | Added once the app is scaffolded |
+| Next.js application | Landing page and process-health endpoint; no feature workflows |
+| Setup instructions | [Development setup](docs/development-setup.md) |
 
 ## Stack
 
@@ -41,17 +41,20 @@ are derived with [`scripts/render_er.py`](./scripts/render_er.py); reproduction 
 
 ## Setup
 
-Not available yet — no application code exists. This section will be filled in once the
-database migrations and Next.js app are in place.
+Use Node.js 24 and `npm ci`, then `npm run dev`. The landing page does not require a database.
+See [development setup](docs/development-setup.md) for environment variables, database isolation,
+checks and implemented command boundaries.
 
 ## Documentation
 
 PDF item #13 requires: problem statement, objectives, scope, functional requirements, ER
 diagram, relational schema, database choice justification, data dictionary, implementation
 details, important queries, system architecture, screenshots, testing results, and conclusion.
-Database design and application planning documents exist; application implementation is pending.
+Database design and application planning documents exist; feature implementation is pending.
 
 Planning documents for review before implementation:
+
+- [Development setup](docs/development-setup.md): runnable scaffold, environment and verification commands.
 
 - [Product workflows](docs/product-workflows.md): scope, roles, permissions, and investigation journeys.
 - [Information architecture](docs/information-architecture.md): navigation, page inventory, and screen relationships.

@@ -35,6 +35,6 @@ psql -v ON_ERROR_STOP=1 --single-transaction -f migrations/010_financial_baselin
 psql -v ON_ERROR_STOP=1 -f tests/sql/financial_baseline.sql
 ```
 
-The first command wraps the migration in a transaction. The SQL file contains no transaction wrappers because the reviewed migration runner owns that boundary. After the scaffold runner is merged, use `npm run db:migrate` with the dedicated migrator connection for ledger/checksum handling. Do not reapply the SQL manually to an existing database or edit an applied migration.
+The first command wraps the migration in a transaction. The SQL file contains no transaction wrappers because the migration runner owns that boundary. For normal development, use `npm run db:migrate` with the dedicated migrator connection for ledger/checksum handling, per [development setup](development-setup.md). Do not reapply the SQL manually to an existing database or edit an applied migration.
 
 The second command inserts synthetic storage probes, checks expected SQLSTATE failures and rolls back its fixtures. It covers all eleven tables, two transactions sharing a method, a null method, rounded USD conversion, nonfinite/negative amounts and rates, generated-base overflow/write rejection, unsupported currency/type, account/method mismatch, required relationships, once-only signals/labels, restrictive deletion and absence of PUBLIC table grants. The dedicated [financial baseline workflow](../.github/workflows/financial-baseline.yml) runs the same commands against a disposable PostgreSQL 17 service.
