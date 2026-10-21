@@ -1,0 +1,38 @@
+name: Financial baseline checks
+on:
+  pull_request:
+    paths: ['migrations/**', 'tests/sql/**', '.github/workflows/financial-baseline.yml']
+  push:
+    branches: [main]
+    paths: ['migrations/**', 'tests/sql/**', '.github/workflows/financial-baseline.yml']
+permissions:
+  contents: read
+jobs:
+  financial-baseline:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: ci-disposable-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provision isolated migration owner
+        env:
+          PGPASSWORD: ci-disposable-only
+        run: |
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE ROLE finsight_migrator LOGIN PASSWORD 'test-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;"
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE finsight_baseline_test OWNER finsight_migrator;"
+      - name: Apply financial baseline and run SQL checks
+        env:
+          PGHOST: localhost
+          PGUSER: finsight_migrator
+          PGPASSWORD: test-only
+          PGDATABASE: finsight_baseline_test
+        run: |
+          psql -v ON_ERROR_STOP=1 --single-transaction -f migrations/010_financial_baseline.sql
+          psql -v ON_ERROR_STOP=1 -f tests/sql/financial_baseline.sql

@@ -7,12 +7,12 @@ DBMS Level 3 Project · 2 people · 2 months.
 
 ## Status
 
-Database design is under review; the application is not scaffolded yet.
+The reconciled ER design is merged. The financial baseline migration is available for isolated PostgreSQL verification; application and operational-schema implementation remain separate work.
 
 | Area | State |
 |---|---|
-| Relational schema + ER diagram | Reconciled design awaiting peer review; no applied schema. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
-| DDL migrations | Not started |
+| Relational schema + ER diagram | Reconciled design merged. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
+| DDL migrations | Financial migration 010 and [SQL verification](docs/financial-baseline.md); no operational tables |
 | Seed data generator | Not started |
 | Next.js application | Not started |
 | Setup instructions | Added once the app is scaffolded |
@@ -62,3 +62,4 @@ Planning documents for review before implementation:
 - [Authentication and case commands](docs/case-auth-contracts.md): session persistence, authorization, version checks, and command/event integrity.
 - [Development and testing contract](docs/development-and-testing-contract.md): migration ownership, isolated roles, test allocation, and academic scope gates.
 - [Session cleanup contract](docs/session-cleanup-contract.md): approved SQL DELETE scope, bounded admin cleanup, audit, and acceptance tests.
+- [Financial baseline](docs/financial-baseline.md): implemented migration boundary, nullability and isolated SQL checks.
