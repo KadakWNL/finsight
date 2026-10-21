@@ -48,11 +48,11 @@ Uppercase names identify ER entities. Lowercase names identify intended SQL obje
 
 | Gap | Consequence | Recommended decision and implementation gate |
 |---|---|---|
-| `PAYMENT_METHOD o\|--o\| TRANSACTION` contradicts the ER change log's one-to-many intent | Incorrect relationship in generated figures | Use the finalized zero-or-one method / many transactions contract below; reconcile source/rendered artifacts before DDL. |
-| `TRANSACTION o\|--o{ INVESTIGATION_CASE` permits ambiguous transaction optionality | Subject-free case could enter the queue | Use the finalized mandatory subject / historical cases contract below and require `transaction_id NOT NULL`. |
+| Method/transaction cardinality needs applied enforcement | Corrected source alone cannot enforce the relationship | Reconciled source uses zero-or-one method / many transactions; peer-review figures and implement the composite FK before DDL acceptance. |
+| Mandatory case subject needs applied enforcement | A diagram cannot prevent a subject-free case | Reconciled source uses mandatory subject / historical cases; require `transaction_id NOT NULL` in reviewed DDL. |
 | Assignee comment says analyst, but FK cannot enforce role or activity | Admin/system/inactive assignee possible | Validate under lock and database function/trigger. Coordinate role/deactivation changes with assignments. |
 | Status checks define vocabulary, not transitions | Invalid close/reopen possible | Implement the state machine in [workflows](product-workflows.md#case-state-contract) with a database guard and backend policy. |
-| `CASE_EVENT` lacks rationale/provenance fields and priority events | State JSON can become an unvalidated metadata bucket | The finalized [event contract](product-workflows.md#case-event-contract) adds dedicated `reason`, `metadata`, and `operation_id`, plus `priority_changed`. General admin audit remains a separate gated structure. |
+| Reconciled `CASE_EVENT` fields lack executable shape enforcement | State JSON can become an unvalidated metadata bucket | The finalized [event contract](product-workflows.md#case-event-contract) adds dedicated `reason`, `metadata`, and `operation_id`, plus `priority_changed`. General admin audit remains a separate gated structure. |
 | `RISK_RULE.version` lacks revisions; `RISK_SIGNAL` lacks rule version/snapshot | Edited thresholds rewrite apparent historical explanations | Freeze rules for the first release. Before editing, propose immutable revision storage and signal-to-revision linkage or a complete firing snapshot. No structure is implemented yet. |
 | Unique `(transaction_id, rule_id)` prevents repeated scoring by version | New runs conflict or replace evidence | First release scores once. Define run/version semantics before replay; preserve historical signals. |
 | `SEMANTIC_DOCUMENT` XOR only counts populated source columns | Mongo source may still be missing | Verify Mongo source existence and authorization; reconcile references. XOR does not prevent cross-database orphans. |
@@ -94,7 +94,7 @@ Reject unsupported currency codes and excess input precision before coercion int
 
 ## ER relationship contract
 
-The table below is the finalized design overlay for required corrections to the baseline [ER source](er-diagram.mmd). Source diagrams and DDL remain untouched during this documentation-only review. Before foundational DDL is authored, synchronize the Mermaid/split figures to these contracts; stale PlantUML remains excluded.
+The table below defines the relationship contract represented by the reconciled [ER source](er-diagram.mmd), split sources and rendered figures. The [relational mapping](er-diagram.md) records current field inventory and approval gates. No DDL is applied; peer review must accept these refinements before foundational implementation. Stale PlantUML remains excluded.
 
 | Relationship | Intended cardinality / target Mermaid notation | Nullability and enforcement |
 |---|---|---|
@@ -167,12 +167,12 @@ The user approved the role model, analyst-first navigation, guarded lifecycle, f
 | Terminal outcomes | Fixed code-to-state mapping in [product workflows](product-workflows.md#resolution-and-reopening-contract) | Database/backend must enforce the same mapping; inconclusive dismissal remains distinct from false positive |
 | Reopening | Admin reopens same case, checks competing active case, clears outcome/due fields, preserves original terminal event | Full retain/reset contract in workflows; no new case or erased history |
 | Rule changes | Read-only first release; editing gated on revisions, audit, and validation | Admin editing screen is specified as a proposed follow-on |
-| Session design | Auth.js credential sign-in; server checks active user/role on every request | Session persistence/expiry needs selection; proposed idle 30 minutes, absolute 8 hours |
+| Session design | [Case/auth contract](case-auth-contracts.md): Auth.js plus `APP_SESSION`, current authority, 30-minute idle and 8-hour absolute expiry | ER models the reviewed design; session implementation and runtime evidence remain absent |
 | Operational monitoring | Defer a standalone health page | Read-only dependency checks can be an admin overview section; no job history is represented today |
 | Export | Defer bulk financial/PII export | Needs explicit field scope, limits, access policy, and general audit first |
 | Meaningful DELETE | Admin previews and removes retention-eligible synthetic Mongo telemetry | Preserves transactions; requires retention policy and durable audit before cleanup |
 | Base currency | INR with deterministic synthetic rates and fixed decimal contract | Explicit product choice; no live FX provider or new rates table |
-| ER corrections | Finalized optional-method/many-transactions, mandatory-case-subject, and multi-document relationships above | Baseline sources/renders need reconciliation before corresponding DDL; no applied schema |
+| ER corrections | Optional-method/many-transactions, mandatory-case-subject, and multi-document relationships above | Source/split/render reconciliation awaits peer review before DDL; no applied schema |
 | Embedding model | Select at semantic retrieval; validate against documented 384-dimensional intent | Foundational migrations and first slice contain no vector dependency; revise vector dimension there if the selected model requires it |
 | Case creation threshold | Manual investigation is allowed for any transaction; display signals, not a fraud assertion | Automated case creation and due-time rules require a separate approved policy |
 

@@ -108,7 +108,7 @@ Reopen preserves `case_id`, case reference, original `opened_at`, and the histor
 
 ### `CASE_EVENT` shape
 
-The baseline ER diagram does not yet fully reflect the workflow contract. Before migration `020`/`050`, synchronize the ER source and data dictionary. These are required additions to review, not claims about the current database:
+The reconciled ER source and data dictionary model this workflow contract, including session and receipt entities. Peer review must accept the mapping before migration `020`/`050`. These are design additions, not claims about an applied database:
 
 - `reason`: dedicated operational rationale; never embedded in `from_state`/`to_state`.
 - `metadata`: nonnull typed JSONB, default empty object, for explicitly approved event-specific supporting data. MVP lifecycle events use `{}`; arbitrary metadata writes are rejected.
