@@ -1,7 +1,7 @@
 import 'server-only';
 import type { SqlClient } from './case-commands';
 import type { SessionUser } from './session';
-import { canAccessCase, filterCaseSummaryForRole } from './authorization';
+import { filterCaseSummaryForRole } from './authorization';
 import type { CaseListQueryOptions } from './case-parameters';
 
 export interface CaseRecord {
@@ -125,10 +125,10 @@ export async function getCaseDetail(
       c.updated_at,
       c.version
     FROM public.investigation_case c
-    WHERE c.case_id = $1
+    WHERE c.case_id = $1 AND ($3::text = 'admin' OR c.assigned_to_user_id = $2::uuid)
   `;
 
-  const { rows } = await client.query(query, [caseId]);
+  const { rows } = await client.query(query, [caseId, user.userId, user.role]);
   if (rows.length === 0) {
     return null;
   }
@@ -138,56 +138,34 @@ export async function getCaseDetail(
     version: Number(rows[0].version),
   };
 
-  if (!canAccessCase(user, row)) {
-    return null;
-  }
-
   return row;
 }
 
 export async function getCaseEvents(
   client: SqlClient,
   caseId: string,
-  user: SessionUser
+  user: SessionUser,
+  options: { limit: number; offset: number } = { limit: 50, offset: 0 }
 ): Promise<CaseEventRecord[] | null> {
-  const caseCheckQuery = `
-    SELECT c.case_id, c.assigned_to_user_id
+  const { rows } = await client.query(`
+    SELECT coalesce((SELECT jsonb_agg(page.event ORDER BY page.occurred_at, page.event_id)
+      FROM (
+        SELECT e.occurred_at, e.event_id,
+          jsonb_build_object(
+            'event_id', e.event_id::text, 'case_id', e.case_id,
+            'actor_user_id', e.actor_user_id, 'event_type', e.event_type,
+            'from_state', e.from_state, 'to_state', e.to_state,
+            'reason', e.reason, 'metadata', e.metadata,
+            'operation_id', e.operation_id, 'event_ordinal', e.event_ordinal,
+            'occurred_at', e.occurred_at
+          ) AS event
+        FROM public.case_event e WHERE e.case_id = c.case_id
+        ORDER BY e.occurred_at ASC, e.event_id ASC LIMIT $4 OFFSET $5
+      ) page), '[]'::jsonb) AS events
     FROM public.investigation_case c
-    WHERE c.case_id = $1
-  `;
-
-  const caseCheck = await client.query(caseCheckQuery, [caseId]);
-  if (caseCheck.rows.length === 0) {
-    return null;
-  }
-
-  if (!canAccessCase(user, caseCheck.rows[0])) {
-    return null;
-  }
-
-  const query = `
-    SELECT
-      e.event_id::text,
-      e.case_id,
-      e.actor_user_id,
-      e.event_type,
-      e.from_state,
-      e.to_state,
-      e.reason,
-      e.metadata,
-      e.operation_id,
-      e.event_ordinal,
-      e.occurred_at
-    FROM public.case_event e
-    WHERE e.case_id = $1
-    ORDER BY e.occurred_at ASC, e.event_ordinal ASC
-  `;
-
-  const { rows } = await client.query(query, [caseId]);
-  return rows.map((r) => ({
-    ...r,
-    event_ordinal: Number(r.event_ordinal),
-  }));
+    WHERE c.case_id = $1 AND ($3::text = 'admin' OR c.assigned_to_user_id = $2::uuid)
+  `, [caseId, user.userId, user.role, options.limit, options.offset]);
+  return rows.length ? rows[0].events : null;
 }
 
 export async function getCaseCommandTarget(

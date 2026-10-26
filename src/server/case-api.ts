@@ -4,10 +4,12 @@ import { NextResponse } from 'next/server';
 import { authenticateRequest } from './authentication';
 import { getPool } from './db';
 import { executeCaseCommand } from './case-commands';
-import { canExecuteCaseCommand } from './authorization';
+import { isSameOriginRequest } from './auth-security';
+import type { ExecuteCaseCommandParams } from './case-commands';
 import {
   validateCaseUuid,
   parseCaseQuery,
+  parseCaseHistoryQuery,
   parseCreateCasePayload,
   parseCaseCommandPayload,
   CaseParameterError,
@@ -20,6 +22,23 @@ import {
 } from './case-queries';
 
 const headers = { 'Cache-Control': 'private, no-store' };
+
+async function executeApiCommand(input: ExecuteCaseCommandParams) {
+  const client = await getPool().connect();
+  try {
+    await client.query('BEGIN');
+    await client.query('SELECT pg_advisory_xact_lock(hashtextextended($1, 0))',
+      [`case-command:${input.actorUserId}:${input.idempotencyKey}`]);
+    const result = await executeCaseCommand(client, input);
+    await client.query('COMMIT');
+    return result;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    throw error;
+  } finally {
+    client.release();
+  }
+}
 
 function formatCommandResult(result: {
   operationId: string;
@@ -96,8 +115,7 @@ export async function caseList(request: Request) {
     if (error instanceof CaseParameterError) {
       return failure(error.statusCode, 'invalid_request', error.message, requestId, error.fields);
     }
-    const err = error as { message?: string };
-    return failure(503, 'dependency_unavailable', err?.message || 'Case service is temporarily unavailable.', requestId);
+    return failure(503, 'dependency_unavailable', 'Case service is temporarily unavailable.', requestId);
   }
 }
 
@@ -114,6 +132,7 @@ export async function caseDetail(request: Request, resourceId: string) {
     }
 
     const caseId = validateCaseUuid(resourceId, 'id');
+    if (new URL(request.url).search) throw new CaseParameterError({ query: 'Case detail does not accept query parameters.' });
     const data = await getCaseDetail(getPool(), caseId, actor);
     if (!data) {
       return failure(404, 'not_found', 'Case not found.', requestId);
@@ -123,8 +142,7 @@ export async function caseDetail(request: Request, resourceId: string) {
     if (error instanceof CaseParameterError) {
       return failure(error.statusCode, 'invalid_request', error.message, requestId, error.fields);
     }
-    const err = error as { message?: string };
-    return failure(503, 'dependency_unavailable', err?.message || 'Case service is temporarily unavailable.', requestId);
+    return failure(503, 'dependency_unavailable', 'Case service is temporarily unavailable.', requestId);
   }
 }
 
@@ -141,22 +159,23 @@ export async function caseEvents(request: Request, resourceId: string) {
     }
 
     const caseId = validateCaseUuid(resourceId, 'id');
-    const data = await getCaseEvents(getPool(), caseId, actor);
+    const query = parseCaseHistoryQuery(new URL(request.url).searchParams);
+    const data = await getCaseEvents(getPool(), caseId, actor, query);
     if (!data) {
       return failure(404, 'not_found', 'Case not found.', requestId);
     }
-    return NextResponse.json({ data, request_id: requestId }, { headers });
+    return NextResponse.json({ data, ...query, request_id: requestId }, { headers });
   } catch (error) {
     if (error instanceof CaseParameterError) {
       return failure(error.statusCode, 'invalid_request', error.message, requestId, error.fields);
     }
-    const err = error as { message?: string };
-    return failure(503, 'dependency_unavailable', err?.message || 'Case service is temporarily unavailable.', requestId);
+    return failure(503, 'dependency_unavailable', 'Case service is temporarily unavailable.', requestId);
   }
 }
 
 export async function caseCreate(request: Request) {
   const requestId = randomUUID();
+  if (!isSameOriginRequest(request)) return failure(403, 'forbidden', 'Request origin could not be verified.', requestId);
   try {
     const validation = await authenticateRequest(request);
     if (!validation.valid) {
@@ -176,16 +195,13 @@ export async function caseCreate(request: Request) {
 
     const input = parseCreateCasePayload(body, request.headers);
 
-    const result = await executeCaseCommand(getPool(), {
+    const result = await executeApiCommand({
       commandType: 'create',
       actorUserId: actor.userId,
       idempotencyKey: input.idempotencyKey,
       transactionId: input.transactionId,
       priority: input.priority,
       reason: input.reason,
-      caseId: input.caseId,
-      caseRef: input.caseRef,
-      rawPayloadForHash: body,
     });
 
     const status = result.replayed ? 200 : 201;
@@ -200,24 +216,27 @@ export async function caseCreate(request: Request) {
       return failure(409, 'active_case_exists', 'An active case already exists for this transaction.', requestId);
     }
     if (dbErr.code === 'P0409') {
-      return failure(409, 'idempotency_conflict', dbErr.message || 'Idempotency conflict.', requestId);
+      return failure(409, 'idempotency_conflict', 'Idempotency key was already used for a different command.', requestId);
     }
     if (dbErr.code === '23503') {
       return failure(404, 'not_found', 'Transaction does not exist.', requestId);
     }
+    if (dbErr.code === 'P0002') return failure(404, 'not_found', 'Case not found.', requestId);
+    if (dbErr.code === '28000') return failure(401, 'unauthenticated', 'Sign in to continue.', requestId);
     if (dbErr.code === '42501') {
-      return failure(403, 'forbidden', dbErr.message || 'Unauthorized.', requestId);
+      return failure(403, 'forbidden', 'This command is not permitted.', requestId);
     }
     if (dbErr.code === '22023' || dbErr.code === '23514') {
-      return failure(422, 'unprocessable_entity', dbErr.message || 'Validation failed.', requestId);
+      return failure(422, 'unprocessable_entity', 'Case creation parameters could not be applied.', requestId);
     }
 
-    return failure(503, 'dependency_unavailable', dbErr.message || 'Case creation failed.', requestId);
+    return failure(503, 'dependency_unavailable', 'Case creation is temporarily unavailable.', requestId);
   }
 }
 
 export async function caseCommand(request: Request, resourceId: string) {
   const requestId = randomUUID();
+  if (!isSameOriginRequest(request)) return failure(403, 'forbidden', 'Request origin could not be verified.', requestId);
   try {
     const validation = await authenticateRequest(request);
     if (!validation.valid) {
@@ -249,41 +268,31 @@ export async function caseCommand(request: Request, resourceId: string) {
 
     const input = parseCaseCommandPayload(body, request.headers);
 
-    // Optimistic locking concurrency check: if target version has already advanced, return 409
-    if (target.version !== input.expectedVersion) {
-      return failure(
-        409,
-        'version_conflict',
-        `Version conflict: expected version ${input.expectedVersion}, found ${target.version}.`,
-        requestId
-      );
+    if (actor.role === 'analyst' && (input.action === 'reopen' || input.action === 'return_to_review')) {
+      return failure(403, 'forbidden', 'Only admins can execute this command.', requestId);
     }
 
-    // Check authority and transition rules
-    const authorized = canExecuteCaseCommand(actor, input.action, target);
-    if (!authorized) {
-      if (actor.role === 'analyst') {
-        if (input.action === 'reopen' || input.action === 'return_to_review') {
-          return failure(403, 'forbidden', 'Only admins can execute this command.', requestId);
-        }
-        if (target.status === 'escalated') {
-          return failure(403, 'forbidden', 'Analyst cannot resolve or dismiss an escalated case.', requestId);
-        }
+    // The writer checks receipts before current version/state so accepted retries remain valid.
+    let result;
+    try {
+      result = await executeApiCommand({
+        commandType: input.action,
+        actorUserId: actor.userId,
+        idempotencyKey: input.idempotencyKey,
+        expectedVersion: input.expectedVersion,
+        caseId,
+        reason: input.reason,
+        resolutionCode: input.resolutionCode,
+        resolutionNotes: input.resolutionNotes,
+      });
+    } catch (error) {
+      const code = (error as { code?: string }).code;
+      if (code === '42501' && actor.role === 'analyst' && target.status !== 'escalated'
+          && (input.action === 'resolve' || input.action === 'dismiss')) {
+        return failure(422, 'invalid_transition', 'Review the case before recording an outcome.', requestId);
       }
-      return failure(422, 'invalid_transition', `Cannot execute ${input.action} on case with status ${target.status}.`, requestId);
+      throw error;
     }
-
-    const result = await executeCaseCommand(getPool(), {
-      commandType: input.action,
-      actorUserId: actor.userId,
-      idempotencyKey: input.idempotencyKey,
-      expectedVersion: input.expectedVersion,
-      caseId,
-      reason: input.reason,
-      resolutionCode: input.resolutionCode,
-      resolutionNotes: input.resolutionNotes,
-      rawPayloadForHash: body,
-    });
 
     return NextResponse.json({ data: formatCommandResult(result), request_id: requestId }, { status: 200, headers });
   } catch (error) {
@@ -295,7 +304,7 @@ export async function caseCommand(request: Request, resourceId: string) {
     if (dbErr.code === 'P0409') {
       const isVersionConflict = (dbErr.message || '').includes('Version conflict');
       const code = isVersionConflict ? 'version_conflict' : 'idempotency_conflict';
-      return failure(409, code, dbErr.message || 'Conflict.', requestId);
+      return failure(409, code, isVersionConflict ? 'The case changed. Reload its current version before retrying.' : 'Idempotency key was already used for a different command.', requestId);
     }
     if (dbErr.code === '23505') {
       return failure(409, 'active_case_exists', 'Another active case already exists for this transaction.', requestId);
@@ -304,12 +313,13 @@ export async function caseCommand(request: Request, resourceId: string) {
       return failure(404, 'not_found', 'Case not found.', requestId);
     }
     if (dbErr.code === '42501') {
-      return failure(403, 'forbidden', dbErr.message || 'Unauthorized.', requestId);
+      return failure(403, 'forbidden', 'This command is not permitted.', requestId);
     }
+    if (dbErr.code === '28000') return failure(401, 'unauthenticated', 'Sign in to continue.', requestId);
     if (dbErr.code === '22023' || dbErr.code === '23514') {
-      return failure(422, 'invalid_transition', dbErr.message || 'Validation failed.', requestId);
+      return failure(422, 'invalid_transition', 'This command is not valid for the current case state.', requestId);
     }
 
-    return failure(503, 'dependency_unavailable', dbErr.message || 'Command execution failed.', requestId);
+    return failure(503, 'dependency_unavailable', 'Case commands are temporarily unavailable.', requestId);
   }
 }

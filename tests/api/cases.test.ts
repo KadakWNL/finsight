@@ -9,6 +9,7 @@ import { seedFinancial, syntheticId as id } from '../../scripts/financial-seed.m
 import { createSession, SESSION_COOKIE_NAME } from '../../src/server/session';
 import { encodeSessionToken } from '../../src/server/authentication';
 import { getPool } from '../../src/server/db';
+import { getCaseEvents } from '../../src/server/case-queries';
 import { GET as casesList, POST as caseCreate } from '../../src/app/api/v1/cases/route';
 import { GET as caseDetail, PATCH as casePatch } from '../../src/app/api/v1/cases/[id]/route';
 import { GET as caseEvents } from '../../src/app/api/v1/cases/[id]/events/route';
@@ -63,6 +64,7 @@ async function apiCreateCase(body: unknown, who = WHO_ANALYST_A, extraHeaders: R
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        origin: process.env.NEXTAUTH_URL ?? 'http://localhost',
         cookie: cookies[who],
         ...extraHeaders,
       },
@@ -77,6 +79,7 @@ async function apiCaseCommand(caseId: string, body: unknown, who = WHO_ANALYST_A
       method: 'POST',
       headers: {
         'content-type': 'application/json',
+        origin: process.env.NEXTAUTH_URL ?? 'http://localhost',
         cookie: cookies[who],
         ...extraHeaders,
       },
@@ -92,6 +95,7 @@ async function apiCasePatch(caseId: string, body: unknown, who = WHO_ANALYST_A, 
       method: 'PATCH',
       headers: {
         'content-type': 'application/json',
+        origin: process.env.NEXTAUTH_URL ?? 'http://localhost',
         cookie: cookies[who],
         ...extraHeaders,
       },
@@ -298,8 +302,13 @@ describe('Case APIs and Lifecycle (VS06 - VS15)', () => {
       WHO_ANALYST_A,
       { 'idempotency-key': '90000000-0000-0000-0000-000000000107' }
     );
-    expect(forged.status).toBe(201);
-    const forgedJson = await forged.json();
+    expect(forged.status).toBe(400);
+    const valid = await apiCreateCase(
+      { transaction_id: txn3, priority: 'low', reason: 'Synthetic reviewed subject' },
+      WHO_ANALYST_A, { 'idempotency-key': '90000000-0000-0000-0000-000000000107' }
+    );
+    expect(valid.status).toBe(201);
+    const forgedJson = await valid.json();
     expect(forgedJson.data.assigned_to_user_id).toBe(analystA); // Bound to session, not forged admin
     expect(forgedJson.data.status).toBe('open'); // Cannot forge closed status
   });
@@ -388,6 +397,19 @@ describe('Case APIs and Lifecycle (VS06 - VS15)', () => {
     expect(escalate.status).toBe(200);
     const escData = (await escalate.json()).data;
     expect(escData.status).toBe('escalated');
+    const retry = await apiCaseCommand(caseAId,
+      { action: 'start_review', expected_version: 1 }, WHO_ANALYST_A,
+      { 'idempotency-key': '90000000-0000-0000-0000-000000000113' });
+    expect(retry.status).toBe(200);
+    const replayed = (await retry.json()).data;
+    expect(replayed.replayed).toBe(true);
+    expect(replayed.operation_id).toBe(reviewData.operation_id);
+    const changedRetry = await apiCaseCommand(caseAId,
+      { action: 'start_review', expected_version: 2 }, WHO_ANALYST_A,
+      { 'idempotency-key': '90000000-0000-0000-0000-000000000113' });
+    expect(changedRetry.status).toBe(409);
+    expect((await changedRetry.json()).error.code).toBe('idempotency_conflict');
+
     expect(escData.version).toBe(3);
 
     // 3. Analyst attempts resolution on escalated case -> 403 Forbidden
@@ -795,4 +817,69 @@ describe('Case APIs and Lifecycle (VS06 - VS15)', () => {
     const systemRes = await apiGetCases({}, WHO_SYSTEM);
     expect(systemRes.status).toBe(401);
   });
+  it('serializes same-key retries and binds idempotency to the URL resource', async () => {
+    const body = { transaction_id: id(100), priority: 'low', reason: 'Synthetic concurrent retry' };
+    const key = '91000000-0000-0000-0000-000000000001';
+    const created = await Promise.all([1, 2].map(() => apiCreateCase(body, WHO_ANALYST_A, { 'idempotency-key': key })));
+    expect(created.map(r => r.status).sort()).toEqual([200, 201]);
+    const caseId = (await created[0].json()).data.case_id;
+    const commandKey = '91000000-0000-0000-0000-000000000002';
+    const command = { action: 'start_review', expected_version: 1 };
+    const results = await Promise.all([1, 2].map(() => apiCaseCommand(caseId, command, WHO_ANALYST_A, { 'idempotency-key': commandKey })));
+    expect(results.map(r => r.status)).toEqual([200, 200]);
+    const values = await Promise.all(results.map(r => r.json()));
+    expect(values.map(v => v.data.replayed).sort()).toEqual([false, true]);
+    expect(values[0].data.operation_id).toBe(values[1].data.operation_id);
+    const other = await apiCreateCase({ ...body, transaction_id: id(107) }, WHO_ANALYST_A,
+      { 'idempotency-key': '91000000-0000-0000-0000-000000000003' });
+    expect(other.status).toBe(201);
+    const otherId = (await other.json()).data.case_id;
+    const conflict = await apiCaseCommand(otherId, command, WHO_ANALYST_A, { 'idempotency-key': commandKey });
+    expect(conflict.status).toBe(409);
+    expect((await conflict.json()).error.code).toBe('idempotency_conflict');
+    expect((await (await apiGetCaseDetail(otherId)).json()).data.status).toBe('open');
+  });
+
+  it('rejects missing/cross-site origins and hides dependency error details', async () => {
+    const body = { transaction_id: id(100), priority: 'low', reason: 'Synthetic origin probe' };
+    const key = '91000000-0000-0000-0000-000000000004';
+    expect((await apiCreateCase(body, WHO_ANALYST_A, { origin: 'https://unrelated.invalid', 'idempotency-key': key })).status).toBe(403);
+    expect((await apiCreateCase(body, WHO_ANALYST_A, { origin: '', 'idempotency-key': key })).status).toBe(403);
+    expect((await apiCaseCommand(caseAId, { action: 'start_review', expected_version: 1 }, WHO_ANALYST_A,
+      { origin: 'https://unrelated.invalid', 'idempotency-key': key })).status).toBe(403);
+    const spy = vi.spyOn(getPool(), 'query').mockRejectedValueOnce(new Error('PRIVATE_SQL_AND_CONNECTION_PASSWORD'));
+    try {
+      const response = await apiGetCases();
+      expect(response.status).toBe(503);
+      expect(JSON.stringify(await response.json())).not.toContain('PRIVATE_SQL_AND_CONNECTION_PASSWORD');
+    } finally { spy.mockRestore(); }
+  });
+
+  it('bounds history, orders tied events by identity and checks ownership in one query', async () => {
+    await client.query(`INSERT INTO public.case_event
+      (case_id, actor_user_id, event_type, from_state, to_state, operation_id, event_ordinal, occurred_at)
+      SELECT $1, $2, 'status_change', '{"status":"open"}', '{"status":"in_review"}', gen_random_uuid(), 1,
+        '2026-10-27T00:00:00Z' FROM generate_series(1, 105)`, [caseAId, analystA]);
+    const actor = { userId: analystA, role: 'analyst' as const, email: '', displayName: '' };
+    const calls = vi.spyOn(client, 'query');
+    try {
+      const first = await getCaseEvents(client, caseAId, actor, { limit: 100, offset: 0 });
+      expect(calls).toHaveBeenCalledTimes(1);
+      expect(first).toHaveLength(100);
+      const next = await getCaseEvents(client, caseAId, actor, { limit: 100, offset: 100 });
+      const all = [...first!, ...next!];
+      const expected = (await client.query('SELECT event_id::text FROM public.case_event WHERE case_id=$1 ORDER BY occurred_at,public.case_event.event_id', [caseAId])).rows;
+      expect(all.map(e => e.event_id)).toEqual(expected.map(e => e.event_id));
+      expect(await getCaseEvents(client, caseAId, { ...actor, userId: analystB })).toBeNull();
+    } finally { calls.mockRestore(); }
+    const response = await caseEvents(new Request(`http://localhost/api/v1/cases/${caseAId}/events?limit=1&offset=1`,
+      { headers: { cookie: cookies[WHO_ANALYST_A] } }), { params: Promise.resolve({ id: caseAId }) });
+    expect(response.status).toBe(200);
+    const page = await response.json();
+    expect(page.data).toHaveLength(1); expect(page.limit).toBe(1); expect(page.offset).toBe(1);
+    const invalid = await caseEvents(new Request(`http://localhost/api/v1/cases/${caseAId}/events?limit=101`,
+      { headers: { cookie: cookies[WHO_ANALYST_A] } }), { params: Promise.resolve({ id: caseAId }) });
+    expect(invalid.status).toBe(400);
+  });
+
 });

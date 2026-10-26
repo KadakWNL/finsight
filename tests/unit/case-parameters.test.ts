@@ -76,8 +76,6 @@ describe('Case Parameter Validation Unit Tests', () => {
         transactionId: validTxnId,
         priority: 'high',
         reason: 'Investigation triggered by high-risk card score',
-        caseId: undefined,
-        caseRef: undefined,
       });
     });
 
@@ -225,4 +223,21 @@ describe('Case Parameter Validation Unit Tests', () => {
       ).toThrow(CaseParameterError);
     });
   });
+  it('rejects unknown fields, ambiguous aliases and noninteger coercions', () => {
+    const headers = new Headers({ 'idempotency-key': validKey });
+    const create = { transaction_id: validTxnId, priority: 'high', reason: 'Synthetic reason' };
+    for (const field of ['actor_user_id', 'assigned_to_user_id', 'status', 'case_id', 'case_ref']) {
+      expect(() => parseCreateCasePayload({ ...create, [field]: validUuid }, headers)).toThrow(CaseParameterError);
+    }
+    expect(() => parseCreateCasePayload({ ...create, transactionId: validTxnId }, headers)).toThrow(CaseParameterError);
+    expect(() => parseCreateCasePayload({ ...create, idempotency_key: validUuid }, headers)).toThrow(CaseParameterError);
+    for (const version of [true, '1', [1], 1.5, Number.MAX_SAFE_INTEGER + 1]) {
+      expect(() => parseCaseCommandPayload({ action: 'start_review', expected_version: version }, headers)).toThrow(CaseParameterError);
+    }
+    expect(() => parseCaseCommandPayload({ action: 'start_review', expected_version: 1, assigned_to_user_id: validUuid }, headers)).toThrow(CaseParameterError);
+    for (const query of ['limit=1e2', 'offset=1.5', 'offset=9007199254740992', 'limit=1&limit=2', 'page_size=1&limit=2', 'unknown=value']) {
+      expect(() => parseCaseQuery(new URLSearchParams(query))).toThrow(CaseParameterError);
+    }
+  });
+
 });

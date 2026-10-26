@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: FinSight Case Management and Workflow API
   version: 1.0.0
-  description: Authenticated case investigation, atomic lifecycle commands, optimistic locking, and immutable audit history.
+  description: Authenticated case investigation, atomic lifecycle commands, optimistic locking, and immutable audit history. Mutations require a matching Origin header and reject cross-site requests.
 security:
   - localCookie: []
   - secureCookie: []
@@ -273,7 +273,7 @@ paths:
       operationId: getCaseEvents
       summary: Retrieve chronological immutable audit events for a case
       description: |
-        Returns ordered event history for admins or the assigned analyst.
+        Returns bounded event history ordered by occurred_at and numeric event_id for admins or the assigned analyst. Ownership and events use one SQL snapshot.
         Unauthorized analysts receive concealed 404.
       parameters:
         - name: id
@@ -282,6 +282,12 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+        - name: offset
+          in: query
+          schema: {type: integer, minimum: 0, maximum: 9007199254740991, default: 0}
       responses:
         '200':
           description: Ordered list of immutable case events.
@@ -289,15 +295,20 @@ paths:
             application/json:
               schema:
                 type: object
-                required: [data, request_id]
+                required: [data, limit, offset, request_id]
                 properties:
                   data:
                     type: array
+                    maxItems: 100
                     items:
                       $ref: '#/components/schemas/CaseEvent'
+                  limit: {type: integer, minimum: 1, maximum: 100}
+                  offset: {type: integer, minimum: 0}
                   request_id:
                     type: string
                     format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '401':
           $ref: '#/components/responses/Unauthenticated'
         '404':
@@ -312,7 +323,7 @@ components:
     secureCookie:
       type: apiKey
       in: cookie
-      name: __Secure-next-auth.session-token
+      name: __Host-next-auth.session-token
     encryptedBearer:
       type: http
       scheme: bearer
@@ -386,7 +397,7 @@ components:
           enum: [low, medium, high]
         status:
           type: string
-          enum: [open]
+          enum: [open, in_review, escalated, closed, dismissed]
         due_at:
           type: [string, 'null']
           format: date-time
@@ -433,6 +444,7 @@ components:
 
     CreateCaseRequest:
       type: object
+      additionalProperties: false
       required:
         - transaction_id
         - priority
@@ -451,16 +463,10 @@ components:
           type: string
           minLength: 1
           maxLength: 2000
-        case_id:
-          type: string
-          format: uuid
-        case_ref:
-          type: string
-          minLength: 1
-          maxLength: 64
 
     CaseCommandRequest:
       type: object
+      additionalProperties: false
       required:
         - action
         - expected_version
@@ -471,6 +477,7 @@ components:
         expected_version:
           type: integer
           minimum: 1
+          maximum: 9007199254740991
         idempotency_key:
           type: string
           format: uuid
