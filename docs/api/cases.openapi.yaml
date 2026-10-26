@@ -1,0 +1,588 @@
+openapi: 3.1.0
+info:
+  title: FinSight Case Management and Workflow API
+  version: 1.0.0
+  description: Authenticated case investigation, atomic lifecycle commands, optimistic locking, and immutable audit history. Mutations require a matching Origin header and reject cross-site requests.
+security:
+  - localCookie: []
+  - secureCookie: []
+  - encryptedBearer: []
+paths:
+  /api/v1/cases:
+    get:
+      operationId: listCases
+      summary: Retrieve the investigation case queue
+      description: |
+        Returns cases accessible to the authenticated role.
+        - Admins see all cases with full details.
+        - Analysts see cases assigned to themselves with full details, plus unassigned cases projected with minimal summaries (case_ref, transaction_id, priority, status, due_at). Cases assigned to other analysts are excluded.
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [open, in_review, escalated, closed, dismissed]
+        - name: priority
+          in: query
+          schema:
+            type: string
+            enum: [low, medium, high]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+      responses:
+        '200':
+          description: List of accessible cases or minimal summaries.
+          headers:
+            Cache-Control:
+              schema:
+                type: string
+              example: 'private, no-store'
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, limit, offset, request_id]
+                properties:
+                  data:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Case'
+                        - $ref: '#/components/schemas/UnassignedCaseSummary'
+                  limit:
+                    type: integer
+                  offset:
+                    type: integer
+                  request_id:
+                    type: string
+                    format: uuid
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createCase
+      summary: Create an investigation case on a financial transaction
+      description: |
+        Creates a new case in 'open' status and automatically assigns it to the authenticated analyst.
+        Only active analysts can create cases. Emits 'created' and 'assigned' case events atomically.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCaseRequest'
+      responses:
+        '201':
+          description: Case created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CaseCommandResult'
+                  request_id:
+                    type: string
+                    format: uuid
+        '200':
+          description: Idempotent replay of previously committed case creation.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CaseCommandResult'
+                  request_id:
+                    type: string
+                    format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Competing active case exists on transaction, or idempotency key reused with different payload.
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/cases/{id}:
+    get:
+      operationId: getCaseDetail
+      summary: Get full details of a specific case
+      description: |
+        Returns full case detail for admins or the assigned analyst.
+        Unauthorized analysts receive a concealed 404 to prevent case ID enumeration.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Full case detail.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Case'
+                  request_id:
+                    type: string
+                    format: uuid
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    patch:
+      operationId: patchCaseCommand
+      summary: Execute a lifecycle command on a case via PATCH
+      description: See POST /api/v1/cases/{id}/commands.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaseCommandRequest'
+      responses:
+        '200':
+          description: Command executed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CaseCommandResult'
+                  request_id:
+                    type: string
+                    format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/cases/{id}/commands:
+    post:
+      operationId: postCaseCommand
+      summary: Execute an atomic lifecycle command on a case
+      description: |
+        Executes lifecycle transitions under optimistic concurrency locking (expected_version).
+        Supported commands:
+        - `start_review`: open -> in_review (assigned analyst or admin)
+        - `escalate`: in_review -> escalated, requires reason (assigned analyst or admin)
+        - `return_to_review`: escalated -> in_review, requires reason (admin only)
+        - `resolve`: in_review/escalated -> closed, requires resolution_code 'confirmed_suspicious' and resolution_notes (assigned analyst for in_review; admin for in_review/escalated)
+        - `dismiss`: in_review/escalated -> dismissed, requires resolution_code 'false_positive'/'insufficient_evidence' and resolution_notes
+        - `reopen`: closed/dismissed -> open, requires reason (admin only)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CaseCommandRequest'
+      responses:
+        '200':
+          description: Command executed or idempotently replayed.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, request_id]
+                properties:
+                  data:
+                    $ref: '#/components/schemas/CaseCommandResult'
+                  request_id:
+                    type: string
+                    format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+
+  /api/v1/cases/{id}/events:
+    get:
+      operationId: getCaseEvents
+      summary: Retrieve chronological immutable audit events for a case
+      description: |
+        Returns bounded event history ordered by occurred_at and numeric event_id for admins or the assigned analyst. Ownership and events use one SQL snapshot.
+        Unauthorized analysts receive concealed 404.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          schema: {type: integer, minimum: 1, maximum: 100, default: 50}
+        - name: offset
+          in: query
+          schema: {type: integer, minimum: 0, maximum: 9007199254740991, default: 0}
+      responses:
+        '200':
+          description: Ordered list of immutable case events.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, limit, offset, request_id]
+                properties:
+                  data:
+                    type: array
+                    maxItems: 100
+                    items:
+                      $ref: '#/components/schemas/CaseEvent'
+                  limit: {type: integer, minimum: 1, maximum: 100}
+                  offset: {type: integer, minimum: 0}
+                  request_id:
+                    type: string
+                    format: uuid
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    localCookie:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+    secureCookie:
+      type: apiKey
+      in: cookie
+      name: __Host-next-auth.session-token
+    encryptedBearer:
+      type: http
+      scheme: bearer
+      bearerFormat: JWE
+
+  schemas:
+    Case:
+      type: object
+      required:
+        - case_id
+        - case_ref
+        - transaction_id
+        - status
+        - priority
+        - opened_at
+        - updated_at
+        - version
+      properties:
+        case_id:
+          type: string
+          format: uuid
+        case_ref:
+          type: string
+        transaction_id:
+          type: string
+          format: uuid
+        assigned_to_user_id:
+          type: [string, 'null']
+          format: uuid
+        status:
+          type: string
+          enum: [open, in_review, escalated, closed, dismissed]
+        priority:
+          type: string
+          enum: [low, medium, high]
+        resolution_code:
+          type: [string, 'null']
+          enum: [confirmed_suspicious, false_positive, insufficient_evidence, null]
+        resolution_notes:
+          type: [string, 'null']
+        opened_at:
+          type: string
+          format: date-time
+        due_at:
+          type: [string, 'null']
+          format: date-time
+        closed_at:
+          type: [string, 'null']
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        version:
+          type: integer
+
+    UnassignedCaseSummary:
+      type: object
+      required:
+        - case_ref
+        - transaction_id
+        - priority
+        - status
+      properties:
+        case_ref:
+          type: string
+        transaction_id:
+          type: string
+          format: uuid
+        priority:
+          type: string
+          enum: [low, medium, high]
+        status:
+          type: string
+          enum: [open, in_review, escalated, closed, dismissed]
+        due_at:
+          type: [string, 'null']
+          format: date-time
+
+    CaseEvent:
+      type: object
+      required:
+        - event_id
+        - case_id
+        - actor_user_id
+        - event_type
+        - to_state
+        - operation_id
+        - event_ordinal
+        - occurred_at
+      properties:
+        event_id:
+          type: string
+        case_id:
+          type: string
+          format: uuid
+        actor_user_id:
+          type: string
+          format: uuid
+        event_type:
+          type: string
+          enum: [created, assigned, status_change]
+        from_state:
+          type: [object, 'null']
+        to_state:
+          type: object
+        reason:
+          type: [string, 'null']
+        metadata:
+          type: object
+        operation_id:
+          type: string
+          format: uuid
+        event_ordinal:
+          type: integer
+        occurred_at:
+          type: string
+          format: date-time
+
+    CreateCaseRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - transaction_id
+        - priority
+        - reason
+      properties:
+        idempotency_key:
+          type: string
+          format: uuid
+        transaction_id:
+          type: string
+          format: uuid
+        priority:
+          type: string
+          enum: [low, medium, high]
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+
+    CaseCommandRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - action
+        - expected_version
+      properties:
+        action:
+          type: string
+          enum: [start_review, escalate, return_to_review, resolve, dismiss, reopen]
+        expected_version:
+          type: integer
+          minimum: 1
+          maximum: 9007199254740991
+        idempotency_key:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          minLength: 1
+          maxLength: 2000
+        resolution_code:
+          type: string
+          enum: [confirmed_suspicious, false_positive, insufficient_evidence]
+        resolution_notes:
+          type: string
+          minLength: 1
+          maxLength: 5000
+
+    CaseCommandResult:
+      type: object
+      required:
+        - operation_id
+        - case_id
+        - case_ref
+        - status
+        - priority
+        - version
+        - response_status
+        - replayed
+      properties:
+        operation_id:
+          type: string
+          format: uuid
+        case_id:
+          type: string
+          format: uuid
+        case_ref:
+          type: string
+        status:
+          type: string
+        priority:
+          type: string
+        assigned_to_user_id:
+          type: [string, 'null']
+          format: uuid
+        version:
+          type: integer
+        response_status:
+          type: integer
+        replayed:
+          type: boolean
+
+    ErrorEnvelope:
+      type: object
+      required:
+        - error
+        - request_id
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            fields:
+              type: object
+              additionalProperties:
+                type: string
+        request_id:
+          type: string
+          format: uuid
+
+  responses:
+    BadRequest:
+      description: Parameter validation error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Unauthenticated:
+      description: Authentication required or session expired.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Forbidden:
+      description: Authenticated role lacks permission for requested operation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    NotFound:
+      description: Resource not found or concealed for unauthorized analyst.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    Conflict:
+      description: Version conflict, idempotency mismatch, or competing active case.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+    UnprocessableEntity:
+      description: Invalid state transition, missing rationale, or constraint violation.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'

@@ -7,14 +7,15 @@ DBMS Level 3 Project · 2 people · 2 months.
 
 ## Status
 
-The application serves a landing page, health/authentication APIs and authenticated transaction list/detail reads. Migrations through 055 implement financial/operational storage, risk scoring, guarded case commands and session validation. Case HTTP APIs and feature screens remain pending.
+The application serves a landing page, health/authentication APIs, authenticated transaction reads, and authenticated case lifecycle APIs. Migrations through 055 implement financial/operational storage, risk scoring, guarded case commands and session validation. Feature screens remain pending.
 
 | Area | State |
 |---|---|
 | Relational schema + ER diagram | Reconciled design merged. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
 | DDL migrations | Financial/operational storage and risk SQL 010-040, protected case commands 050, [session validation 055](docs/authentication.md) |
 | Synthetic data and risk SQL | Eight repeatable scenarios, once-only two-rule scorer, risk view and parameterized financial reads; [commands and verification](docs/deterministic-risk.md) |
-| Next.js application | Landing page, health/authentication and [masked transaction APIs](docs/transaction-api.md); feature screens pending |
+| Next.js application | Landing page, health/authentication, [masked transaction APIs](docs/transaction-api.md) and [case lifecycle APIs](docs/case-api.md); feature screens pending |
+| Case workflow | [Guarded case commands](docs/case-api.md), optimistic concurrency, and immutable event history |
 | Authentication | [Credential/session APIs and provisioning](docs/authentication.md), with unit, database and HTTP checks; sign-in UI pending |
 | Setup instructions | [Development setup](docs/development-setup.md) |
 
@@ -72,3 +73,4 @@ Planning documents for review before implementation:
 - [Deterministic risk SQL](docs/deterministic-risk.md): synthetic seed commands, once-only scoring, bounded SQL reads and exact-result verification.
 - [Authentication setup](docs/authentication.md): shared encrypted sessions, runtime grants, identity provisioning and verification.
 - [Transaction API](docs/transaction-api.md): filters, signed pagination, masks, actor-scoped case indicators and OpenAPI reference.
+- [Case API](docs/case-api.md): atomic case commands, optimistic locking, role-scoped queue, and immutable event history.
