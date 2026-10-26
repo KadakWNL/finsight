@@ -21,6 +21,8 @@
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "db:migrate:test": "node --env-file-if-exists=.env.local scripts/migrate.mjs --test",
     "db:seed": "node --env-file-if-exists=.env.local scripts/seed.mjs",
+    "demo:fx": "node --env-file-if-exists=.env.local scripts/demo-cli.mjs fx",
+    "demo:import": "node --env-file-if-exists=.env.local scripts/demo-cli.mjs import",
     "auth:provision": "node --env-file-if-exists=.env.local scripts/provision-identities.mjs"
   },
   "dependencies": {

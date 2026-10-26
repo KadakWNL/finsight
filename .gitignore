@@ -19,4 +19,5 @@ next-env.d.ts
 playwright-report/
 test-results/
 coverage/
+data/local/
 docs/DBMS Level 3 Project Requirements.pdf

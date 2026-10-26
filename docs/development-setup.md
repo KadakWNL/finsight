@@ -56,6 +56,8 @@ The migration harness requires a database without `public.schema_migrations`; it
 | `npm run db:migrate` | Apply/verify ordered migrations with the dedicated migrator connection |
 | `npm run db:migrate:test` | Apply/verify migrations in an explicitly permitted isolated test database |
 | `npm run db:seed` | Verify eight deterministic synthetic scenarios and once-only signals in an explicitly permitted local demo/test database; see [risk SQL](deterministic-risk.md) |
+| `npm run demo:fx -- --out=data/local/fx.json` | Save daily historical FX reference observations for the [reproducible demo](demo-dataset.md) |
+| `npm run demo:import -- --snapshot=data/local/fx.json --manifest=data/local/demo.json` | Add a bounded synthetic dataset using the saved rate snapshot and an isolated demo/test database |
 | `npm run auth:provision -- --bootstrap-admin` | Provision the first admin through migrator credentials and local credential input |
 | `npm run auth:provision -- --demo` | Provision explicit-password demo identities in an opted-in local isolated database |
 | `npm run test:acceptance` | Fail explicitly because feature acceptance is not implemented |
