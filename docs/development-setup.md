@@ -1,6 +1,6 @@
 # Development setup
 
-The application in `src/app` serves a landing page and `GET /api/health`. Health reports process availability only. Authentication, transaction/case APIs and synthetic seeds are not implemented. The [financial baseline](financial-baseline.md) and [operational schema](operational-schema.md) define migrations 010/020 and their separate SQL checks. Scaffold tests do not establish VS01-VS16 acceptance.
+The application in `src/app` serves a landing page and `GET /api/health`. Health reports process availability only. Authentication, transaction/case APIs and synthetic seeds are not implemented. The [financial baseline](financial-baseline.md), [operational schema](operational-schema.md) and [financial guards](financial-guards.md) define migrations 010-030 and their separate checks. Scaffold tests do not establish VS01-VS16 acceptance.
 
 ## Start the application
 
@@ -28,7 +28,7 @@ The [development contract](development-and-testing-contract.md#2-sql-migration-c
 | `TEST_DATABASE_URL` | None | Disposable local database owned by a non-superuser test role, name ending in `_test` |
 | `ALLOW_TEST_DATABASE` | False unless exactly `true` | Explicit permission to run integration tooling against that isolated database |
 
-`npm run db:migrate` reads `.env.local`, discovers `NNN_lowercase_name.sql` in `migrations`, takes an advisory lock and applies each file with its ledger row in one transaction. It rejects duplicate versions, changed/missing applied files and out-of-order additions. Errors omit connection details. The runner never falls back to application credentials. Migration 010 supplies financial storage; 020 adds operational tables. A native local PostgreSQL 17 installation works; Docker Desktop is optional.
+`npm run db:migrate` reads `.env.local`, discovers `NNN_lowercase_name.sql` in `migrations`, takes an advisory lock and applies each file with its ledger row in one transaction. It rejects duplicate versions, changed/missing applied files and out-of-order additions. Errors omit connection details. The runner never falls back to application credentials. Migration 010 supplies financial storage; 020 adds operational tables; 030 adds financial guards/indexes. A native local PostgreSQL 17 installation works; Docker Desktop is optional.
 
 For local database checks, an administrator creates a disposable database such as `finsight_test`, owned by a separate login with `NOSUPERUSER NOCREATEDB NOCREATEROLE`. Set `TEST_DATABASE_URL` to that local connection and `ALLOW_TEST_DATABASE=true`. URL options, remote hosts and names without the `_test` suffix are refused. Do not point this role at a shared database. No database reset helper is provided.
 

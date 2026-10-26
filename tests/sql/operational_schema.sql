@@ -136,7 +136,9 @@ SELECT pg_temp.expect_error('UPDATE public.case_command_receipt SET response_sta
 SELECT pg_temp.expect_error($q$UPDATE public.case_command_receipt SET case_id='ffffffff-ffff-ffff-ffff-ffffffffffff'$q$, '23503');
 SELECT pg_temp.expect_error('DELETE FROM public.investigation_case', '23503');
 SELECT pg_temp.expect_error('DELETE FROM public.app_user', '23503');
-SELECT pg_temp.expect_error('DELETE FROM public.transaction', '23503');
+SELECT pg_temp.expect_error('DELETE FROM public.transaction', CASE
+    WHEN EXISTS (SELECT 1 FROM pg_trigger WHERE tgrelid='public.transaction'::regclass AND tgname='transaction_retained') THEN '55000'
+    ELSE '23503' END);
 
 DO $$
 BEGIN
