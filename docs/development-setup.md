@@ -9,10 +9,10 @@ Use Node.js 24, pinned by `.nvmrc`, and npm with the committed lockfile. Run the
 ```powershell
 npm ci
 Copy-Item .env.example .env.local
-npm run dev
+npm run dev -- --port 3014
 ```
 
-Open `http://localhost:3000`. The landing page requires no database. Set local values in `.env.local` before running database tooling; the committed example contains placeholders. Never prefix database credentials with `NEXT_PUBLIC_` or commit local environment files.
+Open `http://localhost:3014`. The landing page requires no database. Set local values in `.env.local` before running database tooling; the committed example contains placeholders. Never prefix database credentials with `NEXT_PUBLIC_` or commit local environment files.
 
 The local visual system is recorded in [DESIGN.md](../DESIGN.md) and records the accepted visual direction. `src/app/globals.css` defines light/dark semantic colors, violet accents, bordered surfaces, visible keyboard focus and square sidebar selection. `src/app/layout.tsx` loads local IBM Plex Sans and initializes the theme from a stored choice or system preference. Shared primitives live in `src/components/ui`; `components.json` defines shadcn-compatible paths and Tailwind configuration. Workspace components live in `src/components/workspace`. Open `/sign-in` after configuring the database and [provisioning identities](authentication.md).
 
