@@ -7,12 +7,12 @@ DBMS Level 3 Project · 2 people · 2 months.
 
 ## Status
 
-The Next.js scaffold serves a landing page and process-health endpoint. Financial migration 010 and operational migration 020 have isolated PostgreSQL verification; authentication and investigation features remain pending.
+The Next.js scaffold serves a landing page and process-health endpoint. Migrations 010-030 implement financial storage, operational tables and financial guards with isolated PostgreSQL verification; authentication and investigation features remain pending.
 
 | Area | State |
 |---|---|
 | Relational schema + ER diagram | Reconciled design merged. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
-| DDL migrations | [Financial baseline 010](docs/financial-baseline.md) and [operational schema 020](docs/operational-schema.md), with isolated SQL verification |
+| DDL migrations | [Financial baseline 010](docs/financial-baseline.md), [operational schema 020](docs/operational-schema.md) and [financial guards 030](docs/financial-guards.md), with isolated SQL verification |
 | Seed data generator | Not started |
 | Next.js application | Landing page and process-health endpoint; no feature workflows |
 | Setup instructions | [Development setup](docs/development-setup.md) |
@@ -67,3 +67,4 @@ Planning documents for review before implementation:
 - [Session cleanup contract](docs/session-cleanup-contract.md): approved SQL DELETE scope, bounded admin cleanup, audit, and acceptance tests.
 - [Financial baseline](docs/financial-baseline.md): implemented migration boundary, nullability and isolated SQL checks.
 - [Operational schema](docs/operational-schema.md): operator/case/session/receipt dictionary, event checks and isolated verification.
+- [Financial guards](docs/financial-guards.md): retained facts, coordinate constraints, query plans and balance concurrency verification.
