@@ -7,14 +7,14 @@ DBMS Level 3 Project · 2 people · 2 months.
 
 ## Status
 
-The application serves a landing page, process-health endpoint and credential/session APIs. Migrations through 055 implement financial/operational storage, risk scoring, guarded case commands and session validation. Investigation feature APIs and screens remain pending.
+The application serves a landing page, health/authentication APIs and authenticated transaction list/detail reads. Migrations through 055 implement financial/operational storage, risk scoring, guarded case commands and session validation. Case HTTP APIs and feature screens remain pending.
 
 | Area | State |
 |---|---|
 | Relational schema + ER diagram | Reconciled design merged. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
 | DDL migrations | Financial/operational storage and risk SQL 010-040, protected case commands 050, [session validation 055](docs/authentication.md) |
 | Synthetic data and risk SQL | Eight repeatable scenarios, once-only two-rule scorer, risk view and parameterized financial reads; [commands and verification](docs/deterministic-risk.md) |
-| Next.js application | Landing page, health and authentication APIs; investigation screens pending |
+| Next.js application | Landing page, health/authentication and [masked transaction APIs](docs/transaction-api.md); feature screens pending |
 | Authentication | [Credential/session APIs and provisioning](docs/authentication.md), with unit, database and HTTP checks; sign-in UI pending |
 | Setup instructions | [Development setup](docs/development-setup.md) |
 
@@ -51,7 +51,7 @@ checks and implemented command boundaries.
 PDF item #13 requires: problem statement, objectives, scope, functional requirements, ER
 diagram, relational schema, database choice justification, data dictionary, implementation
 details, important queries, system architecture, screenshots, testing results, and conclusion.
-Database design, migrations, deterministic scoring, case guards, authentication and isolated checks exist. Investigation APIs/screens, MongoDB aggregation and final academic evidence remain pending.
+Database design, migrations, deterministic scoring, case guards, authentication, transaction read APIs and isolated checks exist. Case HTTP APIs, feature screens, MongoDB aggregation and final academic evidence remain pending.
 
 Planning documents for review before implementation:
 
@@ -71,3 +71,4 @@ Planning documents for review before implementation:
 - [Financial guards](docs/financial-guards.md): retained facts, coordinate constraints, query plans and balance concurrency verification.
 - [Deterministic risk SQL](docs/deterministic-risk.md): synthetic seed commands, once-only scoring, bounded SQL reads and exact-result verification.
 - [Authentication setup](docs/authentication.md): shared encrypted sessions, runtime grants, identity provisioning and verification.
+- [Transaction API](docs/transaction-api.md): filters, signed pagination, masks, actor-scoped case indicators and OpenAPI reference.
