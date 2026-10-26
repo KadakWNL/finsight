@@ -20,7 +20,7 @@
     "test:acceptance": "node scripts/pending.mjs acceptance",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "db:migrate:test": "node --env-file-if-exists=.env.local scripts/migrate.mjs --test",
-    "db:seed": "node scripts/pending.mjs seed"
+    "db:seed": "node --env-file-if-exists=.env.local scripts/seed.mjs"
   },
   "dependencies": {
     "clsx": "^2.1.1",
