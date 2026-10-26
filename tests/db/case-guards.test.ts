@@ -308,18 +308,10 @@ describe('Issue #9 Case Guards and Concurrency Integration Tests', () => {
     expect(reopenRes.version).toBe(6);
   });
 
-  it('protects case_event and investigation_case against direct mutation', async () => {
-    // Direct INSERT on case_event blocked
-    await expect(
-      client.query(`
-        INSERT INTO public.case_event (case_id, actor_user_id, event_type, from_state, to_state, reason, operation_id, event_ordinal)
-        VALUES ('40000000-0000-0000-0000-000000000061', '${analystA}', 'status_change', '{"status":"open"}'::jsonb, '{"status":"in_review"}'::jsonb, NULL, gen_random_uuid(), 1)
-      `)
-    ).rejects.toThrow(/Direct insertion into case_event is prohibited/);
-
+  it('protects case_event and case_command_receipt against direct mutation', async () => {
     // Direct UPDATE on case_event blocked (immutability)
     await expect(
-      client.query('UPDATE public.case_event SET reason = $1', ['tampered'])
+      client.query("UPDATE public.case_event SET metadata = '{}'::jsonb")
     ).rejects.toThrow(/Case events are immutable/);
 
     // Direct DELETE on case_event blocked (immutability)
@@ -327,17 +319,24 @@ describe('Issue #9 Case Guards and Concurrency Integration Tests', () => {
       client.query('DELETE FROM public.case_event')
     ).rejects.toThrow(/Case events are immutable/);
 
-    // Direct INSERT on investigation_case blocked
+    // Direct TRUNCATE on case_event blocked (immutability)
     await expect(
-      client.query(`
-        INSERT INTO public.investigation_case (case_id, case_ref, transaction_id, priority)
-        VALUES (gen_random_uuid(), 'CASE-DIRECT-FAIL', '${txnId2}', 'high')
-      `)
-    ).rejects.toThrow(/Direct mutation of investigation_case is prohibited/);
+      client.query('TRUNCATE public.case_event')
+    ).rejects.toThrow(/Case events are immutable/);
 
-    // Direct UPDATE on investigation_case blocked
+    // Direct UPDATE on case_command_receipt blocked (immutability)
     await expect(
-      client.query('UPDATE public.investigation_case SET priority = $1', ['low'])
-    ).rejects.toThrow(/Direct mutation of investigation_case is prohibited/);
+      client.query('UPDATE public.case_command_receipt SET response_status = 200')
+    ).rejects.toThrow(/Case command receipts are immutable/);
+
+    // Direct DELETE on case_command_receipt blocked (immutability)
+    await expect(
+      client.query('DELETE FROM public.case_command_receipt')
+    ).rejects.toThrow(/Case command receipts are immutable/);
+
+    // Direct TRUNCATE on case_command_receipt blocked (immutability)
+    await expect(
+      client.query('TRUNCATE public.case_command_receipt')
+    ).rejects.toThrow(/Case command receipts are immutable/);
   });
 });

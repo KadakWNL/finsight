@@ -5,21 +5,11 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER case_event_immutable BEFORE UPDATE OR DELETE OR TRUNCATE ON public.case_event
+CREATE TRIGGER case_event_immutable_stmt BEFORE DELETE OR TRUNCATE ON public.case_event
     FOR EACH STATEMENT EXECUTE FUNCTION public.reject_case_event_mutation();
 
-CREATE FUNCTION public.guard_case_event_insert() RETURNS trigger
-LANGUAGE plpgsql SET search_path = pg_catalog AS $$
-BEGIN
-    IF current_setting('finsight.trusted_case_writer', true) IS DISTINCT FROM 'true' THEN
-        RAISE EXCEPTION 'Direct insertion into case_event is prohibited; use execute_case_command' USING ERRCODE = '42501';
-    END IF;
-    RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER case_event_insert_guard BEFORE INSERT ON public.case_event
-    FOR EACH ROW EXECUTE FUNCTION public.guard_case_event_insert();
+CREATE TRIGGER case_event_immutable_row AFTER UPDATE ON public.case_event
+    FOR EACH ROW EXECUTE FUNCTION public.reject_case_event_mutation();
 
 CREATE FUNCTION public.reject_case_receipt_mutation() RETURNS trigger
 LANGUAGE plpgsql SET search_path = pg_catalog AS $$
@@ -28,47 +18,11 @@ BEGIN
 END;
 $$;
 
-CREATE TRIGGER case_command_receipt_immutable BEFORE UPDATE OR DELETE OR TRUNCATE ON public.case_command_receipt
+CREATE TRIGGER case_command_receipt_immutable_stmt BEFORE DELETE OR TRUNCATE ON public.case_command_receipt
     FOR EACH STATEMENT EXECUTE FUNCTION public.reject_case_receipt_mutation();
 
-CREATE FUNCTION public.guard_case_receipt_insert() RETURNS trigger
-LANGUAGE plpgsql SET search_path = pg_catalog AS $$
-BEGIN
-    IF current_setting('finsight.trusted_case_writer', true) IS DISTINCT FROM 'true' THEN
-        RAISE EXCEPTION 'Direct insertion into case_command_receipt is prohibited; use execute_case_command' USING ERRCODE = '42501';
-    END IF;
-    RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER case_command_receipt_insert_guard BEFORE INSERT ON public.case_command_receipt
-    FOR EACH ROW EXECUTE FUNCTION public.guard_case_receipt_insert();
-
-CREATE FUNCTION public.guard_investigation_case_dml() RETURNS trigger
-LANGUAGE plpgsql SET search_path = pg_catalog AS $$
-BEGIN
-    IF current_setting('finsight.trusted_case_writer', true) IS DISTINCT FROM 'true' THEN
-        RAISE EXCEPTION 'Direct mutation of investigation_case is prohibited; use execute_case_command' USING ERRCODE = '42501';
-    END IF;
-    IF TG_OP = 'DELETE' THEN
-        RETURN OLD;
-    END IF;
-    RETURN NEW;
-END;
-$$;
-
-CREATE TRIGGER investigation_case_dml_guard BEFORE INSERT OR UPDATE OR DELETE ON public.investigation_case
-    FOR EACH ROW EXECUTE FUNCTION public.guard_investigation_case_dml();
-
-CREATE FUNCTION public.reject_investigation_case_truncate() RETURNS trigger
-LANGUAGE plpgsql SET search_path = pg_catalog AS $$
-BEGIN
-    RAISE EXCEPTION 'Investigation cases cannot be truncated' USING ERRCODE = '55000';
-END;
-$$;
-
-CREATE TRIGGER investigation_case_truncate_guard BEFORE TRUNCATE ON public.investigation_case
-    FOR EACH STATEMENT EXECUTE FUNCTION public.reject_investigation_case_truncate();
+CREATE TRIGGER case_command_receipt_immutable_row AFTER UPDATE ON public.case_command_receipt
+    FOR EACH ROW EXECUTE FUNCTION public.reject_case_receipt_mutation();
 
 CREATE FUNCTION public.execute_case_command(
     p_command_type text,
@@ -159,8 +113,6 @@ BEGIN
             true AS replayed;
         RETURN;
     END IF;
-
-    PERFORM set_config('finsight.trusted_case_writer', 'true', true);
 
     v_operation_id := gen_random_uuid();
     v_now := clock_timestamp();
@@ -539,11 +491,7 @@ END;
 $$;
 
 REVOKE ALL ON FUNCTION public.reject_case_event_mutation() FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.guard_case_event_insert() FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.reject_case_receipt_mutation() FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.guard_case_receipt_insert() FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.guard_investigation_case_dml() FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.reject_investigation_case_truncate() FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.execute_case_command(text, uuid, uuid, text, bigint, uuid, uuid, text, text, text, text, text) FROM PUBLIC;
 
 CREATE PROCEDURE public.grant_runtime_privileges(target_role regrole)

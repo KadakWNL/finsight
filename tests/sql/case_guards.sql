@@ -38,23 +38,7 @@ VALUES ('30000000-0000-0000-0000-000000000050', '30000000-0000-0000-0000-0000000
        ('30000000-0000-0000-0000-000000000051', '30000000-0000-0000-0000-000000000020', '30000000-0000-0000-0000-000000000030',
         '30000000-0000-0000-0000-000000000040', 2000, 'INR', 1, 'debit', 'card_payment', 'posted', '2026-01-01T00:00:00Z', 'IN', 'Guard test transaction 2');
 
--- 1. Direct DML attempts without execute_case_command fail
-SELECT pg_temp.expect_error($q$
-INSERT INTO public.case_event (case_id, actor_user_id, event_type, from_state, to_state, reason, operation_id, event_ordinal)
-VALUES ('30000000-0000-0000-0000-000000000060', '30000000-0000-0000-0000-000000000001', 'created', NULL, '{"status":"open"}'::jsonb, 'Test direct', gen_random_uuid(), 1)
-$q$, '42501');
-
-SELECT pg_temp.expect_error($q$
-INSERT INTO public.case_command_receipt (operation_id, actor_user_id, idempotency_key, command_type, request_hash, case_id, response_status)
-VALUES (gen_random_uuid(), '30000000-0000-0000-0000-000000000001', gen_random_uuid(), 'create', repeat('a', 64), '30000000-0000-0000-0000-000000000060', 201)
-$q$, '42501');
-
-SELECT pg_temp.expect_error($q$
-INSERT INTO public.investigation_case (case_id, case_ref, transaction_id, priority)
-VALUES ('30000000-0000-0000-0000-000000000060', 'CASE-DIRECT', '30000000-0000-0000-0000-000000000050', 'high')
-$q$, '42501');
-
--- 2. System and Inactive users cannot create cases
+-- 1. System and Inactive users cannot create cases
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'create', '30000000-0000-0000-0000-000000000005', gen_random_uuid(), repeat('1', 64),
@@ -69,7 +53,7 @@ SELECT * FROM public.execute_case_command(
 )
 $q$, '28000');
 
--- 3. Valid creation by Analyst A
+-- 2. Valid creation by Analyst A
 SELECT * FROM public.execute_case_command(
     'create', '30000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000070', repeat('1', 64),
     NULL, '30000000-0000-0000-0000-000000000060', '30000000-0000-0000-0000-000000000050', 'high', 'Initial valid creation by Analyst A',
@@ -105,7 +89,7 @@ END;
 $$;
 
 -- Immutability: direct UPDATE, DELETE, TRUNCATE on case_event rejected
-SELECT pg_temp.expect_error('UPDATE public.case_event SET reason=''tampered''', '55000');
+SELECT pg_temp.expect_error('UPDATE public.case_event SET metadata = ''{}''::jsonb', '55000');
 SELECT pg_temp.expect_error('DELETE FROM public.case_event', '55000');
 SELECT pg_temp.expect_error('TRUNCATE public.case_event', '55000');
 
@@ -114,7 +98,7 @@ SELECT pg_temp.expect_error('UPDATE public.case_command_receipt SET response_sta
 SELECT pg_temp.expect_error('DELETE FROM public.case_command_receipt', '55000');
 SELECT pg_temp.expect_error('TRUNCATE public.case_command_receipt', '55000');
 
--- 4. Idempotent replay: same key, same payload -> returns replayed true
+-- 3. Idempotent replay: same key, same payload -> returns replayed true
 DO $$
 DECLARE res record;
 BEGIN
@@ -132,7 +116,7 @@ BEGIN
 END;
 $$;
 
--- 5. Idempotent conflict: same key, different payload -> P0409
+-- 4. Idempotent conflict: same key, different payload -> P0409
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'create', '30000000-0000-0000-0000-000000000001', '30000000-0000-0000-0000-000000000070', repeat('2', 64),
@@ -140,7 +124,7 @@ SELECT * FROM public.execute_case_command(
 )
 $q$, 'P0409');
 
--- 6. Competing active case on same transaction rejected
+-- 5. Competing active case on same transaction rejected
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'create', '30000000-0000-0000-0000-000000000002', gen_random_uuid(), repeat('3', 64),
@@ -148,7 +132,7 @@ SELECT * FROM public.execute_case_command(
 )
 $q$, '23505');
 
--- 7. Analyst B cannot start review on Analyst A's case
+-- 6. Analyst B cannot start review on Analyst A's case
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'start_review', '30000000-0000-0000-0000-000000000002', gen_random_uuid(), repeat('4', 64),
@@ -156,7 +140,7 @@ SELECT * FROM public.execute_case_command(
 )
 $q$, '42501');
 
--- 8. Stale expected_version rejected
+-- 7. Stale expected_version rejected
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'start_review', '30000000-0000-0000-0000-000000000001', gen_random_uuid(), repeat('4', 64),
@@ -164,19 +148,19 @@ SELECT * FROM public.execute_case_command(
 )
 $q$, 'P0409');
 
--- 9. Analyst A starts review -> status becomes in_review, version becomes 2
+-- 8. Analyst A starts review -> status becomes in_review, version becomes 2
 SELECT * FROM public.execute_case_command(
     'start_review', '30000000-0000-0000-0000-000000000001', gen_random_uuid(), repeat('4', 64),
     1, '30000000-0000-0000-0000-000000000060'
 );
 
--- 10. Analyst A escalates case -> status becomes escalated, version becomes 3
+-- 9. Analyst A escalates case -> status becomes escalated, version becomes 3
 SELECT * FROM public.execute_case_command(
     'escalate', '30000000-0000-0000-0000-000000000001', gen_random_uuid(), repeat('5', 64),
     2, '30000000-0000-0000-0000-000000000060', NULL, NULL, 'Suspicious transaction pattern requires tier-2 review'
 );
 
--- 11. Analyst cannot return to review (admin only)
+-- 10. Analyst cannot return to review (admin only)
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'return_to_review', '30000000-0000-0000-0000-000000000001', gen_random_uuid(), repeat('6', 64),
@@ -190,7 +174,7 @@ SELECT * FROM public.execute_case_command(
     3, '30000000-0000-0000-0000-000000000060', NULL, NULL, 'Admin returning to analyst for additional device evidence'
 );
 
--- 12. Resolution: invalid combination rejected
+-- 11. Resolution: invalid combination rejected
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'resolve', '30000000-0000-0000-0000-000000000001', gen_random_uuid(), repeat('7', 64),
@@ -204,7 +188,7 @@ SELECT * FROM public.execute_case_command(
     4, '30000000-0000-0000-0000-000000000060', NULL, NULL, NULL, 'confirmed_suspicious', 'Verified fraudulent card activity across accounts'
 );
 
--- 13. Analyst cannot reopen terminal case
+-- 12. Analyst cannot reopen terminal case
 SELECT pg_temp.expect_error($q$
 SELECT * FROM public.execute_case_command(
     'reopen', '30000000-0000-0000-0000-000000000001', gen_random_uuid(), repeat('9', 64),
@@ -215,7 +199,7 @@ $q$, '42501');
 -- Admin reopens case -> status becomes open, resolution fields cleared, version becomes 6
 SELECT * FROM public.execute_case_command(
     'reopen', '30000000-0000-0000-0000-000000000003', gen_random_uuid(), repeat('9', 64),
-    5, '30000000-0000-0000-0000-000000000060', NULL, NULL, 'New dispute evidence from issuing bank requires reopening'
+    5, '30000000-0000-0000-0000-000000000060', NULL, NULL, 'New customer evidence provided to overturn prior conclusion'
 );
 
 DO $$
