@@ -1,6 +1,6 @@
 # Development setup
 
-The application in `src/app` serves a landing page, `GET /api/health` and [authentication APIs](authentication.md). Health reports process availability only. Transaction/case HTTP APIs and feature screens remain pending. Migrations through 055 implement storage, financial guards/risk SQL, case commands and protected session validation. These checks do not establish VS01-VS16 acceptance.
+The application in `src/app` serves a landing page, `GET /api/health`, [authentication APIs](authentication.md) and [transaction read APIs](transaction-api.md). Health reports process availability only. Case HTTP APIs and feature screens remain pending. Migrations through 055 implement storage, financial guards/risk SQL, case commands and protected session validation. These checks do not establish VS01-VS16 acceptance.
 
 ## Start the application
 
@@ -47,10 +47,10 @@ The migration harness requires a database without `public.schema_migrations`; it
 | `npm run lint` | ESLint and TypeScript ESLint checks |
 | `npm run typecheck` | Generate Next route types and run TypeScript without emitting |
 | `npm run test:unit` | Test database-target guards, password hashing and authorization/security helpers |
-| `npm run test:api` | Exercise authentication/session handlers with PostgreSQL fixtures and identity-provisioning CLIs |
+| `npm run test:api` | Exercise auth/session and transaction handlers with PostgreSQL fixtures, masks, signed cursors and provisioning CLIs |
 | `npm run test:db` | Run the PostgreSQL 17 migration harness using the isolated test role |
 | `npm run test:discovery` | List Vitest and Playwright tests without running database/browser checks |
-| `npm run test:e2e` | Launch a local Next server on port 3100 against the isolated test database; verify shell/health and both authentication HTTP paths |
+| `npm run test:e2e` | Launch a local Next server on port 3100 against the isolated test database; verify shell/health, both auth paths and authenticated transaction HTTP behavior |
 | `npm run build` | Create the production build |
 | `npm start` | Serve the production build on port 3000 |
 | `npm run db:migrate` | Apply/verify ordered migrations with the dedicated migrator connection |
