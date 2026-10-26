@@ -3,20 +3,20 @@
 A financial transaction intelligence platform: multi-database design over synthetic financial
 data, detecting suspicious transaction behaviour and supporting analyst investigation.
 
-DBMS Level 3 Project · 2 people · 2 months.
+DBMS Level 3 Project Â· 2 people Â· 2 months.
 
 ## Status
 
-The application serves a landing page, health/authentication APIs, authenticated transaction reads, and authenticated case lifecycle APIs. Migrations through 055 implement financial/operational storage, risk scoring, guarded case commands and session validation. Feature screens remain pending.
+The application serves sign-in, role overviews, transaction discovery/detail, guarded analyst case creation and authenticated case lifecycle APIs. Migrations through 055 implement financial/operational storage, risk scoring, guarded case commands and session validation. Case workspaces remain pending.
 
 | Area | State |
 |---|---|
 | Relational schema + ER diagram | Reconciled design merged. See [`docs/er-diagram.md`](./docs/er-diagram.md) |
 | DDL migrations | Financial/operational storage and risk SQL 010-040, protected case commands 050, [session validation 055](docs/authentication.md) |
 | Synthetic data and risk SQL | Eight repeatable scenarios, once-only two-rule scorer, risk view and parameterized financial reads; [commands and verification](docs/deterministic-risk.md) |
-| Next.js application | Landing page, health/authentication, [masked transaction APIs](docs/transaction-api.md) and [case lifecycle APIs](docs/case-api.md); feature screens pending |
-| Case workflow | [Guarded case commands](docs/case-api.md), optimistic concurrency, and immutable event history |
-| Authentication | [Credential/session APIs and provisioning](docs/authentication.md), with unit, database and HTTP checks; sign-in UI pending |
+| Next.js application | [Discovery workspace](docs/discovery-ui.md), health/authentication and [masked transaction APIs](docs/transaction-api.md) |
+| Case workflow | [Case lifecycle APIs](docs/case-api.md), optimistic concurrency and immutable event history; case screens pending |
+| Authentication | Sign-in UI, [credential/session APIs and provisioning](docs/authentication.md), with unit, database and browser checks |
 | Setup instructions | [Development setup](docs/development-setup.md) |
 
 ## Stack
@@ -31,9 +31,9 @@ The application serves a landing page, health/authentication APIs, authenticated
 The schema is documented in [`docs/er-diagram.md`](./docs/er-diagram.md), which includes:
 
 - Three report-ready figures (Identity & Banking, Transactions & Risk, Investigation)
-- Indexes, triggers, views and privileges — an ER diagram cannot show these
+- Indexes, triggers, views and privileges â€” an ER diagram cannot show these
 - Full-text and vector retrieval strategies
-- The MongoDB ↔ PostgreSQL boundary
+- The MongoDB â†” PostgreSQL boundary
 - Deliberate denormalisations and the reason each one is accepted
 - A field dictionary, relational mapping, and explicit implementation/review gates
 
@@ -52,7 +52,7 @@ checks and implemented command boundaries.
 PDF item #13 requires: problem statement, objectives, scope, functional requirements, ER
 diagram, relational schema, database choice justification, data dictionary, implementation
 details, important queries, system architecture, screenshots, testing results, and conclusion.
-Database design, migrations, deterministic scoring, case guards, authentication, transaction read APIs and isolated checks exist. Case HTTP APIs, feature screens, MongoDB aggregation and final academic evidence remain pending.
+Database design, migrations, deterministic scoring, case guards, authentication, transaction discovery and isolated checks exist. Case screens, MongoDB aggregation and final academic evidence remain pending.
 
 Planning documents for review before implementation:
 
@@ -74,3 +74,4 @@ Planning documents for review before implementation:
 - [Authentication setup](docs/authentication.md): shared encrypted sessions, runtime grants, identity provisioning and verification.
 - [Transaction API](docs/transaction-api.md): filters, signed pagination, masks, actor-scoped case indicators and OpenAPI reference.
 - [Case API](docs/case-api.md): atomic case commands, optimistic locking, role-scoped queue, and immutable event history.
+- [Discovery workspace](docs/discovery-ui.md): implemented routes, overview read, guarded creation, shared shell integration and browser checks.

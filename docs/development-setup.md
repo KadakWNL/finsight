@@ -1,6 +1,6 @@
 # Development setup
 
-The application in `src/app` serves a landing page, `GET /api/health`, [authentication APIs](authentication.md) and [transaction read APIs](transaction-api.md). Health reports process availability only. Case HTTP APIs and feature screens remain pending. Migrations through 055 implement storage, financial guards/risk SQL, case commands and protected session validation. These checks do not establish VS01-VS16 acceptance.
+The application in `src/app` serves a landing page, `GET /api/health`, [authentication APIs](authentication.md), [transaction read APIs](transaction-api.md) and the [discovery workspace](discovery-ui.md). Health reports process availability only. The [case lifecycle APIs](case-api.md) are implemented; case screens remain pending. Migrations through 055 implement storage, financial guards/risk SQL, case commands and protected session validation. These checks do not establish VS01-VS16 acceptance.
 
 ## Start the application
 
@@ -14,7 +14,7 @@ npm run dev
 
 Open `http://localhost:3000`. The landing page requires no database. Set local values in `.env.local` before running database tooling; the committed example contains placeholders. Never prefix database credentials with `NEXT_PUBLIC_` or commit local environment files.
 
-The visual tokens follow the [UI specification](ui-ux-specification.md#visual-design-system): slate canvas, navy text, system sans typography and visible keyboard focus. Shared primitives live in `src/components/ui`; `components.json` defines shadcn-compatible paths and Tailwind configuration. Role navigation and feature controls belong to their later integration work.
+The local visual system is recorded in [DESIGN.md](../DESIGN.md) and records the accepted visual direction. `src/app/globals.css` defines light/dark semantic colors, violet accents, bordered surfaces, visible keyboard focus and square sidebar selection. `src/app/layout.tsx` loads local IBM Plex Sans and initializes the theme from a stored choice or system preference. Shared primitives live in `src/components/ui`; `components.json` defines shadcn-compatible paths and Tailwind configuration. Workspace components live in `src/components/workspace`. Open `/sign-in` after configuring the database and [provisioning identities](authentication.md).
 
 ## Environment and database tooling
 
@@ -50,7 +50,7 @@ The migration harness requires a database without `public.schema_migrations`; it
 | `npm run test:api` | Exercise auth/session and transaction handlers with PostgreSQL fixtures, masks, signed cursors and provisioning CLIs |
 | `npm run test:db` | Run the PostgreSQL 17 migration harness using the isolated test role |
 | `npm run test:discovery` | List Vitest and Playwright tests without running database/browser checks |
-| `npm run test:e2e` | Launch a local Next server on port 3100 against the isolated test database; verify shell/health, both auth paths and authenticated transaction HTTP behavior |
+| `npm run test:e2e` | Launch a local Next server on port 3100 against the isolated test database; verify discovery UI, case creation/recovery, mobile/keyboard behavior and authentication/transaction HTTP behavior |
 | `npm run build` | Create the production build |
 | `npm start` | Serve the production build on port 3000 |
 | `npm run db:migrate` | Apply/verify ordered migrations with the dedicated migrator connection |
