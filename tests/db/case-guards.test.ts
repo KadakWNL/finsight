@@ -308,6 +308,46 @@ describe('Issue #9 Case Guards and Concurrency Integration Tests', () => {
     expect(reopenRes.version).toBe(6);
   });
 
+  it('rechecks current case access before replaying an earlier admin command', async () => {
+    const created = await executeCaseCommand(client, {
+      commandType: 'create',
+      actorUserId: analystA,
+      idempotencyKey: '40000000-0000-0000-0000-000000000079',
+      transactionId: txnId2,
+      priority: 'low',
+      reason: 'Synthetic replay permission fixture',
+    });
+    const command = {
+      commandType: 'start_review' as const,
+      actorUserId: admin,
+      idempotencyKey: '40000000-0000-0000-0000-000000000080',
+      caseId: created.caseId,
+      expectedVersion: 1,
+    };
+    const accepted = await executeCaseCommand(client, command);
+    expect((await executeCaseCommand(client, command)).replayed).toBe(true);
+    const before = (await client.query(`SELECT c.version,
+      (SELECT count(*) FROM public.case_event e WHERE e.case_id=c.case_id) AS events,
+      (SELECT count(*) FROM public.case_command_receipt r WHERE r.case_id=c.case_id) AS receipts
+      FROM public.investigation_case c WHERE c.case_id=$1`, [created.caseId])).rows[0];
+
+    await client.query("UPDATE public.app_user SET role='analyst' WHERE user_id=$1", [admin]);
+    try {
+      await expect(executeCaseCommand(client, command)).rejects.toMatchObject({ code: 'P0002' });
+      const after = (await client.query(`SELECT c.version,
+        (SELECT count(*) FROM public.case_event e WHERE e.case_id=c.case_id) AS events,
+        (SELECT count(*) FROM public.case_command_receipt r WHERE r.case_id=c.case_id) AS receipts
+        FROM public.investigation_case c WHERE c.case_id=$1`, [created.caseId])).rows[0];
+      expect(after).toEqual(before);
+    } finally {
+      await client.query("UPDATE public.app_user SET role='admin' WHERE user_id=$1", [admin]);
+    }
+
+    const replay = await executeCaseCommand(client, command);
+    expect(replay.operationId).toBe(accepted.operationId);
+    expect(replay.replayed).toBe(true);
+  });
+
   it('protects case_event and case_command_receipt against direct mutation', async () => {
     // Direct UPDATE on case_event blocked (immutability)
     await expect(

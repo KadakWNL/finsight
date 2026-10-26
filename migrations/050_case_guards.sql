@@ -101,6 +101,9 @@ BEGIN
             RAISE EXCEPTION 'Idempotency conflict: key already used with different request hash' USING ERRCODE = 'P0409';
         END IF;
         SELECT * INTO v_case FROM public.investigation_case WHERE investigation_case.case_id = v_receipt.case_id;
+        IF NOT FOUND OR (v_actor.role = 'analyst' AND v_case.assigned_to_user_id IS DISTINCT FROM p_actor_user_id) THEN
+            RAISE EXCEPTION 'Case not found' USING ERRCODE = 'P0002';
+        END IF;
         RETURN QUERY SELECT
             v_receipt.operation_id,
             v_case.case_id,
