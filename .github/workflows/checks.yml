@@ -34,6 +34,7 @@ jobs:
         run: |
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE ROLE finsight_test LOGIN PASSWORD 'test-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;"
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE finsight_test OWNER finsight_test;"
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE ROLE finsight_auth_probe NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE; GRANT finsight_auth_probe TO finsight_test;"
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run test:unit
