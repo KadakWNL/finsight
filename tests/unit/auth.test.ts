@@ -181,14 +181,15 @@ describe('Authentication and Authorization Unit Tests (VS01-VS03)', () => {
       expect(result).toEqual(caseData);
     });
 
-    it('returns minimal projected summary for unassigned or other analyst case to analyst', () => {
+    it('conceals other analysts cases from the queue', () => {
       const result = filterCaseSummaryForRole(analystAlice, caseData);
-      expect(result.case_ref).toBe('CASE-001');
-      expect(result.priority).toBe('high');
-      expect(result.status).toBe('in_review');
-      // Private fields stripped
-      expect(result).not.toHaveProperty('resolution_notes');
-      expect(result).not.toHaveProperty('internal_score');
+      expect(result).toBeNull();
+    });
+
+    it('returns only approved fields for unassigned cases', () => {
+      const result = filterCaseSummaryForRole(analystAlice, { ...caseData, assigned_to_user_id: null });
+      expect(result).toEqual({ case_ref: 'CASE-001', transaction_id: caseData.transaction_id,
+        priority: 'high', status: 'in_review', due_at: caseData.due_at });
     });
 
     it('returns full allowed summary when case is assigned to analyst', () => {

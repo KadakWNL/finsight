@@ -1,8 +1,9 @@
 import 'server-only';
 import type { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { validateCredentials } from './auth';
-import { createSession, revokeSession } from './session';
+import { revokeSession, validateSession } from './session';
+import { signInWithCredentials } from './authentication';
+import { getAuthSecret, sessionCookieName, sessionCookieOptions } from './auth-security';
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -17,18 +18,11 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
-        const authResult = await validateCredentials(credentials.email, credentials.password);
-        if (!authResult.ok) {
-          return null;
-        }
-
-        const sessionRecord = await createSession(authResult.user.userId);
+        const result = await signInWithCredentials(credentials.email, credentials.password);
+        if (!result) return null;
         return {
-          id: authResult.user.userId,
-          email: authResult.user.email,
-          name: authResult.user.displayName,
-          role: authResult.user.role,
-          sessionId: sessionRecord.sessionId,
+          id: result.user.userId,
+          sessionId: result.session.sessionId,
         };
       },
     }),
@@ -40,17 +34,16 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.sub = user.id;
-        token.sid = (user as unknown as { sessionId: string }).sessionId;
+        return { sub: user.id, sid: (user as unknown as { sessionId: string }).sessionId };
       }
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
-        (session.user as unknown as { id: string }).id = token.sub as string;
-        (session as unknown as { sessionId: string }).sessionId = token.sid as string;
-      }
-      return session;
+      if (typeof token.sid !== 'string' || typeof token.sub !== 'string') throw new Error('Session unavailable');
+      const validation = await validateSession(token.sid, undefined, token.sub);
+      if (!validation.valid) throw new Error('Session unavailable');
+      return { ...session, expires: validation.session.absoluteExpiresAt,
+        user: { ...validation.user, id: validation.user.userId, name: validation.user.displayName } };
     },
   },
   events: {
@@ -63,5 +56,6 @@ export const authOptions: NextAuthOptions = {
   pages: {
     signIn: '/login',
   },
-  secret: process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || 'dev-fallback-secret-minimum-32-chars-long!!',
+  cookies: { sessionToken: { name: sessionCookieName(), options: sessionCookieOptions() } },
+  get secret() { return getAuthSecret(); },
 };

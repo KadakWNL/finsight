@@ -1,42 +1,18 @@
 import { NextResponse } from 'next/server';
-import { validateSession, SESSION_COOKIE_NAME } from '@/server/session';
+import { authenticateRequest } from '@/server/authentication';
 
 export async function GET(request: Request) {
+  const headers = { 'Cache-Control': 'private, no-store' };
   try {
-    let sessionId: string | undefined;
-
-    // Check Cookie header
-    const cookieHeader = request.headers.get('cookie');
-    if (cookieHeader) {
-      const match = cookieHeader.match(new RegExp(`(?:^|;\\s*)${SESSION_COOKIE_NAME}=([^;]*)`));
-      if (match) {
-        sessionId = decodeURIComponent(match[1]);
-      }
-    }
-
-    // Check Bearer authorization header
-    if (!sessionId) {
-      const authHeader = request.headers.get('authorization');
-      if (authHeader?.startsWith('Bearer ')) {
-        sessionId = authHeader.slice(7).trim();
-      }
-    }
-
-    if (!sessionId) {
-      return NextResponse.json({ authenticated: false, reason: 'no_session' }, { status: 401 });
-    }
-
-    const validation = await validateSession(sessionId);
-    if (!validation.valid) {
-      return NextResponse.json({ authenticated: false, reason: validation.reason }, { status: 401 });
-    }
-
+    const validation = await authenticateRequest(request);
+    if (!validation.valid) return NextResponse.json({ authenticated: false }, { status: 401, headers });
     return NextResponse.json({
       authenticated: true,
-      user: validation.user,
-      session: validation.session,
-    });
+      user: { ...validation.user, id: validation.user.userId, name: validation.user.displayName },
+      expires: validation.session.absoluteExpiresAt,
+      session: { idleExpiresAt: validation.session.idleExpiresAt, absoluteExpiresAt: validation.session.absoluteExpiresAt },
+    }, { headers });
   } catch {
-    return NextResponse.json({ authenticated: false, reason: 'error' }, { status: 500 });
+    return NextResponse.json({ authenticated: false }, { status: 503, headers });
   }
 }

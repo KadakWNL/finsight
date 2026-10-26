@@ -1,14 +1,13 @@
 import 'server-only';
 import pg from 'pg';
+import { requireTestDatabase } from '../../scripts/database-safety.mjs';
 
 export type SqlClient = Pick<pg.ClientBase, 'query'>;
 
 let pool: pg.Pool | null = null;
 
 export function getDatabaseUrl(): string {
-  if (process.env.ALLOW_TEST_DATABASE === 'true' && process.env.TEST_DATABASE_URL) {
-    return process.env.TEST_DATABASE_URL;
-  }
+  if (process.env.NODE_ENV === 'test') return requireTestDatabase();
   const url = process.env.DATABASE_URL;
   if (!url) {
     throw new Error('DATABASE_URL is not set.');

@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import pg from 'pg';
+import { setTimeout as delay } from 'node:timers/promises';
 
 vi.mock('server-only', () => ({}));
 
@@ -16,6 +17,11 @@ import {
 import { POST as loginRoute } from '../../src/app/api/auth/login/route';
 import { POST as logoutRoute } from '../../src/app/api/auth/logout/route';
 import { GET as sessionRoute } from '../../src/app/api/auth/session/route';
+import { encodeSessionToken } from '../../src/server/authentication';
+import { getPool } from '../../src/server/db';
+import { authOptions } from '../../src/server/auth-config';
+import { decode } from 'next-auth/jwt';
+import { getAuthSecret } from '../../src/server/auth-security';
 
 describe('Authentication and Session API Integration Tests (VS01-VS03)', () => {
   let pool: pg.Pool;
@@ -72,7 +78,117 @@ describe('Authentication and Session API Integration Tests (VS01-VS03)', () => {
       // Clean up all schema objects so migrations.test.ts finds a fresh disposable DB
       await pool.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;');
       await pool.end();
+      await getPool().end();
     }
+  });
+
+  async function waitForLock(pid: number) {
+    for (let n=0; n<100; n++) {
+      const row=(await pool.query('SELECT wait_event_type FROM pg_stat_activity WHERE pid=$1',[pid])).rows[0];
+      if(row?.wait_event_type==='Lock') return;
+      await delay(10);
+    }
+    throw new Error('Validation did not wait on the session lock');
+  }
+
+  it('rejects revocation committed while validation waits, without refreshing idle expiry', async () => {
+    const session=await createSession(analystAliceId,pool);
+    const blocker=await pool.connect(); const reader=await pool.connect();
+    try {
+      await blocker.query('BEGIN');
+      await blocker.query("UPDATE public.app_session SET revoked_at=clock_timestamp(),revocation_reason='sign_out' WHERE session_id=$1",[session.sessionId]);
+      const pid=(await reader.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+      const pending=validateSession(session.sessionId,reader);
+      await waitForLock(pid); await blocker.query('COMMIT');
+      expect(await pending).toEqual({valid:false,reason:'revoked'});
+      expect((await pool.query('SELECT last_seen_at=created_at AS unchanged FROM public.app_session WHERE session_id=$1',[session.sessionId])).rows[0].unchanged).toBe(true);
+    } finally { await blocker.query('ROLLBACK'); blocker.release(); reader.release(); }
+  });
+
+  it('checks expiry after acquiring a contended lock instead of reviving an expired session', async () => {
+    const session=await createSession(analystAliceId,pool);
+    await pool.query("UPDATE public.app_session SET idle_expires_at=clock_timestamp()+interval '500 milliseconds' WHERE session_id=$1",[session.sessionId]);
+    const blocker=await pool.connect(); const reader=await pool.connect();
+    try {
+      await blocker.query('BEGIN'); await blocker.query('SELECT 1 FROM public.app_session WHERE session_id=$1 FOR UPDATE',[session.sessionId]);
+      const pid=(await reader.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+      const pending=validateSession(session.sessionId,reader);
+      await waitForLock(pid); await delay(550); await blocker.query('COMMIT');
+      expect(await pending).toEqual({valid:false,reason:'idle_expired'});
+      expect((await pool.query('SELECT last_seen_at=created_at AS unchanged FROM public.app_session WHERE session_id=$1',[session.sessionId])).rows[0].unchanged).toBe(true);
+    } finally { await blocker.query('ROLLBACK'); blocker.release(); reader.release(); }
+  });
+
+  it('uses the Auth.js session callback to recheck current authority without exposing the session ID', async () => {
+    const session=await createSession(adminCarolId,pool);
+    const callback=authOptions.callbacks!.session!;
+    const parameters:Parameters<typeof callback>[0]={session:{user:{},expires:session.absoluteExpiresAt},token:{sub:adminCarolId,sid:session.sessionId},
+      user:{id:adminCarolId,email:adminCarolEmail,emailVerified:null},newSession:undefined,trigger:'update'};
+    const result=await callback(parameters);
+    expect(JSON.stringify(result)).not.toContain(session.sessionId);
+    expect(result.user).toMatchObject({role:'admin',id:adminCarolId});
+    await pool.query("UPDATE public.app_user SET role='analyst' WHERE user_id=$1",[adminCarolId]);
+    try { expect((await callback(parameters)).user).toMatchObject({role:'analyst'}); }
+    finally { await pool.query("UPDATE public.app_user SET role='admin' WHERE user_id=$1",[adminCarolId]); }
+    await revokeSession(session.sessionId,'sign_out',pool);
+    await expect(callback(parameters)).rejects.toThrow('Session unavailable');
+  });
+
+  it('validates through the protected function as a nonowner without granting operator writes', async () => {
+    const session=await createSession(analystAliceId,pool);
+    await pool.query("CALL public.grant_auth_privileges('finsight_auth_probe'::regrole)");
+    const runtime=await pool.connect();
+    try {
+      await runtime.query('SET ROLE finsight_auth_probe');
+      expect((await runtime.query('SELECT current_user AS role')).rows[0].role).toBe('finsight_auth_probe');
+      expect((await runtime.query("SELECT has_table_privilege(current_user,'public.app_user','UPDATE') AS may_write")).rows[0].may_write).toBe(false);
+      expect((await validateSession(session.sessionId,runtime,analystAliceId)).valid).toBe(true);
+    } finally { await runtime.query('RESET ROLE'); runtime.release(); }
+  });
+
+  it('round trips the login cookie through session and logout without leaking reusable credentials', async () => {
+    const response=await loginRoute(new Request('http://localhost:3000/api/auth/login',{method:'POST',headers:{origin:'http://localhost:3000','content-type':'application/json'},body:JSON.stringify({email:analystAliceEmail,password:analystAlicePassword})}));
+    expect(response.status).toBe(200);
+    const cookie=response.headers.get('set-cookie')!.split(';')[0];
+    const token=await decode({token:decodeURIComponent(cookie.slice(cookie.indexOf('=')+1)),secret:getAuthSecret()});
+    expect(token?.sub).toBe(analystAliceId); expect(token?.sid).toBeTypeOf('string');
+    const result=await sessionRoute(new Request('http://localhost:3000/api/auth/session',{headers:{cookie}}));
+    expect(result.status).toBe(200); expect(result.headers.get('cache-control')).toContain('no-store');
+    const body=await result.json(); expect(body.expires).toBeTruthy();
+    expect(JSON.stringify(body)).not.toContain(token!.sid); expect(JSON.stringify(body)).not.toContain(cookie);
+    const signout=await logoutRoute(new Request('http://localhost:3000/api/auth/logout',{method:'POST',headers:{origin:'http://localhost:3000',cookie}}));
+    expect(signout.status).toBe(200); expect(signout.headers.get('set-cookie')).toContain('Max-Age=0');
+    expect((await sessionRoute(new Request('http://localhost:3000/api/auth/session',{headers:{cookie}}))).status).toBe(401);
+  });
+
+  it('rejects raw session IDs, mismatched token subjects and forged JWTs', async () => {
+    const session=await createSession(analystAliceId,pool);
+    for(const authorization of [`Bearer ${session.sessionId}`,`Bearer ${await encodeSessionToken(adminCarolId,session.sessionId)}`,'Bearer forged.invalid.token']) {
+      expect((await sessionRoute(new Request('http://localhost:3000/api/auth/session',{headers:{authorization}}))).status).toBe(401);
+    }
+    expect((await pool.query('SELECT last_seen_at=created_at AS unchanged FROM public.app_session WHERE session_id=$1',[session.sessionId])).rows[0].unchanged).toBe(true);
+  });
+
+  it('denies cross-origin and missing-origin login/logout without creating or revoking sessions', async () => {
+    const session=await createSession(analystAliceId,pool);
+    const before=(await pool.query('SELECT count(*) AS n FROM public.app_session')).rows[0].n;
+    for(const origin of [undefined,'https://unrelated.invalid']) {
+      const headers:Record<string,string>={'content-type':'application/json',cookie:`${SESSION_COOKIE_NAME}=${await encodeSessionToken(analystAliceId,session.sessionId)}`};
+      if(origin) headers.origin=origin;
+      expect((await loginRoute(new Request('http://localhost:3000/api/auth/login',{method:'POST',headers,body:JSON.stringify({email:analystAliceEmail,password:analystAlicePassword})}))).status).toBe(403);
+      expect((await logoutRoute(new Request('http://localhost:3000/api/auth/logout',{method:'POST',headers}))).status).toBe(403);
+    }
+    expect((await pool.query('SELECT count(*) AS n FROM public.app_session')).rows[0].n).toBe(before);
+    expect((await validateSession(session.sessionId,pool)).valid).toBe(true);
+  });
+
+  it('throttles repeated sign-in attempts before further password checks', async () => {
+    const provider=authOptions.providers[0] as import('next-auth/providers/credentials').CredentialsConfig;
+    for(let n=0;n<5;n++) expect(await provider.options!.authorize!({email:'throttled@synthetic.invalid',password:'wrong'},{headers:{},method:'POST',body:{},query:{}})).toBeNull();
+    const before=(await pool.query('SELECT count(*) AS n FROM public.app_session')).rows[0].n;
+    const response=await loginRoute(new Request('http://localhost:3000/api/auth/login',{method:'POST',headers:{origin:'http://localhost:3000','content-type':'application/json'},body:JSON.stringify({email:'throttled@synthetic.invalid',password:'wrong'})}));
+    expect(response.status).toBe(401);
+    expect((await pool.query('SELECT count(*) AS n FROM public.app_session')).rows[0].n).toBe(before);
   });
 
   describe('Credential Validation (validateCredentials)', () => {
@@ -288,7 +404,7 @@ describe('Authentication and Session API Integration Tests (VS01-VS03)', () => {
     it('login route sets HttpOnly session cookie on valid credentials', async () => {
       const request = new Request('http://localhost:3000/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Origin: 'http://localhost:3000' },
         body: JSON.stringify({ email: analystAliceEmail, password: analystAlicePassword }),
       });
 
@@ -314,7 +430,7 @@ describe('Authentication and Session API Integration Tests (VS01-VS03)', () => {
     it('login route returns 401 generic error on invalid password', async () => {
       const request = new Request('http://localhost:3000/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', Origin: 'http://localhost:3000' },
         body: JSON.stringify({ email: analystAliceEmail, password: 'wrong' }),
       });
 
@@ -330,7 +446,8 @@ describe('Authentication and Session API Integration Tests (VS01-VS03)', () => {
       const request = new Request('http://localhost:3000/api/auth/logout', {
         method: 'POST',
         headers: {
-          Cookie: `${SESSION_COOKIE_NAME}=${session.sessionId}`,
+          Cookie: `${SESSION_COOKIE_NAME}=${await encodeSessionToken(analystAliceId, session.sessionId)}`,
+          Origin: 'http://localhost:3000',
         },
       });
 
@@ -345,11 +462,11 @@ describe('Authentication and Session API Integration Tests (VS01-VS03)', () => {
       }
     });
 
-    it('session route authenticates with Bearer token header', async () => {
+    it('session route authenticates an encrypted Auth.js token', async () => {
       const session = await createSession(adminCarolId, pool);
 
       const request = new Request('http://localhost:3000/api/auth/session', {
-        headers: { Authorization: `Bearer ${session.sessionId}` },
+        headers: { Authorization: `Bearer ${await encodeSessionToken(adminCarolId, session.sessionId)}` },
       });
 
       const response = await sessionRoute(request);

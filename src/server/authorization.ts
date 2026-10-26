@@ -99,20 +99,17 @@ export function canExecuteCaseCommand(
 }
 
 export const MINIMAL_ANALYST_QUEUE_FIELDS = [
-  'case_id',
   'case_ref',
   'transaction_id',
   'priority',
   'status',
-  'opened_at',
   'due_at',
-  'assigned_to_user_id',
 ] as const;
 
 export function filterCaseSummaryForRole<T extends Record<string, unknown>>(
   user: Pick<SessionUser, 'userId' | 'role'>,
   caseRow: T
-): Partial<T> {
+): Partial<T> | null {
   // Admin sees full summary
   if (user.role === 'admin') {
     return caseRow;
@@ -123,7 +120,8 @@ export function filterCaseSummaryForRole<T extends Record<string, unknown>>(
     return caseRow;
   }
 
-  // Unassigned or assigned-to-another queue row: minimal summary projection
+  if (user.role !== 'analyst' || caseRow.assigned_to_user_id !== null) return null;
+
   const projected: Partial<T> = {};
   for (const field of MINIMAL_ANALYST_QUEUE_FIELDS) {
     if (field in caseRow) {

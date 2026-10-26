@@ -2,8 +2,10 @@ import { defineConfig } from 'vitest/config';
 import { existsSync } from 'node:fs';
 import { loadEnvFile } from 'node:process';
 import path from 'node:path';
+import { randomBytes } from 'node:crypto';
 
 if (existsSync('.env.local')) loadEnvFile('.env.local');
+process.env.AUTH_SECRET = randomBytes(32).toString('hex');
 
 export default defineConfig({
   resolve: {
@@ -31,6 +33,7 @@ export default defineConfig({
         test: {
           name: 'api',
           include: ['tests/api/**/*.test.ts'],
+          fileParallelism: false,
         },
       },
     ],

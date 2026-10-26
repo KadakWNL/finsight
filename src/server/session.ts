@@ -2,8 +2,9 @@ import 'server-only';
 import { randomUUID } from 'node:crypto';
 import type { SqlClient } from './db';
 import { getPool } from './db';
+import { sessionCookieName } from './auth-security';
 
-export const SESSION_COOKIE_NAME = 'finsight_session';
+export const SESSION_COOKIE_NAME = sessionCookieName();
 export const IDLE_TIMEOUT_MINUTES = 30;
 export const ABSOLUTE_TIMEOUT_HOURS = 8;
 
@@ -98,9 +99,13 @@ export async function createSession(
 
 export async function validateSession(
   sessionId: string,
-  client?: SqlClient
+  client?: SqlClient,
+  expectedUserId?: string
 ): Promise<SessionValidationResult> {
   if (!sessionId || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(sessionId)) {
+    return { valid: false, reason: 'not_found' };
+  }
+  if (expectedUserId && !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(expectedUserId)) {
     return { valid: false, reason: 'not_found' };
   }
 
@@ -120,21 +125,10 @@ export async function validateSession(
     display_name: string;
     role: string;
     is_active: boolean;
+    refreshed_id: string | null;
   }>(
-    `SELECT
-       s.session_id, s.user_id,
-       to_char(s.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS created_at,
-       to_char(s.last_seen_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS last_seen_at,
-       to_char(s.idle_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS idle_expires_at,
-       to_char(s.absolute_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS absolute_expires_at,
-       s.revoked_at,
-       (clock_timestamp() >= s.idle_expires_at) AS is_idle_expired,
-       (clock_timestamp() >= s.absolute_expires_at) AS is_absolute_expired,
-       u.email, u.display_name, u.role, u.is_active
-     FROM public.app_session s
-     JOIN public.app_user u ON s.user_id = u.user_id
-     WHERE s.session_id = $1`,
-    [sessionId]
+    `SELECT * FROM public.validate_app_session($1, $2)`,
+    [sessionId, expectedUserId ?? null]
   );
 
   const session = rows[0];
@@ -162,24 +156,7 @@ export async function validateSession(
     return { valid: false, reason: 'invalid_role' };
   }
 
-  // Active authorized request: extend idle window, capped at absolute_expires_at
-  const { rows: updatedRows } = await db.query<{
-    idle_expires_at: string;
-    absolute_expires_at: string;
-  }>(
-    `WITH now_time AS (SELECT clock_timestamp() AS t)
-     UPDATE public.app_session
-     SET last_seen_at = t,
-         idle_expires_at = LEAST(t + interval '30 minutes', absolute_expires_at)
-     FROM now_time
-     WHERE session_id = $1 AND revoked_at IS NULL
-     RETURNING
-       to_char(idle_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS idle_expires_at,
-       to_char(absolute_expires_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS absolute_expires_at`,
-    [sessionId]
-  );
-
-  const updated = updatedRows[0] ?? session;
+  if (!session.refreshed_id) return { valid: false, reason: 'not_found' };
 
   return {
     valid: true,
@@ -191,8 +168,8 @@ export async function validateSession(
     },
     session: {
       sessionId: session.session_id,
-      idleExpiresAt: updated.idle_expires_at,
-      absoluteExpiresAt: updated.absolute_expires_at,
+      idleExpiresAt: session.idle_expires_at,
+      absoluteExpiresAt: session.absolute_expires_at,
     },
   };
 }

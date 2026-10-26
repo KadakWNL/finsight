@@ -29,13 +29,13 @@ async function run() {
   let connectionString;
   if (isDemo) {
     // Demo provisioning is strictly restricted to test or demo databases
-    connectionString = process.env.ALLOW_TEST_DATABASE === 'true'
-      ? requireTestDatabase()
-      : requireSyntheticDatabase();
+    connectionString = process.env.MIGRATOR_DATABASE_URL
+      ? requireSyntheticDatabase()
+      : requireTestDatabase();
   } else {
-    connectionString = process.env.MIGRATOR_DATABASE_URL || process.env.DATABASE_URL;
+    connectionString = process.env.MIGRATOR_DATABASE_URL;
     if (!connectionString) {
-      console.error('MIGRATOR_DATABASE_URL or DATABASE_URL is required for bootstrap administration.');
+      console.error('MIGRATOR_DATABASE_URL is required for bootstrap administration.');
       process.exit(1);
     }
   }
@@ -92,8 +92,9 @@ async function run() {
     }
 
     if (isDemo) {
-      const analystPassword = process.env.DEMO_ANALYST_PASSWORD || 'synthetic-analyst-pass-1';
-      const adminPassword = process.env.DEMO_ADMIN_PASSWORD || 'synthetic-admin-pass-1';
+      const analystPassword = process.env.DEMO_ANALYST_PASSWORD;
+      const adminPassword = process.env.DEMO_ADMIN_PASSWORD;
+      if (!analystPassword || !adminPassword) throw new Error('DEMO_ANALYST_PASSWORD and DEMO_ADMIN_PASSWORD are required.');
 
       const analystHash = await hashPassword(analystPassword);
       const adminHash = await hashPassword(adminPassword);
