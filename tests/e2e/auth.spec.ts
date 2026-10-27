@@ -12,6 +12,8 @@ const password=randomBytes(24).toString('hex');
 const uiId='70000000-0000-0000-0000-000000000014';
 const uiEmail='ui_analyst@synthetic.invalid';
 const adminId='70000000-0000-0000-0000-000000000015';
+const sidebarEmail='sidebar_analyst@synthetic.invalid';
+const settingsEmail='settings_analyst@synthetic.invalid';
 const origin='http://127.0.0.1:3100';
 let client:pg.Client;
 
@@ -23,6 +25,9 @@ test.beforeAll(async()=>{
     VALUES ($1,$2,$3,'Synthetic HTTP analyst','analyst')`,[userId,email,hash]);
   await client.query(`INSERT INTO public.app_user(user_id,email,password_hash,display_name,role)
     VALUES ($1,$2,$3,'Synthetic UI analyst','analyst'),($4,'ui_admin@synthetic.invalid',$3,'Synthetic UI admin','admin')`,[uiId,uiEmail,hash,adminId]);
+  await client.query(`INSERT INTO public.app_user(user_id,email,password_hash,display_name,role)
+    VALUES ('70000000-0000-0000-0000-000000000016',$1,$3,'Sidebar analyst','analyst'),
+           ('70000000-0000-0000-0000-000000000017',$2,$3,'Settings analyst','analyst')`,[sidebarEmail,settingsEmail,hash]);
   await seedFinancial(client);
   await client.query("UPDATE public.customer SET full_name='HTTP_PRIVATE_CUSTOMER',email='http_private@synthetic.invalid'");
   await client.query(`INSERT INTO public.app_user(user_id,email,password_hash,display_name,role)
@@ -151,7 +156,7 @@ test('theme follows the system and preserves explicit choices across reloads and
 
 test('sidebar collapse preserves navigation, keyboard labels and mobile access',async({page})=>{
   await page.goto('/sign-in');
-  await page.getByLabel('Email address').fill(uiEmail);
+  await page.getByLabel('Email address').fill(sidebarEmail);
   await page.getByLabel('Password',{exact:true}).fill(password);
   await page.getByRole('button',{name:'Sign in',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Your overview'})).toBeVisible();
@@ -194,11 +199,11 @@ test('settings preserves return paths, synchronizes appearance controls and work
   await page.emulateMedia({colorScheme:'dark'});
   await page.goto('/settings');
   await expect(page).toHaveURL(/\/sign-in\?next=%2Fsettings/);
-  await page.getByLabel('Email address').fill(uiEmail);
+  await page.getByLabel('Email address').fill(settingsEmail);
   await page.getByLabel('Password',{exact:true}).fill(password);
   await page.getByRole('button',{name:'Sign in',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Settings',exact:true})).toBeVisible();
-  await expect(page.getByText(uiEmail,{exact:true})).toBeVisible();
+  await expect(page.getByText(settingsEmail,{exact:true})).toBeVisible();
   const fixture = await page.request.post('/api/v1/cases',{
     headers:{origin,'idempotency-key':randomUUID()},
     data:{transaction_id:syntheticId(107),priority:'low',reason:'Settings timestamp display verification'},

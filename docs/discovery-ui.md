@@ -40,6 +40,8 @@ Navigation exposes Overview, Cases and Transactions. The Settings gear sits besi
 
 The button beside FinSight collapses the desktop sidebar to icons and expands it again. Collapsed links retain accessible names, a square active selection and labels on hover or keyboard focus. Settings remains reachable at the bottom. The mobile disclosure menu keeps full labels regardless of the saved desktop choice.
 
+`next.config.ts` disables the development badge so it cannot cover fixed navigation controls. Next.js compile and runtime errors still surface normally.
+
 ## Settings and display preferences
 
 `src/app/(workspace)/settings/page.tsx` requires an active human session. Account name, email and role are read-only. Appearance controls share state with the header theme switch. `src/components/workspace/display-preferences.tsx` applies regional choices across the workspace; `src/lib/display-preferences.ts` validates stored values.
