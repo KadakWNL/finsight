@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { formatTime, type HumanRole } from '@/lib/workspace';
 import type { CaseDetail, CaseEventItem } from '@/lib/case-types';
 import { useApi } from './use-api';
+import { useDisplayPreferences } from './display-preferences';
 import { EmptyState, ErrorState, LoadingState, PageHeading, PriorityBadge, StatusBadge } from './ui';
 import { RecordIdentifier } from './record-identifier';
 import {
@@ -79,6 +80,8 @@ function EventDiff({ event }: { event: CaseEventItem }) {
 }
 
 export function CaseDetailScreen({ id, returnTo, role, userId }: CaseDetailScreenProps) {
+  const { timeZone } = useDisplayPreferences();
+  const displayTime = (value: string | null) => formatTime(value, timeZone);
   const [historyOffset, setHistoryOffset] = useState(0);
   const historyUrl = '/api/v1/cases/' + encodeURIComponent(id) + '/events?limit=50&offset=' + historyOffset;
   const detailApi = useApi<{ data: CaseDetail; request_id: string }>('/api/v1/cases/' + encodeURIComponent(id));
@@ -147,18 +150,18 @@ export function CaseDetailScreen({ id, returnTo, role, userId }: CaseDetailScree
                       ? `User ${caseData.assigned_to_user_id.slice(0, 8)}…`
                       : 'Unassigned'}
               </strong>
-              <p className="cell-secondary">Opened {formatTime(caseData.opened_at)} UTC</p>
+              <p className="cell-secondary">Opened {displayTime(caseData.opened_at)} {timeZone}</p>
             </div>
             {caseData.due_at ? (
               <div>
                 <span className="summary-label">Due date</span>
-                <strong>{formatTime(caseData.due_at)} UTC</strong>
+                <strong>{displayTime(caseData.due_at)} {timeZone}</strong>
               </div>
             ) : null}
             {caseData.closed_at ? (
               <div>
                 <span className="summary-label">Closed at</span>
-                <strong>{formatTime(caseData.closed_at)} UTC</strong>
+                <strong>{displayTime(caseData.closed_at)} {timeZone}</strong>
                 <p className="cell-secondary">{caseData.resolution_code ?? 'None'}</p>
               </div>
             ) : null}
@@ -204,10 +207,10 @@ export function CaseDetailScreen({ id, returnTo, role, userId }: CaseDetailScree
                           'Unassigned'
                         ),
                       ],
-                      ['Opened (UTC)', formatTime(caseData.opened_at)],
-                      ['Due (UTC)', caseData.due_at ? formatTime(caseData.due_at) : 'No due date set'],
-                      ['Updated (UTC)', formatTime(caseData.updated_at)],
-                      ['Closed (UTC)', caseData.closed_at ? formatTime(caseData.closed_at) : 'Active / not closed'],
+                      [`Opened (${timeZone})`, displayTime(caseData.opened_at)],
+                      [`Due (${timeZone})`, caseData.due_at ? displayTime(caseData.due_at) : 'No due date set'],
+                      [`Updated (${timeZone})`, displayTime(caseData.updated_at)],
+                      [`Closed (${timeZone})`, caseData.closed_at ? displayTime(caseData.closed_at) : 'Active / not closed'],
                       [
                         'Resolution Code',
                         caseData.resolution_code ? <code>{caseData.resolution_code}</code> : 'None',
@@ -272,7 +275,7 @@ export function CaseDetailScreen({ id, returnTo, role, userId }: CaseDetailScree
                                   <h3 id={`event-${event.event_id}`}>{title}</h3>
                                   <div className="event-meta">
                                     <span>#{event.event_ordinal}</span>
-                                    <span>{formatTime(event.occurred_at)} UTC</span>
+                                    <span>{displayTime(event.occurred_at)} {timeZone}</span>
                                     <span>
                                       Actor: {event.actor_user_id === userId ? 'You' : `${event.actor_user_id.slice(0, 8)}…`}
                                     </span>

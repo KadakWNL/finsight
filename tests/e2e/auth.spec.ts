@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { randomBytes } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 import pg from 'pg';
 import argon2 from 'argon2';
 import { requireTestDatabase } from '../../scripts/database-safety.mjs';
@@ -50,7 +50,7 @@ test('discovery UI uses real database reads, safe deep links, filters, evidence 
   await page.getByLabel('Description or exact transaction ID').fill('missingwordnosynthetic');
   await page.getByRole('button',{name:'Apply filters'}).click();await expect(page.getByRole('heading',{name:'No transactions match these filters'})).toBeVisible();
   await page.getByRole('button',{name:'Reset filters'}).click();await expect(page.getByRole('link',{name:/View transaction/})).toHaveCount(8);
-  await page.goto('/transactions?amount_min=1');await expect(page.getByRole('alert')).toBeVisible();await expect(page.getByLabel('Minimum amount')).toHaveValue('1');
+  await page.goto('/transactions?amount_min=1');await expect(page.getByRole('main').getByRole('alert')).toBeVisible();await expect(page.getByLabel('Minimum amount')).toHaveValue('1');
   await page.getByLabel('Original currency').selectOption('INR');await page.getByRole('button',{name:'Apply filters'}).click();
   await expect(page.getByRole('link',{name:/View transaction/})).toHaveCount(5);
   await page.goto('/transactions/'+syntheticId(106));
@@ -149,6 +149,47 @@ test('theme follows the system and preserves explicit choices across reloads and
   await page.emulateMedia({colorScheme:'light'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
 });
 
+test('sidebar collapse preserves navigation, keyboard labels and mobile access',async({page})=>{
+  await page.goto('/sign-in');
+  await page.getByLabel('Email address').fill(uiEmail);
+  await page.getByLabel('Password',{exact:true}).fill(password);
+  await page.getByRole('button',{name:'Sign in',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Your overview'})).toBeVisible();
+  const before = await page.locator('.workspace-body').boundingBox();
+  await page.screenshot({path:'test-results/sidebar-expanded.png',fullPage:true});
+  await page.getByRole('button',{name:'Collapse sidebar',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Expand sidebar',exact:true})).toHaveAttribute('aria-expanded','false');
+  const after = await page.locator('.workspace-body').boundingBox();
+  expect(after!.x).toBeLessThan(before!.x);
+  const navigation = page.getByRole('navigation',{name:'Primary navigation'});
+  const cases = navigation.getByRole('link',{name:'Cases',exact:true});
+  await page.keyboard.press('Tab');
+  await page.keyboard.press('Tab');
+  await expect(cases).toBeFocused();
+  await expect(cases.locator('.sidebar-tooltip')).toBeVisible();
+  await page.screenshot({path:'test-results/sidebar-collapsed-tooltip.png',fullPage:true});
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/cases$/);
+  await expect(navigation.getByRole('link',{name:'Cases',exact:true})).toHaveAttribute('aria-current','page');
+  await page.reload();
+  await expect(page.getByRole('button',{name:'Expand sidebar',exact:true})).toBeVisible();
+  await page.mouse.move(800,100);
+  await page.screenshot({path:'test-results/sidebar-collapsed.png',fullPage:true});
+  await page.locator('.sidebar-settings').click();
+  await expect(page.getByRole('heading',{name:'Settings',exact:true})).toBeVisible();
+  await page.setViewportSize({width:390,height:844});
+  await expect(page.getByRole('button',{name:'Expand sidebar',exact:true})).toHaveCount(0);
+  await page.getByText('Menu',{exact:true}).click();
+  await expect(page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Transactions',exact:true})).toBeVisible();
+  await page.screenshot({path:'test-results/sidebar-mobile-menu.png',fullPage:true});
+  await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Transactions',exact:true}).click();
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.setViewportSize({width:1280,height:720});
+  await page.getByRole('button',{name:'Expand sidebar',exact:true}).click();
+  await expect(page.getByRole('button',{name:'Collapse sidebar',exact:true})).toHaveAttribute('aria-expanded','true');
+  await expect(navigation.getByRole('link',{name:'Transactions',exact:true}).locator('.sidebar-link-label')).toBeVisible();
+});
+
 test('settings preserves return paths, synchronizes appearance controls and works on mobile',async({page})=>{
   await page.emulateMedia({colorScheme:'dark'});
   await page.goto('/settings');
@@ -158,9 +199,36 @@ test('settings preserves return paths, synchronizes appearance controls and work
   await page.getByRole('button',{name:'Sign in',exact:true}).click();
   await expect(page.getByRole('heading',{name:'Settings',exact:true})).toBeVisible();
   await expect(page.getByText(uiEmail,{exact:true})).toBeVisible();
+  const fixture = await page.request.post('/api/v1/cases',{
+    headers:{origin,'idempotency-key':randomUUID()},
+    data:{transaction_id:syntheticId(107),priority:'low',reason:'Settings timestamp display verification'},
+  });
+  expect(fixture.status()).toBe(201);
   await expect(page.getByRole('radio',{name:/System/})).toBeChecked();
   await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
   await expect(page.locator('.sidebar-settings')).toHaveAttribute('aria-current','page');
+  await page.getByLabel('Time zone',{exact:true}).selectOption('Asia/Kolkata');
+  await page.getByLabel('Display currency',{exact:true}).selectOption('INR');
+  await expect(page.locator('.workspace-footer')).toContainText('Asia/Kolkata');
+  await page.reload();
+  await expect(page.getByLabel('Time zone',{exact:true})).toHaveValue('Asia/Kolkata');
+  await expect(page.getByLabel('Display currency',{exact:true})).toHaveValue('INR');
+  await page.goto('/transactions/'+syntheticId(106));
+  await expect(page.locator('.amount-large')).toHaveText('INR 10,000.00');
+  await expect(page.getByText('USD 125.00 original',{exact:true})).toBeVisible();
+  const timestamp = await page.request.get('/api/v1/transactions/'+syntheticId(106));
+  const occurred = (await timestamp.json()).data.occurred_at;
+  const expectedTime = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Kolkata',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(occurred));
+  await expect(page.locator('.detail-summary')).toContainText(expectedTime+' Asia/Kolkata');
+  await page.goto('/cases');
+  await expect(page.getByRole('columnheader',{name:'Opened (Asia/Kolkata)'})).toBeVisible();
+  const secondTab = await page.context().newPage();
+  await secondTab.goto('/settings');
+  await page.goto('/settings');
+  await page.getByLabel('Time zone',{exact:true}).selectOption('America/New_York');
+  await expect(secondTab.getByLabel('Time zone',{exact:true})).toHaveValue('America/New_York');
+  await secondTab.close();
+  await page.getByLabel('Time zone',{exact:true}).selectOption('Asia/Kolkata');
   await page.screenshot({path:'test-results/settings-desktop-dark.png',fullPage:true});
   await page.getByRole('radio',{name:/Light/}).check();
   await expect(page.locator('html')).toHaveAttribute('data-theme','light');

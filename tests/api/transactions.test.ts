@@ -76,8 +76,11 @@ test('overview isolates assigned work, admin sees active team work, and no priva
   const own=await read();expect(own.headers.get('cache-control')).toContain('no-store');
   const body=await own.json();expect(body.data.map((r:{case_ref:string})=>r.case_ref)).toEqual(['OWN-CASE-A']);
   expect(body.data[0].owner_label).toBeNull();noLeak(body);
+  expect(body.data[0]).toMatchObject({amount:'12000.00',amount_base:'12000.00',currency_code:'INR'});
   const team=await (await read(2)).json();expect(team.data).toHaveLength(3);expect(team.data.some((r:{case_ref:string})=>r.case_ref==='TERMINAL-PRIVATE')).toBe(false);
   expect(JSON.stringify(team)).not.toContain('PRIVATE_CASE_REASON');
+  expect(team.data.find((row:{transaction_id:string})=>row.transaction_id===id(106)))
+    .toMatchObject({amount:'125.00',amount_base:'10000.00',currency_code:'USD'});
   expect((await read(0,'?scope=all')).status).toBe(400);
 });
 

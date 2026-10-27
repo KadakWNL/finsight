@@ -71,7 +71,7 @@ All implemented GET responses use `Cache-Control: private, no-store`. A successf
 
 400 means malformed filters/ID/cursor; 401 means missing, revoked, expired or ineligible authentication; 403 is the role-denial boundary; 404 means absent transaction; 503 means unavailable authentication/database reads. Error bodies omit SQL, connection details, credentials and supplied cursor contents. An empty `data` array is a successful query, not a dependency failure. Unsupported write methods return the framework's 405 response and change no financial facts.
 
-Frontend requests use the existing same-origin Auth.js cookie. Keep monetary strings intact for rendering. Preserve filter state on errors; reset continuation only when the query changes or a cursor is rejected. Use the scoped case indicator for link availability and the no-signal/coverage wording for explanation. Other dimensions remain unevaluated. Sign-in/navigation/explorer/detail UI remains separate work.
+Frontend requests use the existing same-origin Auth.js cookie. Keep monetary strings intact for rendering. Preserve filter state on errors; reset continuation only when the query changes or a cursor is rejected. Use the scoped case indicator for link availability and the no-signal/coverage wording for explanation. Other dimensions remain unevaluated. The [discovery workspace](discovery-ui.md) implements sign-in, navigation, explorer and detail screens. Its display preferences select the leading recorded amount and timestamp zone without changing API filters, sorting or values.
 
 ## Verification
 

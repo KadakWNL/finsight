@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { formatTime, type HumanRole } from '@/lib/workspace';
 import type { CaseListPage, CasePriority, CaseStatus, CaseSummaryItem } from '@/lib/case-types';
 import { useApi } from './use-api';
+import { useDisplayPreferences } from './display-preferences';
 import { EmptyState, ErrorState, LoadingState, PageHeading, PriorityBadge, StatusBadge } from './ui';
 
 interface CaseQueueScreenProps {
@@ -14,6 +15,7 @@ interface CaseQueueScreenProps {
 }
 
 export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
+  const { timeZone } = useDisplayPreferences();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -218,7 +220,7 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             <h2>
               {role === 'analyst'
                 ? tab === 'mine'
-                  ? 'Your active cases'
+                  ? 'Your cases'
                   : tab === 'unassigned'
                     ? 'Unassigned case summaries'
                     : 'Permitted cases'
@@ -263,8 +265,8 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
                       <th scope="col">Priority</th>
                       <th scope="col">Subject transaction</th>
                       <th scope="col">Assignee</th>
-                      <th scope="col">Due (UTC)</th>
-                      <th scope="col">Opened (UTC)</th>
+                      <th scope="col">Due ({timeZone})</th>
+                      <th scope="col">Opened ({timeZone})</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -314,8 +316,8 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
                             <span className="muted">Unassigned</span>
                           )}
                         </td>
-                        <td>{row.due_at ? formatTime(row.due_at) : '—'}</td>
-                        <td>{row.opened_at ? formatTime(row.opened_at) : '—'}</td>
+                        <td>{row.due_at ? formatTime(row.due_at, timeZone) : '—'}</td>
+                        <td>{row.opened_at ? formatTime(row.opened_at, timeZone) : '—'}</td>
                       </tr>
                     ))}
                   </tbody>

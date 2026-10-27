@@ -152,6 +152,22 @@ dialog { width: min(560px,calc(100vw - 32px)); max-height: calc(100vh - 48px); m
 .sidebar nav a:hover { background: var(--surface-muted); color: var(--foreground); }
 .sidebar nav a[aria-current=page] { background: var(--selection); color: var(--foreground); font-weight: 600; }
 .sidebar nav a[aria-current=page] svg { color: var(--primary); }
+.sidebar-top { display: flex; align-items: center; gap: 8px; min-height: 44px; }
+.sidebar-top .workspace-brand { flex: 1; min-width: 0; padding: 0; }
+.sidebar-toggle { position: relative; flex: 0 0 44px; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; border: 0; border-radius: 5px; background: transparent; color: var(--secondary-text); }
+.sidebar-toggle:hover { background: var(--surface-muted); color: var(--foreground); }
+.sidebar nav a,.sidebar-settings { position: relative; }
+.sidebar-tooltip { display: none; position: absolute; z-index: 50; left: calc(100% + 12px); top: 50%; transform: translateY(-50%); padding: 7px 10px; border-radius: 5px; background: var(--foreground); color: var(--background); font-size: 12px; font-weight: 500; line-height: 1.4; white-space: nowrap; pointer-events: none; }
+.sidebar-settings .sidebar-tooltip { display: none; margin: 0; color: var(--background); }
+.sidebar-toggle:hover .sidebar-tooltip,.sidebar-toggle:focus-visible .sidebar-tooltip,.sidebar-settings:hover .sidebar-tooltip,.sidebar-settings:focus-visible .sidebar-tooltip { display: block; }
+@media(min-width:801px) {
+  .workspace[data-sidebar-collapsed=true] .sidebar { width: 72px; padding-inline: 13px; }
+  .workspace[data-sidebar-collapsed=true] .workspace-body { margin-left: 72px; }
+  .workspace[data-sidebar-collapsed=true] .sidebar .workspace-brand,.workspace[data-sidebar-collapsed=true] .sidebar-link-label,.workspace[data-sidebar-collapsed=true] .sidebar-account { display: none; }
+  .workspace[data-sidebar-collapsed=true] .sidebar nav a { justify-content: center; padding: 12px; }
+  .workspace[data-sidebar-collapsed=true] .sidebar-context { justify-content: center; }
+  .workspace[data-sidebar-collapsed=true] .sidebar nav a:hover .sidebar-tooltip,.workspace[data-sidebar-collapsed=true] .sidebar nav a:focus-visible .sidebar-tooltip { display: block; }
+}
 .sidebar-context { margin: auto 0 0; padding-top: 20px; border-top: 1px solid var(--border); font-size: 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; text-align: left; }
 .sidebar-context strong,.sidebar-context span { display: block; }.sidebar-context span { color: var(--secondary-text); margin-top: 4px; }
 .sidebar-account { min-width: 0; }
@@ -183,6 +199,13 @@ body { font-family: var(--font-plex), 'Segoe UI', system-ui, sans-serif; }
 .choice-option strong { display: block; font-weight: 600; }
 .choice-description { display: block; color: var(--secondary-text); font-size: 13px; line-height: 1.5; margin-top: 2px; }
 .settings-content { max-width: 840px; }
+.regional-settings { display: grid; gap: 24px; }
+.regional-settings .settings-help { margin-top: 8px; }
+.timezone-controls { display: flex; gap: 12px; align-items: start; }
+.timezone-controls select { flex: 1; min-width: 0; }
+.timezone-controls button { flex-shrink: 0; }
+.settings-preview { font-size: 13px; color: var(--foreground); margin: 12px 0 0; overflow-wrap: anywhere; }
+@media(max-width:600px) { .timezone-controls { flex-direction: column; }.timezone-controls button { width: 100%; } }
 .settings-help { color: var(--secondary-text); font-size: 12px; margin: 16px 0 0; }
 .theme-choices { grid-template-columns: repeat(3,minmax(0,1fr)); }
 @media(max-width:600px) { .tab-row { width: 100%; }.tab-button { flex: 1 1 auto; padding-inline: 12px; }.theme-choices { grid-template-columns: minmax(0,1fr); } }

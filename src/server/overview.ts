@@ -14,7 +14,7 @@ export async function overviewRead(request:Request) {
     if(new URL(request.url).search) return failure(400,'invalid_request','Overview does not accept query parameters.');
     const {rows}=await getPool().query(`SELECT c.case_id,c.case_ref,c.status,c.priority,
       to_char(c.due_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS due_at,
-      c.transaction_id,t.amount,t.currency_code,m.merchant_name,
+      c.transaction_id,t.amount,t.amount_base,t.currency_code,m.merchant_name,
       CASE WHEN $2::text='admin' THEN u.display_name ELSE NULL END AS owner_label
       FROM public.investigation_case c JOIN public.transaction t USING(transaction_id)
       JOIN public.merchant m USING(merchant_id) LEFT JOIN public.app_user u ON u.user_id=c.assigned_to_user_id

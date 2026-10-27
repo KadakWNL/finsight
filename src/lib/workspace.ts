@@ -24,9 +24,9 @@ export function formatMoney(value: string, currency: string) {
   if (!/^\d+$/.test(whole) || !/^\d{0,2}$/.test(fraction)) return `${currency} ${value}`;
   return `${currency} ${new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US').format(BigInt(whole))}.${fraction.padEnd(2,'0')}`;
 }
-export function formatTime(value: string | null) {
+export function formatTime(value: string | null, timeZone = 'UTC') {
   if (!value) return 'Not set';
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return 'Not recorded';
-  return new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(date);
+  return new Intl.DateTimeFormat('en-GB',{timeZone,day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(date);
 }

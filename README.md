@@ -22,11 +22,12 @@ The captures show the running application with generated synthetic data. The wor
 | Authentication | Provisioned analyst/admin identities, Argon2id passwords, encrypted cookies, PostgreSQL-backed session expiry and sign-out |
 | Discovery | Role overview, description/exact-ID search, date/status/risk/entity/amount filters, stable signed cursor paging |
 | Transaction evidence | Masked customer/account context, original currency and INR base amounts, recorded contributions, rule context and completeness caveats |
-| Investigation | Analyst case creation from transaction detail; scoped queue/detail/history and guarded lifecycle APIs |
+| Investigation | Case creation, scoped queue/detail/history, and role-aware lifecycle dialogs backed by guarded APIs |
+| Workspace preferences | [Settings and collapsible navigation](docs/discovery-ui.md#settings-and-display-preferences), browser appearance, time zone and original/INR amount display |
 | Demo data | Reproducible linked activity, saved historical FX observations, conflict-safe import and offline replay |
 | Integrity | PK/FK/check constraints, retained financial facts, unique active cases, version conflicts, idempotent commands and immutable events |
 
-Case queue/detail/lifecycle **screens remain pending**. MongoDB telemetry and analyst notes, general administration and semantic search are not exposed as working features. A recorded risk score supports review; it is not a fraud verdict.
+The [case screens](docs/case-ui.md) support investigation and lifecycle review. MongoDB telemetry and analyst notes, general administration and semantic search are not exposed as working features. A recorded risk score supports review; it is not a fraud verdict.
 
 ## Get started
 
@@ -77,7 +78,7 @@ npm run demo:import -- --snapshot=data/local/fx-2026-q1.json --manifest=data/loc
 npm run dev -- --port 3014
 ```
 
-Open **[http://localhost:3014/sign-in](http://localhost:3014/sign-in)**. Use the theme switch beside sign-out to change appearance. If you choose another port, change `NEXTAUTH_URL` to match before starting the server.
+Open **[http://localhost:3014/sign-in](http://localhost:3014/sign-in)**. The sidebar Settings gear opens [appearance and display preferences](docs/discovery-ui.md#settings-and-display-preferences); the button beside FinSight collapses the desktop sidebar. If you choose another port, change `NEXTAUTH_URL` to match before starting the server.
 
 The public landing page and process-health endpoint do not require a database. Authenticated screens require the configured PostgreSQL instance.
 
@@ -132,7 +133,7 @@ npm run test:e2e
 npm run build
 ```
 
-Vitest covers validation, migration behavior and PostgreSQL-backed handlers. Playwright checks real sign-in, discovery, masks, role denial, case creation, recovery, keyboard/mobile behavior and theme persistence. Browser checks start their own server on port 3100; stop another development server for this checkout before running them.
+Vitest covers validation, migration behavior and PostgreSQL-backed handlers. Playwright checks real sign-in, discovery, masks, role denial, case lifecycle, recovery, keyboard/mobile behavior, sidebar collapse and Settings preferences. Browser checks start their own server on port 3100; stop another development server for this checkout before running them.
 
 [GitHub Actions](https://github.com/KadakWNL/finsight/actions) records the reproducible checks. `npm run test:acceptance` deliberately fails until the complete VS01-VS16 acceptance work is implemented; component tests do not establish final academic acceptance.
 
@@ -142,7 +143,7 @@ FinSight follows the locally supplied **DBMS Experiential Learning, Level 3 Proj
 
 | Brief items | Repository evidence | Remaining completion work |
 |---|---|---|
-| 1, 17: meaningful problem beyond CRUD | Explainable risk review, guarded investigations, concurrency and immutable decisions | Confirm section title uniqueness; complete and demonstrate the case UI |
+| 1, 17: meaningful problem beyond CRUD | Explainable risk review, guarded investigations, concurrency and immutable decisions | Confirm section title uniqueness; retain final demonstration and acceptance evidence |
 | 2, 14, 15: two-member team, Git and contribution evidence | [Commit history](https://github.com/KadakWNL/finsight/commits/main/), [pull requests](https://github.com/KadakWNL/finsight/pulls), [project board](https://github.com/users/KadakWNL/projects/5) | Course team approval, individual database/application contribution evidence and timed demonstration |
 | 3: multiple database paradigms | Implemented PostgreSQL model; documented MongoDB boundary | MongoDB integration and scoped aggregation |
 | 4: database design | ER figures, relational mapping, dictionaries and constraints | Executable NoSQL collections, validators and indexes |
@@ -150,7 +151,7 @@ FinSight follows the locally supplied **DBMS Experiential Learning, Level 3 Proj
 | 6: meaningful DML and queries | Financial/case INSERT, guarded UPDATE, scoped SELECT, joins, grouping, ordering and aggregates | Audited nonfinancial DELETE and final query evidence; financial DELETE stays blocked |
 | 7: four SQL advanced concepts plus a NoSQL/vector concept | Transactions, views, stored functions, triggers, indexes and full-text search | NoSQL aggregation demonstration |
 | 8: optional vector search | Deferred retrieval design | Optional embedding/model/storage/metric evidence if implemented |
-| 9-12: Next.js, backend integration, roles and integrity | Working discovery UI, authenticated APIs, analyst/admin policy and database constraints | Case-screen integration and complete acceptance run |
+| 9-12: Next.js, backend integration, roles and integrity | Discovery and case UI, authenticated APIs, analyst/admin policy and database constraints | Complete academic acceptance run |
 | 13: soft-copy documentation | Architecture, schema, API contracts, screenshots and reproducible checks | Final report, measured test results and conclusion |
 | 16: originality | Project-specific schema, workflow guards and independently authored demo generator | Preserve source attribution and individual implementation evidence |
 
@@ -162,6 +163,7 @@ The [requirements traceability](docs/requirements-traceability.md) and [testing 
 |---|---|
 | [Development setup](docs/development-setup.md) | Environment, roles, database isolation and command reference |
 | [Discovery workspace](docs/discovery-ui.md) / [design system](DESIGN.md) | Routes, themed shell, interaction boundaries and visual tokens |
+| [Case workspace](docs/case-ui.md) | Queue views, lifecycle dialogs, conflict recovery and audit history |
 | [Authentication](docs/authentication.md) | Provisioning, cookies, sessions, grants and role checks |
 | [Transaction API](docs/transaction-api.md) / [Case API](docs/case-api.md) | Request validation, scoping, pagination and guarded commands |
 | [Demo dataset](docs/demo-dataset.md) / [deterministic risk](docs/deterministic-risk.md) | Generated activity, historical conversion and exact regression fixtures |
