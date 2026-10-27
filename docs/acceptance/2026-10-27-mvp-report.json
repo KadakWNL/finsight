@@ -1,0 +1,955 @@
+{
+  "startedAt": "2026-10-27T16:58:17.389Z",
+  "completedAt": "2026-10-27T16:59:22.034Z",
+  "technicalStatus": "passed",
+  "reviewStatus": "pending_teammate_cross_review",
+  "mvpComplete": false,
+  "environment": {
+    "postgresVersion": 170010,
+    "ownerRole": "finsight_test",
+    "runtimeRole": "finsight_runtime",
+    "runtimeIsNonowner": true
+  },
+  "runtime": {
+    "node": "v24.15.0",
+    "platform": "win32",
+    "architecture": "x64"
+  },
+  "source": {
+    "commit": "900883e3375b7bdb1fba02a34c4b18005fe7044d",
+    "dirty": false,
+    "hashes": {
+      "scripts/acceptance-matrix.mjs": "6fc51992b5601743f50503a852023284d4df19c6c394bc0f55aac4ecdac559a9",
+      "scripts/acceptance-safety.mjs": "4136389c85903c77cecad5d8961f7ea611e23bf4978c6e2fef2b300bebcbd105",
+      "scripts/acceptance.mjs": "e7c916bc054748f1f383f672bcd3e634f73d107c52240f429dd6824c868f38aa",
+      "scripts/database-safety.mjs": "ff9c39b3833c3f2bc6c140ae5898dcc9b1d03db9c3d10076cb85fbfebf6d09c4",
+      "scripts/demo-cli.mjs": "ecec98e68428ff7c59d50124db5377688201a62f7ef601df3bbf47b56c2620a5",
+      "scripts/demo-dataset.mjs": "fc1a7bb32d1c4d5a21202db4278057bb174e2b951f4d810534c95002fddfd1d2",
+      "scripts/demo-fx.mjs": "f7ae83a0221bab8dfe80aae72156f65faf57be2bd0c43cf647b0885d14a68f96",
+      "scripts/demo-import.mjs": "559c59a8431b6c77013aa445202ddebe2afcd6ac68d065dfb556cf325bde64c0",
+      "scripts/financial-seed.mjs": "b81a8a54fc7fc22e6e4e776ff0a3aef569677242661e4adbd59209dbbf43ad2f",
+      "scripts/migrate.mjs": "0f432b4b23ed9e7a9c01f584adb3e22f9104fa9da3cacbe0d8a6a27bb0463267",
+      "scripts/migration-runner.mjs": "247594be29e47338f2acda5d859669e7b7f270032d1fdffb9a3663b8c6758dc2",
+      "scripts/pending.mjs": "577c0a8f55354e8786066dc20f325ecac68ef576d2f3649cfbec03547208b479",
+      "scripts/provision-identities.mjs": "8c03b7537e654507a8eb13c26c7f4285af0028f088e914533aa65495f60f2fb5",
+      "scripts/seed.mjs": "0dccebae59f555fb5c86505435b2bebda1d3f81333570f20f67f7055a86cdf63",
+      "src/app/(workspace)/access-denied/page.tsx": "49e4b7162c575f6886df5eae3e24868fc9e19c984b4cfc94964f1b95b54d5725",
+      "src/app/(workspace)/admin/page.tsx": "a34f997b94e3abe9b980c3acd1c037f27f5e41f0f171c389448406c460c5eeb4",
+      "src/app/(workspace)/cases/page.tsx": "0e3630448bcea999d25f4d0eb7ad0a445890c538146553afb932096716cc2030",
+      "src/app/(workspace)/cases/[id]/page.tsx": "7a37affd584b0d38813f46d576d424856200f8c24669d20b98333ed6d2812593",
+      "src/app/(workspace)/layout.tsx": "254811e0003ed6c52634adc15a83aeadc9e2f72be8d88f0126a8eae5d3a7fa91",
+      "src/app/(workspace)/overview/page.tsx": "fc7f2ee7330efd74b71cd789a3576f94ef031d4156a00aec816ad822bd506a88",
+      "src/app/(workspace)/settings/page.tsx": "bdf0b621a53f2f75285a0750b83d31a386e1ce0fee4feb7ea123021dec0d92e1",
+      "src/app/(workspace)/transactions/page.tsx": "65adaef55a0f48b14606d84264caed92d51542f1035f03d4173050e50cfdbd93",
+      "src/app/(workspace)/transactions/[id]/page.tsx": "6301c9b32170f444e369a5932cbb5ca15c44adadc1de668d934fa1a4166ec726",
+      "src/app/actions/create-subject-case.ts": "49b5e36c21f06b410c702014403cf66ea6842f737bfff33e2e5ae1643251f8f2",
+      "src/app/api/auth/login/route.ts": "8d89bdeba50eb6be57ecc64d604bd72e98448839cdf0b6b81ccaa2a34f5d6261",
+      "src/app/api/auth/logout/route.ts": "6abaa51d162c9306d25af919e2f4c4808a9303eac6e54c22b940a67e05eee399",
+      "src/app/api/auth/session/route.ts": "cd1be6e2586f87b7e8104bcaeb720da9eb87b0d53d25bded685c33229576837c",
+      "src/app/api/auth/[...nextauth]/route.ts": "54cba45feec374dc485d62001ba40c16650311c092507eed62ecc865ef415b61",
+      "src/app/api/cases/route.ts": "15c002dad9d1dbdd2937d0841eab9ca1c1e803f84646edefa4e73d828ed4fb8a",
+      "src/app/api/cases/[id]/commands/route.ts": "6cfc3e81832869f01fcd332816018899b1a4a4490b2b51774295c6a55e890aa3",
+      "src/app/api/cases/[id]/events/route.ts": "8d55cb3fb56614ae128218ecfd5f32a31b7819ee2c8c232d48ebbbf79b394eb7",
+      "src/app/api/cases/[id]/route.ts": "93f8339eca341409a6094f2336540f5827b1ea2f779376af0cbe7f15db3a3cc1",
+      "src/app/api/health/route.ts": "2f9bc06a20048011d6d5d55cb727cab34b2afe8ee4bd825de5a3567a415b9f86",
+      "src/app/api/v1/cases/route.ts": "15c002dad9d1dbdd2937d0841eab9ca1c1e803f84646edefa4e73d828ed4fb8a",
+      "src/app/api/v1/cases/[id]/commands/route.ts": "6cfc3e81832869f01fcd332816018899b1a4a4490b2b51774295c6a55e890aa3",
+      "src/app/api/v1/cases/[id]/events/route.ts": "8d55cb3fb56614ae128218ecfd5f32a31b7819ee2c8c232d48ebbbf79b394eb7",
+      "src/app/api/v1/cases/[id]/route.ts": "93f8339eca341409a6094f2336540f5827b1ea2f779376af0cbe7f15db3a3cc1",
+      "src/app/api/v1/overview/route.ts": "12ba2214eb5227ba94abf6486d92fcb93520b4692688db1771ba23576e4cc506",
+      "src/app/api/v1/transactions/route.ts": "8eca586180d4cfa165cede662933931c4c3feb3cce4ad8eae30a54fc2004ccaa",
+      "src/app/api/v1/transactions/[id]/route.ts": "002cecc4001dc2c703f718304bd18e1323315e50211bb7ebb84a35c88827bec9",
+      "src/app/error.tsx": "802fb75c8b27694a303469974b73b086efb042c24c964a07afda69526269c807",
+      "src/app/layout.tsx": "79b7dd74c6967226d357f4ec145c604fa661a709e4283b3084eda530f90bce4e",
+      "src/app/login/page.tsx": "bb49d3b9e39571fe8da2c38fbe66f590755df3603671189ec3d7e3278660ba75",
+      "src/app/page.tsx": "c25d3c79f831eb5313f102bb34da0dda89bbf6f695336a281a1b9b10191590b7",
+      "src/app/sign-in/page.tsx": "e268c4c43f2502f7c36d34b4b3658f510d9e76a44eddaac74bb481a0057bb342",
+      "src/components/ui/button.tsx": "9e6aa72d04d8e6bbf352c26f71baf22741546c44fa220ddb343095c07ccdd24a",
+      "src/components/ui/settings-icon.tsx": "8c7132da78cb140a17ea6959790254531eb3afd4d33bf2ec2931c968b5b9e95e",
+      "src/components/workspace/app-shell.tsx": "53a77c1d8b85430688898558b780305fe13e0efe419777c85eb4188ffcd27d59",
+      "src/components/workspace/case-detail.tsx": "e873f263d24dadfa65e3850a97f9d27163bd953d8125464ec7764397c9bae246",
+      "src/components/workspace/case-dialogs.tsx": "5d08841098f2bf95ac71fdc3e53ae06b5fa830c9f828065ea40deded3dd37774",
+      "src/components/workspace/case-queue.tsx": "6dca08583f5a1042793d0b48c0912ec2c19ab9496589013656c5a62830860f43",
+      "src/components/workspace/create-case-dialog.tsx": "26f406c104898b2f0439681471c7550e470b29c0cd582d4af92cf1a51d49cc03",
+      "src/components/workspace/display-preferences.tsx": "9b1a53654b445a53c6a9e365282aa31d02a43315f37133d0ca0264299b19adf5",
+      "src/components/workspace/explorer.tsx": "c2579769bd825a6b1d46d1a90d88ee6dfe3031d4b28de20a6a33da638dfb0206",
+      "src/components/workspace/overview-screen.tsx": "ab68bf2cbc9cfd09ec96dc287c04437ec6b604f3b29afa9a61314b963aef701f",
+      "src/components/workspace/record-identifier.tsx": "1e4f5826a89756a534f72da90ce18482ab7bf581b977b57176b6a4b0cc0f501c",
+      "src/components/workspace/sign-in-form.tsx": "e51dbec21782e925fb469b00cd359373d83dda8b8271c27bff46282bde0e7584",
+      "src/components/workspace/theme-switch.tsx": "71f918acbccb757290f730c3e650065d8fcdf7d70c083628a4622e15c6ae8c2c",
+      "src/components/workspace/transaction-detail.tsx": "20e8464ff1127c0044fdf32e0ac173d2b331b3a4df3141cf32845286026e1571",
+      "src/components/workspace/transaction-table.tsx": "11856191a1feba89440d6b509a20d000ba44ca924b9a4e06482d37152c3cc475",
+      "src/components/workspace/ui.tsx": "5ed79f01772a05f5d92012b5e50144d3ba57922ec3af89a16113e8f84dafda42",
+      "src/components/workspace/use-api.ts": "a5356ccc724f17f8b996d65ab04ad5bfcb5115a57a4615392b54e5fc81a4822b",
+      "src/lib/case-types.ts": "8f7bf3a263ccb44af5f34429888b3fef214a2ba8351235119085479acaa7c710",
+      "src/lib/display-preferences.ts": "4f274fc5e15483b855d2fdf3f7e60515323ef056ff53b75ba5f5f811e63b9f0e",
+      "src/lib/transaction-types.ts": "97ee34a64973deb25f08aa090df769f8486ec6a7a253d91fe972794d0f98b8a2",
+      "src/lib/utils.ts": "4b705c7d7e5c7a2dd73d26ad35e9c0583d3d3655e2a5be1e67cea21458f29c01",
+      "src/lib/workspace.ts": "ac1a3972d1c2da2081960aac6a5c87ae68e0855b4d72e933b486f821882f4d1c",
+      "src/server/auth-config.ts": "964a2dc94b61660950814b247dd09634961302ba1d0f1f4406ab701455369a31",
+      "src/server/auth-security.ts": "2970ab606a806ed716061bb4081d317bb1ef2491abc965a50f57824d4f8ff3f3",
+      "src/server/auth.ts": "29b439267f56b1ff8fc3763994b91fa87668c30cd69049b2d9ceeadda7ee0c4c",
+      "src/server/authentication.ts": "2c07b5a448232b1c9fe7d8d788992e1268393c3490e58dec127969c71180702c",
+      "src/server/authorization.ts": "67b7959e9c6427890581e2e99f7be8e949b0a922af5caf381299b6b7dcb1a6bf",
+      "src/server/case-api.ts": "e67e7133fa116a65fbbe809671cb662499a2a7a6345e52fe0e9a6ab4fe8d8232",
+      "src/server/case-commands.ts": "6832b34c3b6079af824bab74a135df31952986ff4ef7c46ef670c98816823d34",
+      "src/server/case-parameters.ts": "987aee53d4900688d6367d1828fa6d18bc18f9be50bd53d8dcb084fc7d0454ef",
+      "src/server/case-queries.ts": "84122cf43d362fab48fa6cd0850d200274c790dfe0ec26545a401ee5c90c02ae",
+      "src/server/db.ts": "4fb9b8bba75829bef8de7cdde9bc58dc366ac8ba19e372fcd9e39b9a0cb167d7",
+      "src/server/financial-queries.ts": "57b2ef559e2beaa417e0f24f65bbacdf4de70be116f8720604b4fcd09e8f64f3",
+      "src/server/login-limit.ts": "c7e58900aca5f7bc0446259489658e7c6b7501ddc80b7e041f5c4a78fdba42cb",
+      "src/server/overview.ts": "8ecca2d813862de0b1939900847db28075e46f627192369afdbe898b2157c0e3",
+      "src/server/page-auth.ts": "8859522a59fdbf60a55cdd42230ad49351863500c6006bd9fd6caeae013728ed",
+      "src/server/session.ts": "e82b7f6cdf603eb014935a2fdcaa4bfb0748be383b9056b06a8b30ed2035c725",
+      "src/server/subject-case.ts": "679fb193e29876f87181b456ddb0823a32ce5f46d743c4ef3578784479e07701",
+      "src/server/transaction-api.ts": "78b7c97a5c8a3927f93d4ec619ec77d2166c1dc4e5582446a5c9169fae0145c7",
+      "src/server/transaction-parameters.ts": "49a68d007b4c3f0e12b02f95727a083e6d0bef1d9faca56f0121c3d46ad11c9f",
+      "tests/api/acceptance-gaps.test.ts": "97dbcb006e51390c13f7630b7e5ace1bbf96eadcd7693c06de15f2d5d8bf5860",
+      "tests/api/acceptance-safety.test.ts": "6f2fc26a40b7715b5d6e121101224dae1b13147c98056e3160cd3c58789deb08",
+      "tests/api/auth.test.ts": "7d44d100a57916b2faf21a9a1fea27595714eb37ee2df1c28f6d275144a858c4",
+      "tests/api/cases.test.ts": "aa8ac0c3d6f2a28c0690e68ac0b4793106c065069029da34604650b5163822c8",
+      "tests/api/demo-import.test.ts": "57778efda47bde9e3632dc901f34e4355a9a5e8d93e2b3ba0ac9494a98dffc5d",
+      "tests/api/health.test.ts": "3002bc2428b53f5967e0ccea1cef7ccafb731732e5174fc5b7836fca5285ef27",
+      "tests/api/provision.test.ts": "37a70160b206c5312c391d59949cdeca9ff76b83c0e522e6cc455295a5d1507e",
+      "tests/api/transactions.test.ts": "383f11f1cd596554ac5f61ae3352c153b0645b0f491fb3e54659e62321f1cf0a",
+      "tests/db/case-guards.test.ts": "006d12c23ca65afde736dd1e07467376b8da855a01f5805345d5025399517d91",
+      "tests/db/migrations.test.ts": "8ecf63a0014489ddf1066262e10dcad222ffb4f2b58decb568aa511bb48780bc",
+      "tests/e2e/auth.spec.ts": "0a4bcfa3a5924b3fdb894afd272262b7ff5f16b14de7e534b1b8a6d21050d422",
+      "tests/e2e/case-ui.spec.ts": "e15062e56125ebc80db08e18aaa78334a89432321265aba827d6532bb33dc18d",
+      "tests/e2e/mvp-acceptance.spec.ts": "fc25eff3a83f42908cdc04341d1f2ebf4b37554577b4f2402446d3380784a0b6",
+      "tests/e2e/shell.spec.ts": "e1c161e9136f18e0a4739bff42a4dc81e3dab7d012869001159eb161a2044a5a",
+      "tests/financial-verification.mjs": "eef19b9b5d0622ed03d55e5828a64e754da7bddb8a774758f52684277364f902",
+      "tests/risk-verification.mjs": "3e8ec9d199a853fc96fc3f2939252ee27d08ad1f4f48e57b55de746b5ff3c225",
+      "tests/sql/case_guards.sql": "8c9e95391b4915b2ce8cb6a9e78d04ba834402a2ebc1429e217bfb098dd9abb6",
+      "tests/sql/financial_baseline.sql": "0827023cba579c3e4ea3cb60d10b6454e135d984b88363329b6f49dc7a4cac5d",
+      "tests/sql/financial_fixture.sql": "500bc11b800ab8dbe6415ee4001bf2a70e559f77203351dd15473e24a325b451",
+      "tests/sql/financial_guards.sql": "6689232b05ab8489117de2bb3fee020b6d89a3af6174f8a54081feedd7c8d459",
+      "tests/sql/operational_schema.sql": "19010ca49358688ed105fe74c73c54c7ad407cff03e42c2a034c1efde36d7a74",
+      "tests/unit/acceptance.test.ts": "e55401fed6dd0ba6e01c6f915d95af48c9d429e16f07144bba1ff347abe9e9f8",
+      "tests/unit/auth-security.test.ts": "7a3c27a46a77eabafeb7b7a40dbafee18f237907de944ec2257d627bd0e18fa1",
+      "tests/unit/auth.test.ts": "8dc36bf8e7a017acd17a238a1053cd2039ce0e1e4922d8648046b8513ef5afdd",
+      "tests/unit/case-parameters.test.ts": "350e22eb917ae754a6d332044243494c855440b945f366f145f1dc751902b380",
+      "tests/unit/database-safety.test.ts": "d895b3363a3063ce665971a698ecec9179d278b17473ce55ae350dda138e3bd5",
+      "tests/unit/demo-dataset.test.ts": "32ce60690b741c40b93ae0e4276d576170bc487fc609bd6f436b5641b8e693d4",
+      "tests/unit/display-preferences.test.ts": "aa58be587fa3080ed50fa14d9a97fb4592bd56142b044a12835f4bc85ae50c38",
+      "tests/unit/synthetic-database-safety.test.ts": "79f28f5855e101b2117085388f20e32d7eb2c24eb55b1d3ba4bab6fe525d94d7",
+      "tests/unit/transaction-parameters.test.ts": "254737ad12fdac9f4526c9f1a0367ad76a13c1c5c0ccff0eb01e50f1cf9af693",
+      "tests/unit/workspace.test.ts": "e0a1ed2df5ad460fae01485b29ed91202b47bd680063b7dd218632282cbdaabd",
+      "migrations/010_financial_baseline.sql": "2585550ff1be78aec0c907aeba9e11df70f007ed6fc5c0d88f729c4b09d75914",
+      "migrations/020_operational_schema.sql": "1a4748725e1a2b5b2b421cb3b81a62f06aa75a6dd9fa83ec12d19ed5a88c1b77",
+      "migrations/030_financial_guards.sql": "54fa5436b59b7177d5d2acfd35d153bc0ac444e4adc5f9ff7e830729f1b7e682",
+      "migrations/040_deterministic_risk.sql": "c3a24aecbbb0c2d03a9a600914ee32d55901ef85dd5cb7bbb72f71a4791ea66a",
+      "migrations/050_case_guards.sql": "9c301374f58793fb16055b78a59e461c4e9c5e5aaae0857ff2769bd5bd795727",
+      "migrations/055_auth_session_validation.sql": "3ea8af7cf28e4b02b1569e307599d73ebfc3d64dbd75c60c18f509c834541a5b",
+      "package-lock.json": "b08fc6009ec7abca340782a4a650b7eb11bba65e6ab5384fec9163ec29ab5113",
+      "playwright.config.ts": "f69750342569618851ace1278ee2c7e4c0987db4998fd303b3472363ce3b269b",
+      "playwright.acceptance.config.ts": "af0623a363d74c1f41d29f3e8e63656f1a2e80b09033915951337b418af1d2dd",
+      "vitest.config.ts": "fd7810e6783a7473ae6de4838d0acbccbc5778f90389ac2bf455846790edec33",
+      "next.config.ts": "6db4086280cf267532afb665b08010d3a91f2398f7ebd0f5011e8428ab48da99"
+    }
+  },
+  "fixtures": "scripts/financial-seed.mjs",
+  "migrations": [
+    {
+      "filename": "010_financial_baseline.sql",
+      "checksum": "2585550ff1be78aec0c907aeba9e11df70f007ed6fc5c0d88f729c4b09d75914"
+    },
+    {
+      "filename": "020_operational_schema.sql",
+      "checksum": "1a4748725e1a2b5b2b421cb3b81a62f06aa75a6dd9fa83ec12d19ed5a88c1b77"
+    },
+    {
+      "filename": "030_financial_guards.sql",
+      "checksum": "54fa5436b59b7177d5d2acfd35d153bc0ac444e4adc5f9ff7e830729f1b7e682"
+    },
+    {
+      "filename": "040_deterministic_risk.sql",
+      "checksum": "c3a24aecbbb0c2d03a9a600914ee32d55901ef85dd5cb7bbb72f71a4791ea66a"
+    },
+    {
+      "filename": "050_case_guards.sql",
+      "checksum": "9c301374f58793fb16055b78a59e461c4e9c5e5aaae0857ff2769bd5bd795727"
+    },
+    {
+      "filename": "055_auth_session_validation.sql",
+      "checksum": "3ea8af7cf28e4b02b1569e307599d73ebfc3d64dbd75c60c18f509c834541a5b"
+    }
+  ],
+  "stages": [
+    {
+      "id": "unit",
+      "command": "npm run test:unit",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 1556
+    },
+    {
+      "id": "build",
+      "command": "npm run build",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 14548
+    },
+    {
+      "id": "api",
+      "command": "npm run test:api -- --reporter=json",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 12127
+    },
+    {
+      "id": "db",
+      "command": "npm run test:db -- --reporter=json",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 2001
+    },
+    {
+      "id": "financial-schema",
+      "command": "psql --single-transaction -f migrations/010_financial_baseline.sql",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 189
+    },
+    {
+      "id": "financial-baseline",
+      "command": "psql -X -v ON_ERROR_STOP=1 -f tests/sql/financial_baseline.sql",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 171
+    },
+    {
+      "id": "operational-schema",
+      "command": "psql --single-transaction -f migrations/020_operational_schema.sql",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 164
+    },
+    {
+      "id": "operational-sql",
+      "command": "psql -X -v ON_ERROR_STOP=1 -f tests/sql/operational_schema.sql",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 214
+    },
+    {
+      "id": "financial-sql",
+      "command": "psql -X -v ON_ERROR_STOP=1 -v runtime_role=finsight_runtime -f tests/sql/financial_guards.sql",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 166
+    },
+    {
+      "id": "case-sql",
+      "command": "psql -X -v ON_ERROR_STOP=1 -v runtime_role=finsight_runtime -f tests/sql/case_guards.sql",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 179
+    },
+    {
+      "id": "risk",
+      "command": "node --conditions=react-server tests/risk-verification.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 1065
+    },
+    {
+      "id": "financial-plans",
+      "command": "node tests/financial-verification.mjs",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 1005
+    },
+    {
+      "id": "browser",
+      "command": "playwright test --config playwright.acceptance.config.ts",
+      "status": "passed",
+      "exitCode": 0,
+      "durationMs": 30465
+    }
+  ],
+  "scenarios": [
+    {
+      "id": "VS01",
+      "owner": "ShrikarDesai07",
+      "title": "Human sign-in and protected deep links",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "authenticates active analyst",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Credential Validation (validateCredentials) authenticates active analyst with correct password",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "authenticates active admin",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Credential Validation (validateCredentials) authenticates active admin with correct password (case-insensitive email)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "recorded analyst/admin investigation",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts recorded analyst/admin investigation preserves evidence through review, escalation, outcome and reopen",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS02",
+      "owner": "ShrikarDesai07",
+      "title": "Generic rejection, expiry and revoked-cookie replay",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "generic error on wrong password",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Credential Validation (validateCredentials) returns generic error on wrong password",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "generic error on inactive user",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Credential Validation (validateCredentials) returns generic error on inactive user without revealing account state",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "generic error on system",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Credential Validation (validateCredentials) returns generic error on system service role (human sign-in prohibited)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "idle timeout has elapsed",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Session Lifecycle and Database Expiry (VS01-VS03) rejects session when idle timeout has elapsed (30m without request)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "absolute timeout has elapsed",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Session Lifecycle and Database Expiry (VS01-VS03) rejects session when absolute timeout has elapsed (8h total)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "round trips the login cookie",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) round trips the login cookie through session and logout without leaking reusable credentials",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/auth.spec.ts",
+          "match": "Auth.js login protects",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "auth.spec.ts Auth.js login protects transaction reads and shares sign-out with JSON endpoints",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS03",
+      "owner": "ShrikarDesai07",
+      "title": "Current role and active-state enforcement",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "immediately reflects role changes",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Session Lifecycle and Database Expiry (VS01-VS03) immediately reflects role changes on next request",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/auth.test.ts",
+          "match": "immediately reflects user deactivation",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Authentication and Session API Integration Tests (VS01-VS03) Session Lifecycle and Database Expiry (VS01-VS03) immediately reflects user deactivation on next request without token expiry",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/acceptance-gaps.test.ts",
+          "match": "VS03:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "VS03: demotion immediately denies an admin-only mutation and deactivation denies writes without side effects",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS04",
+      "owner": "KadakWNL",
+      "title": "Risk explanations, bounded filters and stable paging",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/transactions.test.ts",
+          "match": "masked facts, decimal strings and zero-signal",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "returns SQL-backed masked facts, decimal strings and zero-signal transactions",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/transactions.test.ts",
+          "match": "composes exact-ID",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "composes exact-ID, FTS, date, status, risk and original/base amount filters",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/transactions.test.ts",
+          "match": "pages tied timestamps",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "pages tied timestamps and all allowed orders without losing or duplicating rows",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "risk",
+          "status": "passed",
+          "tests": []
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "recorded analyst/admin investigation",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts recorded analyst/admin investigation preserves evidence through review, escalation, outcome and reopen",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS05",
+      "owner": "KadakWNL",
+      "title": "Exact currencies and rejected financial invariants",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/transactions.test.ts",
+          "match": "masked facts, decimal strings and zero-signal",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "returns SQL-backed masked facts, decimal strings and zero-signal transactions",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "financial-sql",
+          "status": "passed",
+          "tests": []
+        },
+        {
+          "stage": "financial-plans",
+          "status": "passed",
+          "tests": []
+        },
+        {
+          "stage": "operational-sql",
+          "status": "passed",
+          "tests": []
+        }
+      ]
+    },
+    {
+      "id": "VS06",
+      "owner": "ShrikarDesai07",
+      "title": "Atomic self-assigned case creation and event shape",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS06:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS06: Analyst A creates case with priority and creation reason",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "case-sql",
+          "status": "passed",
+          "tests": []
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "recorded analyst/admin investigation",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts recorded analyst/admin investigation preserves evidence through review, escalation, outcome and reopen",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS07",
+      "owner": "ShrikarDesai07",
+      "title": "Idempotency and competing creation",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS07:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS07: Same-key retry returns committed result; changed payload conflicts; race leaves one active case",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "serializes same-key retries",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) serializes same-key retries and binds idempotency to the URL resource",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS08",
+      "owner": "ShrikarDesai07",
+      "title": "Concealed peer cases and denied administrative actions",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS08:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS08: Analyst B requests Analyst A private case/events -> concealed 404; unauthorized admin action -> 403",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/case-ui.spec.ts",
+          "match": "concealed peer case",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "case-ui.spec.ts Issue #15 — Case Queue, Lifecycle Dialogs, and Event History Analyst sees assigned queue, concealed peer case, and unassigned summary",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS09",
+      "owner": "ShrikarDesai07",
+      "title": "Invalid transitions and bounded rationale",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS09:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS09: Attempt open-to-terminal, escalation without reason, blank/oversize reasons -> 422/400",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/acceptance-gaps.test.ts",
+          "match": "VS09:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "VS09: reopen reason boundaries and invalid outcome combinations leave case, events and receipts unchanged",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "case-sql",
+          "status": "passed",
+          "tests": []
+        }
+      ]
+    },
+    {
+      "id": "VS10",
+      "owner": "ShrikarDesai07",
+      "title": "Review, escalation and administrative return",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS10:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS10: Owning analyst starts review and escalates; analyst resolution denied; admin returns case with reason",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "recorded analyst/admin investigation",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts recorded analyst/admin investigation preserves evidence through review, escalation, outcome and reopen",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS11",
+      "owner": "ShrikarDesai07",
+      "title": "All outcomes through both authorized paths",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/acceptance-gaps.test.ts",
+          "match": "VS11:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "VS11: every outcome code maps correctly for the owner and escalated admin paths",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS11:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS11: Parameterized resolution for all three codes (confirmed_suspicious, false_positive, insufficient_evidence)",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "recorded analyst/admin investigation",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts recorded analyst/admin investigation preserves evidence through review, escalation, outcome and reopen",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS12",
+      "owner": "ShrikarDesai07",
+      "title": "Repeated reopen and preserved terminal history",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS12:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS12: Admin reopens terminal case; active owner retained; inactive owner reset via assigned event",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/acceptance-gaps.test.ts",
+          "match": "VS12:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "VS12: repeated reopening preserves both terminal records, identity and priority while clearing outcome and due time",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "recorded analyst/admin investigation",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts recorded analyst/admin investigation preserves evidence through review, escalation, outcome and reopen",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS13",
+      "owner": "ShrikarDesai07",
+      "title": "Denied and competing-subject reopening",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS13:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS13: Analyst attempts reopening -> 403; admin attempts reopen when competing active case exists -> 409",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "case-sql",
+          "status": "passed",
+          "tests": []
+        }
+      ]
+    },
+    {
+      "id": "VS14",
+      "owner": "Both",
+      "title": "Concurrent versions, atomic failure rollback and retained draft",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS14:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS14: Optimistic concurrency - concurrent mutations on same expected_version produce 409",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "api",
+          "file": "tests/api/acceptance-gaps.test.ts",
+          "match": "VS14:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "VS14: failures before event and receipt insertion roll back state, events and receipts together",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/case-ui.spec.ts",
+          "match": "Optimistic concurrency",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "case-ui.spec.ts Issue #15 — Case Queue, Lifecycle Dialogs, and Event History Optimistic concurrency (HTTP 409) preserves user draft on conflict",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "two real tabs",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts VS14: two real tabs preserve an outcome draft when a concurrent transition removes that action",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "financial-plans",
+          "status": "passed",
+          "tests": []
+        }
+      ]
+    },
+    {
+      "id": "VS15",
+      "owner": "Both",
+      "title": "Runtime privileges and immutable-event triggers",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "api",
+          "file": "tests/api/cases.test.ts",
+          "match": "VS15:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "Case APIs and Lifecycle (VS06 - VS15) VS15: Privilege boundaries and immutability trigger protection",
+              "status": "passed"
+            }
+          ]
+        },
+        {
+          "stage": "financial-sql",
+          "status": "passed",
+          "tests": []
+        },
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "runtime database role rejects",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts runtime database role rejects direct writes and immutable-event triggers also reject the privileged fixture owner",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "VS16",
+      "owner": "Both",
+      "title": "Administrative and cross-store mutation gates stay closed",
+      "status": "passed",
+      "evidence": [
+        {
+          "stage": "browser",
+          "file": "tests/e2e/mvp-acceptance.spec.ts",
+          "match": "VS16:",
+          "status": "passed",
+          "tests": [
+            {
+              "title": "mvp-acceptance.spec.ts VS16: admin mutation gates reject direct HTTP requests without data changes or actionable UI",
+              "status": "passed"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "defects": [],
+  "limitations": [
+    "Teammate contract/acceptance sign-off is required separately.",
+    "MongoDB and full academic acceptance remain outside this MVP run."
+  ]
+}

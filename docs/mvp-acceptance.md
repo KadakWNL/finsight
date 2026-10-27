@@ -4,6 +4,8 @@
 
 The command produces technical evidence for review. It does not record teammate approval, close the issue, or establish full SQL-plus-NoSQL academic acceptance. The responsible workstreams follow the [acceptance plan](development-and-testing-contract.md#5-acceptance-matrix-ownership); those names are responsibility assignments, not claims that a teammate ran or approved this evidence.
 
+The [2026-10-27 execution record](acceptance/2026-10-27-mvp.md) contains a pinned local result, SQL plans and the defect disposition.
+
 ## Isolated prerequisites
 
 Use Node.js 24, PostgreSQL 17, the PostgreSQL `psql` client on PATH, and Playwright Chromium. Install dependencies with `npm ci` and the browser with `npx playwright install chromium`. Linux CI installs the browser's OS dependencies as well.
