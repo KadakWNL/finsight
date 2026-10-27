@@ -1,5 +1,7 @@
 'use client';
 import Link from 'next/link';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { formatTime, type HumanRole } from '@/lib/workspace';
 import type { CaseDetail, CaseEventItem } from '@/lib/case-types';
 import { useApi } from './use-api';
@@ -77,14 +79,14 @@ function EventDiff({ event }: { event: CaseEventItem }) {
 }
 
 export function CaseDetailScreen({ id, returnTo, role, userId }: CaseDetailScreenProps) {
+  const [historyOffset, setHistoryOffset] = useState(0);
+  const historyUrl = '/api/v1/cases/' + encodeURIComponent(id) + '/events?limit=50&offset=' + historyOffset;
   const detailApi = useApi<{ data: CaseDetail; request_id: string }>('/api/v1/cases/' + encodeURIComponent(id));
-  const eventsApi = useApi<{ data: CaseEventItem[]; request_id: string }>(
-    '/api/v1/cases/' + encodeURIComponent(id) + '/events'
-  );
+  const eventsApi = useApi<{ data: CaseEventItem[]; request_id: string }>(historyUrl);
 
   const caseData = detailApi.loadedUrl === '/api/v1/cases/' + encodeURIComponent(id) ? detailApi.data?.data : undefined;
   const eventsData =
-    eventsApi.loadedUrl === '/api/v1/cases/' + encodeURIComponent(id) + '/events' ? eventsApi.data?.data : undefined;
+    eventsApi.loadedUrl === historyUrl ? eventsApi.data?.data : undefined;
 
   function reloadAll() {
     detailApi.reload();
@@ -319,6 +321,19 @@ export function CaseDetailScreen({ id, returnTo, role, userId }: CaseDetailScree
                       </div>
                     )
                   ) : null}
+                  <div className="pagination">
+                    <p>History offset {historyOffset}</p>
+                    <div className="action-row">
+                      <Button type="button" className="secondary" disabled={historyOffset === 0 || eventsApi.loading}
+                        onClick={() => setHistoryOffset(value => Math.max(0, value - 50))}>
+                        Previous events
+                      </Button>
+                      <Button type="button" className="secondary" disabled={eventsApi.loading || !eventsData || eventsData.length < 50}
+                        onClick={() => setHistoryOffset(value => value + 50)}>
+                        Next events
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>

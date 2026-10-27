@@ -19,5 +19,5 @@ export default async function CaseDetailPage({
   const search = await searchParams;
   const returnTo = safeWorkspacePath(typeof search.returnTo === 'string' ? search.returnTo : null) || '/cases';
   const user = await requirePageUser('/cases/' + id + '?returnTo=' + encodeURIComponent(returnTo));
-  return <CaseDetailScreen id={id} returnTo={returnTo} role={user.role} userId={user.userId} />;
+  return <CaseDetailScreen key={id} id={id} returnTo={returnTo} role={user.role} userId={user.userId} />;
 }

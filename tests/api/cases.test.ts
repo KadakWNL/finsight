@@ -9,7 +9,7 @@ import { seedFinancial, syntheticId as id } from '../../scripts/financial-seed.m
 import { createSession, SESSION_COOKIE_NAME } from '../../src/server/session';
 import { encodeSessionToken } from '../../src/server/authentication';
 import { getPool } from '../../src/server/db';
-import { getCaseEvents } from '../../src/server/case-queries';
+import { getCaseEvents, listCases } from '../../src/server/case-queries';
 import { GET as casesList, POST as caseCreate } from '../../src/app/api/v1/cases/route';
 import { GET as caseDetail, PATCH as casePatch } from '../../src/app/api/v1/cases/[id]/route';
 import { GET as caseEvents } from '../../src/app/api/v1/cases/[id]/events/route';
@@ -311,6 +311,29 @@ describe('Case APIs and Lifecycle (VS06 - VS15)', () => {
     const forgedJson = await valid.json();
     expect(forgedJson.data.assigned_to_user_id).toBe(analystA); // Bound to session, not forged admin
     expect(forgedJson.data.status).toBe('open'); // Cannot forge closed status
+  });
+
+  it('filters ownership before pagination without exposing peer cases or private unassigned fields', async () => {
+    await client.query('BEGIN');
+    try {
+      const actor = { userId: analystA, role: 'analyst' as const, email: '', displayName: '' };
+      await client.query('UPDATE public.investigation_case SET assigned_to_user_id = NULL WHERE case_id <> $1', [caseAId]);
+      await client.query("UPDATE public.investigation_case SET opened_at = '2000-01-01' WHERE case_id = $1", [caseAId]);
+      const mine = await listCases(client, { scope: 'mine', limit: 1, offset: 0 }, actor);
+      expect(mine.map(row => row.case_id)).toEqual([caseAId]);
+      const peer = await listCases(client, { scope: 'mine', limit: 1, offset: 0 }, { ...actor, userId: analystB });
+      expect(peer).toEqual([]);
+      const rows = await listCases(client, { scope: 'unassigned', limit: 1, offset: 0 }, actor);
+      expect(rows).toHaveLength(1);
+      expect(rows[0]).not.toHaveProperty('case_id');
+      expect(rows[0]).not.toHaveProperty('resolution_notes');
+    } finally {
+      await client.query('ROLLBACK');
+    }
+    expect((await apiGetCases({ scope: analystB })).status).toBe(400);
+    const mine = await apiGetCases({ scope: 'mine', page_size: '1' });
+    expect(mine.status).toBe(200);
+    expect((await mine.json()).data[0].assigned_to_user_id).toBe(analystA);
   });
 
   it('VS09: Attempt open-to-terminal, escalation without reason, blank/oversize reasons -> 422/400', async () => {

@@ -17,20 +17,25 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  const tab = searchParams.get('tab') ?? (role === 'analyst' ? 'mine' : 'all');
+  const requestedTab = searchParams.get('tab');
+  const tabs = role === 'analyst' ? ['mine', 'unassigned', 'all'] : ['all', 'unassigned', 'escalated'];
+  const tab = requestedTab && tabs.includes(requestedTab) ? requestedTab : tabs[0];
   const statusFilter = searchParams.get('status') ?? '';
   const priorityFilter = searchParams.get('priority') ?? '';
-  const pageSize = searchParams.get('page_size') ?? '25';
+  const requestedSize = searchParams.get('page_size') ?? '25';
+  const pageSize = ['25', '50', '100'].includes(requestedSize) ? requestedSize : '25';
   const offset = Math.max(0, parseInt(searchParams.get('offset') ?? '0', 10) || 0);
 
-  // Build strictly validated query string for the API (only status, priority, page_size, offset)
+  // Apply tab scope before server pagination so matching rows cannot be skipped.
   const apiParams = new URLSearchParams();
+  if (tab === 'mine' || tab === 'unassigned') apiParams.set('scope', tab);
   if (statusFilter && ['open', 'in_review', 'escalated', 'closed', 'dismissed'].includes(statusFilter)) {
     apiParams.set('status', statusFilter);
   }
   if (priorityFilter && ['low', 'medium', 'high'].includes(priorityFilter)) {
     apiParams.set('priority', priorityFilter);
   }
+  if (tab === 'escalated') apiParams.set('status', 'escalated');
   apiParams.set('page_size', pageSize);
   if (offset > 0) {
     apiParams.set('offset', String(offset));
@@ -79,22 +84,9 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
     navigate(params);
   }
 
-  // Filter cases client-side based on the selected tab
+  // The server scopes rows before applying the page limit.
   const allCases: CaseSummaryItem[] = result.data?.data ?? [];
-  let displayedCases = allCases;
-  if (role === 'analyst') {
-    if (tab === 'mine') {
-      displayedCases = allCases.filter(c => c.assigned_to_user_id === userId);
-    } else if (tab === 'unassigned') {
-      displayedCases = allCases.filter(c => !c.assigned_to_user_id || !c.case_id);
-    }
-  } else if (role === 'admin') {
-    if (tab === 'unassigned') {
-      displayedCases = allCases.filter(c => !c.assigned_to_user_id);
-    } else if (tab === 'escalated') {
-      displayedCases = allCases.filter(c => c.status === 'escalated');
-    }
-  }
+  const displayedCases = allCases;
 
   const hasFilterApplied = Boolean(statusFilter || priorityFilter || (tab !== (role === 'analyst' ? 'mine' : 'all')));
   const limitNum = parseInt(pageSize, 10) || 25;
@@ -165,13 +157,13 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
         )}
       </nav>
 
-      <form className="filter-panel" onSubmit={applyFilters}>
+      <form key={search} className="filter-panel" onSubmit={applyFilters}>
         <fieldset>
           <legend>Filter cases</legend>
           <div className="filter-grid">
             <div>
               <label htmlFor="filter-status">Status</label>
-              <select id="filter-status" name="status" defaultValue={statusFilter}>
+              <select id="filter-status" name="status" defaultValue={tab === 'escalated' ? 'escalated' : statusFilter} disabled={tab === 'escalated'}>
                 <option value="">All statuses</option>
                 <option value="open">Open</option>
                 <option value="in_review">In review</option>
@@ -330,7 +322,10 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
                   </tbody>
                 </table>
               </div>
-
+            </>
+          )
+        ) : null}
+        {result.data && !result.loading ? (
               <div className="pagination">
                 <p>
                   Showing {displayedCases.length} case{displayedCases.length === 1 ? '' : 's'} on this page (offset {offset}).
@@ -364,8 +359,6 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
                   </Button>
                 </div>
               </div>
-            </>
-          )
         ) : null}
       </section>
     </>

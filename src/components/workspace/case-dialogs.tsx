@@ -21,18 +21,26 @@ async function sendCommand(
     resolution_notes?: string;
   }
 ) {
-  const response = await fetch(`/api/v1/cases/${encodeURIComponent(caseId)}/commands`, {
-    method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-      'idempotency-key': payload.idempotency_key,
-    },
-    body: JSON.stringify(payload),
-    cache: 'no-store',
-    credentials: 'same-origin',
-  });
-  const data = await response.json().catch(() => null);
-  return { ok: response.ok, status: response.status, data };
+  try {
+    const response = await fetch(`/api/v1/cases/${encodeURIComponent(caseId)}/commands`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'idempotency-key': payload.idempotency_key,
+      },
+      body: JSON.stringify(payload),
+      cache: 'no-store',
+      credentials: 'same-origin',
+    });
+    const data = await response.json().catch(() => null);
+    return { ok: response.ok, status: response.status, data };
+  } catch {
+    return {
+      ok: false,
+      status: 0,
+      data: { error: { message: 'Check your connection, then retry. Your draft is preserved.' } },
+    };
+  }
 }
 
 export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProps) {

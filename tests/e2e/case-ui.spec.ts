@@ -153,6 +153,11 @@ test.describe('Issue #15 — Case Queue, Lifecycle Dialogs, and Event History', 
 
     // In "Assigned to me" tab (default for analyst)
     await expect(page.getByRole('link', { name: case1Ref })).toBeVisible();
+
+    await page.goto('/cases?offset=999999');
+    await expect(page.getByRole('button', { name: 'Previous', exact: true })).toBeEnabled();
+    await page.getByRole('button', { name: 'Reset', exact: true }).click();
+    await expect(page.getByRole('link', { name: case1Ref })).toBeVisible();
     await expect(page.getByText(case2Ref)).not.toBeVisible(); // Peer case must not appear
 
     // Switch to "Unassigned summaries" tab
@@ -279,6 +284,13 @@ test.describe('Issue #15 — Case Queue, Lifecycle Dialogs, and Event History', 
     await page.getByRole('button', { name: 'Escalate' }).click();
     const rationaleField = page.getByLabel('Operational escalation reason (required)');
     await rationaleField.fill('My valuable draft rationale that must not be lost');
+
+    // A dropped connection must release the pending state without losing the draft.
+    await page.route('**/api/v1/cases/*/commands', route => route.abort(), { times: 1 });
+    await page.getByRole('button', { name: 'Confirm escalation' }).click();
+    await expect(page.getByRole('dialog').getByRole('alert')).toContainText('Check your connection');
+    await expect(rationaleField).toHaveValue('My valuable draft rationale that must not be lost');
+    await expect(page.getByRole('button', { name: 'Confirm escalation' })).toBeEnabled();
 
     // Bump version behind the scenes in PostgreSQL
     await client.query('UPDATE public.investigation_case SET version = version + 1 WHERE case_id = $1', [caseConflictId]);

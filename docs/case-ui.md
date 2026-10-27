@@ -13,7 +13,7 @@ The investigation workspace components in `src/components/workspace` and routes 
 
 ## 1. Investigation Queue (`/cases`)
 
-The queue is backed by `GET /api/v1/cases`, strictly validating supported parameters (`status`, `priority`, `page_size`, `offset`).
+The queue is backed by `GET /api/v1/cases`, using `scope`, `status`, `priority`, `page_size`, and `offset`. Ownership scope and status are applied before pagination. The escalated tab fixes the status to `escalated`.
 
 ### Role-Scoped Visibility & Projections
 - **Analyst:**
@@ -54,7 +54,7 @@ If an analyst navigates directly to a case assigned to another analyst (or a non
 
 ## 3. Chronological Audit Event History
 
-Case events are fetched from `GET /api/v1/cases/:id/events`, reading from the append-only `public.case_event` table.
+Case events are fetched from `GET /api/v1/cases/:id/events`, reading from the append-only `public.case_event` table. Previous events and Next events controls page through history in groups of 50.
 
 Events are presented chronologically with three strictly separated sections:
 1. **Field Changes:**
@@ -97,8 +97,8 @@ All state mutations are dispatched via `POST /api/v1/cases/:id/commands` backed 
 ### Optimistic Concurrency Protocol (HTTP 409)
 - Every command payload transmits `expected_version` and a client-generated UUID `idempotency_key`.
 - If the case is modified concurrently by another process, the server returns HTTP 409 `version_conflict`.
-- The dialog catches the conflict, displays a non-destructive warning, **preserves the user's unsent draft textarea**, and surfaces a "Reload case version" button.
-- Clicking reload refreshes the version token so the user can immediately submit without retyping their rationale.
+- The dialog displays a conflict warning and automatically reloads the case version. When the action remains available, the entered draft is preserved for review and resubmission.
+- A network failure clears the submitting state, displays a connection error, and preserves the draft and idempotency key for retry.
 
 ### Idempotency & Replay
 - Submitting an identical command with the same idempotency key replays the previous command receipt with HTTP 200 without appending duplicate events or advancing version.

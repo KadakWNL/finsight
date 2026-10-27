@@ -20,6 +20,7 @@ export function validateCaseUuid(value: unknown, field = 'id'): string {
 }
 
 export interface CaseListQueryOptions {
+  scope?: 'mine' | 'unassigned';
   status?: string;
   priority?: string;
   limit: number;
@@ -79,11 +80,15 @@ function idempotencyKey(record: Record<string, unknown>, headers: Headers): stri
 }
 
 export function parseCaseQuery(searchParams: URLSearchParams): CaseListQueryOptions {
-  validateQueryKeys(searchParams, ['status', 'priority', 'limit', 'page_size', 'offset']);
+  validateQueryKeys(searchParams, ['scope', 'status', 'priority', 'limit', 'page_size', 'offset']);
+  const scope = searchParams.get('scope');
+  if (scope !== null && scope !== 'mine' && scope !== 'unassigned') {
+    throw new CaseParameterError({ scope: 'Scope must be mine or unassigned.' });
+  }
   let status: string | undefined;
   let priority: string | undefined;
   const { limit, offset } = parseCaseHistoryQuery(new URLSearchParams(
-    [...searchParams.entries()].filter(([key]) => !['status', 'priority'].includes(key))
+    [...searchParams.entries()].filter(([key]) => !['scope', 'status', 'priority'].includes(key))
   ));
 
   if (searchParams.has('status')) {
@@ -102,7 +107,7 @@ export function parseCaseQuery(searchParams: URLSearchParams): CaseListQueryOpti
     priority = val;
   }
 
-  return { status, priority, limit, offset };
+  return { ...(scope ? { scope } : {}), status, priority, limit, offset };
 }
 
 export interface CreateCaseInput {

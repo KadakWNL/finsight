@@ -33,7 +33,7 @@ Access to case details and history is strictly scoped to the case owner or admin
 
 ---
 
-Queue reads accept `status`, `priority`, `limit` (or `page_size`) and `offset`. Queue and history pages default to 50 rows and allow at most 100; offsets are nonnegative safe integers. History accepts only the paging parameters and returns `data`, `limit`, `offset` and `request_id`. Order is `occurred_at,event_id`, with the bigint event identity breaking timestamp ties. Continue with the same limit and the next offset. Pages reflect live data and do not promise a frozen snapshot. History visibility and event reads share one SQL statement; an empty visible history returns an empty array, while an inaccessible case returns 404.
+Queue reads accept `scope` (`mine` or `unassigned`, omitted for all permitted cases), `status`, `priority`, `limit` (or `page_size`) and `offset`. Queue and history pages default to 50 rows and allow at most 100; offsets are nonnegative safe integers. History accepts only the paging parameters and returns `data`, `limit`, `offset` and `request_id`. Order is `occurred_at,event_id`, with the bigint event identity breaking timestamp ties. Continue with the same limit and the next offset. Pages reflect live data and do not promise a frozen snapshot. History visibility and event reads share one SQL statement; an empty visible history returns an empty array, while an inaccessible case returns 404.
 
 ## 3. Case Creation (`POST /api/v1/cases`)
 
