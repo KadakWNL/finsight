@@ -1,0 +1,626 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-26T18:58:15.845871+00:00",
+  "title": "Design System: FinSight",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Primary",
+        "tonalRamp": [
+          "#190c2f",
+          "#32175f",
+          "#4a238e",
+          "#632ebe",
+          "#9661f1",
+          "#b089f4",
+          "#cbb0f8",
+          "#e5d8fb"
+        ]
+      },
+      "primary-foreground": {
+        "role": "neutral",
+        "displayName": "Primary foreground",
+        "tonalRamp": [
+          "#333333",
+          "#666666",
+          "#999999",
+          "#cccccc",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "ring": {
+        "role": "neutral",
+        "displayName": "Ring",
+        "tonalRamp": [
+          "#190c2f",
+          "#32175f",
+          "#4a238e",
+          "#632ebe",
+          "#9661f1",
+          "#b089f4",
+          "#cbb0f8",
+          "#e5d8fb"
+        ]
+      },
+      "selection": {
+        "role": "neutral",
+        "displayName": "Selection",
+        "tonalRamp": [
+          "#2e2e2e",
+          "#5c5c5c",
+          "#898989",
+          "#b7b7b7",
+          "#eaeaea",
+          "#efefef",
+          "#f5f5f5",
+          "#fafafa"
+        ]
+      },
+      "background": {
+        "role": "neutral",
+        "displayName": "Background",
+        "tonalRamp": [
+          "#333333",
+          "#666666",
+          "#999999",
+          "#cccccc",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "foreground": {
+        "role": "neutral",
+        "displayName": "Foreground",
+        "tonalRamp": [
+          "#030303",
+          "#060606",
+          "#090909",
+          "#0c0c0c",
+          "#3f3f3f",
+          "#6f6f6f",
+          "#9f9f9f",
+          "#cfcfcf"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "#333333",
+          "#666666",
+          "#999999",
+          "#cccccc",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "surface-muted": {
+        "role": "neutral",
+        "displayName": "Surface muted",
+        "tonalRamp": [
+          "#303030",
+          "#616161",
+          "#919191",
+          "#c2c2c2",
+          "#f5f5f5",
+          "#f7f7f7",
+          "#fafafa",
+          "#fcfcfc"
+        ]
+      },
+      "surface-hover": {
+        "role": "neutral",
+        "displayName": "Surface hover",
+        "tonalRamp": [
+          "#2e2e2e",
+          "#5c5c5c",
+          "#898989",
+          "#b7b7b7",
+          "#eaeaea",
+          "#efefef",
+          "#f5f5f5",
+          "#fafafa"
+        ]
+      },
+      "secondary-text": {
+        "role": "neutral",
+        "displayName": "Secondary text",
+        "tonalRamp": [
+          "#131313",
+          "#262626",
+          "#3a3a3a",
+          "#4d4d4d",
+          "#808080",
+          "#a0a0a0",
+          "#bfbfbf",
+          "#dfdfdf"
+        ]
+      },
+      "subtle-text": {
+        "role": "neutral",
+        "displayName": "Subtle text",
+        "tonalRamp": [
+          "#161616",
+          "#2d2d2d",
+          "#434343",
+          "#5a5a5a",
+          "#8d8d8d",
+          "#a9a9a9",
+          "#c6c6c6",
+          "#e2e2e2"
+        ]
+      },
+      "border": {
+        "role": "neutral",
+        "displayName": "Border",
+        "tonalRamp": [
+          "#2c2c2c",
+          "#595959",
+          "#858585",
+          "#b2b2b2",
+          "#e5e5e5",
+          "#ebebeb",
+          "#f2f2f2",
+          "#f8f8f8"
+        ]
+      },
+      "control-border": {
+        "role": "neutral",
+        "displayName": "Control border",
+        "tonalRamp": [
+          "#1b1b1b",
+          "#373737",
+          "#525252",
+          "#6e6e6e",
+          "#a1a1a1",
+          "#b8b8b8",
+          "#d0d0d0",
+          "#e7e7e7"
+        ]
+      },
+      "notice": {
+        "role": "neutral",
+        "displayName": "Notice",
+        "tonalRamp": [
+          "#313133",
+          "#626166",
+          "#939299",
+          "#c4c2cc",
+          "#f7f5ff",
+          "#f9f8ff",
+          "#fbfaff",
+          "#fdfdff"
+        ]
+      },
+      "notice-error": {
+        "role": "neutral",
+        "displayName": "Notice error",
+        "tonalRamp": [
+          "#33312e",
+          "#66625c",
+          "#999289",
+          "#ccc3b7",
+          "#fff6ea",
+          "#fff8ef",
+          "#fffbf5",
+          "#fffdfa"
+        ]
+      },
+      "error-text": {
+        "role": "neutral",
+        "displayName": "Error text",
+        "tonalRamp": [
+          "#1e0c05",
+          "#3c1809",
+          "#5a230e",
+          "#782f12",
+          "#ab6245",
+          "#c08974",
+          "#d5b1a2",
+          "#ead8d1"
+        ]
+      },
+      "error-line": {
+        "role": "neutral",
+        "displayName": "Error line",
+        "tonalRamp": [
+          "#281509",
+          "#502b11",
+          "#77401a",
+          "#9f5622",
+          "#d28955",
+          "#dda680",
+          "#e9c4aa",
+          "#f4e1d5"
+        ]
+      },
+      "dark-primary": {
+        "role": "primary",
+        "displayName": "Dark primary",
+        "tonalRamp": [
+          "#211c32",
+          "#433864",
+          "#645396",
+          "#866fc8",
+          "#b9a2fb",
+          "#cab9fc",
+          "#dcd1fd",
+          "#ede8fe"
+        ]
+      },
+      "dark-primary-foreground": {
+        "role": "neutral",
+        "displayName": "Dark primary foreground",
+        "tonalRamp": [
+          "#040209",
+          "#090512",
+          "#0d071b",
+          "#120a24",
+          "#453d57",
+          "#736d81",
+          "#a29eab",
+          "#d0ced5"
+        ]
+      },
+      "dark-ring": {
+        "role": "neutral",
+        "displayName": "Dark ring",
+        "tonalRamp": [
+          "#211c32",
+          "#433864",
+          "#645396",
+          "#866fc8",
+          "#b9a2fb",
+          "#cab9fc",
+          "#dcd1fd",
+          "#ede8fe"
+        ]
+      },
+      "dark-selection": {
+        "role": "neutral",
+        "displayName": "Dark selection",
+        "tonalRamp": [
+          "#080808",
+          "#101010",
+          "#171717",
+          "#1f1f1f",
+          "#525252",
+          "#7d7d7d",
+          "#a9a9a9",
+          "#d4d4d4"
+        ]
+      },
+      "dark-background": {
+        "role": "neutral",
+        "displayName": "Dark background",
+        "tonalRamp": [
+          "#030303",
+          "#060606",
+          "#090909",
+          "#0c0c0c",
+          "#3f3f3f",
+          "#6f6f6f",
+          "#9f9f9f",
+          "#cfcfcf"
+        ]
+      },
+      "dark-foreground": {
+        "role": "neutral",
+        "displayName": "Dark foreground",
+        "tonalRamp": [
+          "#303030",
+          "#606060",
+          "#919191",
+          "#c1c1c1",
+          "#f4f4f4",
+          "#f7f7f7",
+          "#f9f9f9",
+          "#fcfcfc"
+        ]
+      },
+      "dark-surface": {
+        "role": "neutral",
+        "displayName": "Dark surface",
+        "tonalRamp": [
+          "#050505",
+          "#0a0a0a",
+          "#0e0e0e",
+          "#131313",
+          "#464646",
+          "#747474",
+          "#a3a3a3",
+          "#d1d1d1"
+        ]
+      },
+      "dark-surface-muted": {
+        "role": "neutral",
+        "displayName": "Dark surface muted",
+        "tonalRamp": [
+          "#070707",
+          "#0e0e0e",
+          "#141414",
+          "#1b1b1b",
+          "#4e4e4e",
+          "#7a7a7a",
+          "#a7a7a7",
+          "#d3d3d3"
+        ]
+      },
+      "dark-surface-hover": {
+        "role": "neutral",
+        "displayName": "Dark surface hover",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#131313",
+          "#1d1d1d",
+          "#262626",
+          "#595959",
+          "#838383",
+          "#acacac",
+          "#d6d6d6"
+        ]
+      },
+      "dark-secondary-text": {
+        "role": "neutral",
+        "displayName": "Dark secondary text",
+        "tonalRamp": [
+          "#222222",
+          "#444444",
+          "#666666",
+          "#888888",
+          "#bbbbbb",
+          "#cccccc",
+          "#dddddd",
+          "#eeeeee"
+        ]
+      },
+      "dark-subtle-text": {
+        "role": "neutral",
+        "displayName": "Dark subtle text",
+        "tonalRamp": [
+          "#1f1f1f",
+          "#3e3e3e",
+          "#5d5d5d",
+          "#7c7c7c",
+          "#afafaf",
+          "#c3c3c3",
+          "#d7d7d7",
+          "#ebebeb"
+        ]
+      },
+      "dark-border": {
+        "role": "neutral",
+        "displayName": "Dark border",
+        "tonalRamp": [
+          "#0a0a0a",
+          "#141414",
+          "#1f1f1f",
+          "#292929",
+          "#5c5c5c",
+          "#858585",
+          "#adadad",
+          "#d6d6d6"
+        ]
+      },
+      "dark-control-border": {
+        "role": "neutral",
+        "displayName": "Dark control border",
+        "tonalRamp": [
+          "#161616",
+          "#2c2c2c",
+          "#434343",
+          "#595959",
+          "#8c8c8c",
+          "#a9a9a9",
+          "#c5c5c5",
+          "#e2e2e2"
+        ]
+      },
+      "dark-notice": {
+        "role": "neutral",
+        "displayName": "Dark notice",
+        "tonalRamp": [
+          "#07050a",
+          "#0d0b13",
+          "#14101d",
+          "#1a1626",
+          "#4d4959",
+          "#7a7683",
+          "#a6a4ac",
+          "#d3d1d6"
+        ]
+      },
+      "dark-notice-error": {
+        "role": "neutral",
+        "displayName": "Dark notice error",
+        "tonalRamp": [
+          "#0c0906",
+          "#17120d",
+          "#231b13",
+          "#2e241a",
+          "#61574d",
+          "#898179",
+          "#b0aba6",
+          "#d8d5d2"
+        ]
+      },
+      "dark-error-text": {
+        "role": "neutral",
+        "displayName": "Dark error text",
+        "tonalRamp": [
+          "#32261c",
+          "#634c37",
+          "#957353",
+          "#c6996e",
+          "#f9cca1",
+          "#fbd9b9",
+          "#fce5d0",
+          "#fef2e8"
+        ]
+      },
+      "dark-error-line": {
+        "role": "neutral",
+        "displayName": "Dark error line",
+        "tonalRamp": [
+          "#2f2216",
+          "#5d442d",
+          "#8c6743",
+          "#ba895a",
+          "#edbc8d",
+          "#f2cda9",
+          "#f6ddc6",
+          "#fbeee2"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Sign-in display",
+        "purpose": "Sign-in introduction; reduces at the small-screen breakpoint."
+      },
+      "identifier": {
+        "displayName": "Full identifier",
+        "purpose": "Exact UUID disclosures and copying."
+      }
+    },
+    "shadows": [
+      {
+        "name": "dialog",
+        "value": "0 20px 60px #00000033",
+        "purpose": "Native modal dialog only; backdrop is #00000080."
+      }
+    ],
+    "motion": [
+      {
+        "name": "loading-spin",
+        "value": "load-spin 1s linear infinite",
+        "purpose": "Rotating loading indicator; disabled under prefers-reduced-motion: reduce."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "filter-two-columns",
+        "value": "1200px"
+      },
+      {
+        "name": "hide-workspace-context",
+        "value": "1100px"
+      },
+      {
+        "name": "detail-single-column",
+        "value": "900px"
+      },
+      {
+        "name": "mobile-navigation",
+        "value": "800px"
+      },
+      {
+        "name": "small-screen",
+        "value": "600px"
+      },
+      {
+        "name": "filter-single-column",
+        "value": "480px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Shared primary action from Button; no distinct hover color is defined.",
+      "html": "<button class=\"ds-primary\" type=\"button\">Create case</button>",
+      "css": ".ds-primary{display:inline-flex;min-height:44px;align-items:center;justify-content:center;border:0;border-radius:0.375rem;padding:8px 16px;font-size:14px;line-height:20px;font-weight:500;cursor:pointer;font-family:var(--font-plex,'IBM Plex Sans'),'Segoe UI',system-ui,sans-serif;background:var(--primary,#7c3aed);color:var(--primary-foreground,#ffffff);}.ds-primary:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:2px;}.ds-primary:disabled{pointer-events:none;opacity:.5;}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Bordered session or dialog action.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Cancel</button>",
+      "css": ".ds-secondary{display:inline-flex;min-height:44px;align-items:center;justify-content:center;border:0;border-radius:0.375rem;padding:8px 16px;font-size:14px;line-height:20px;font-weight:500;cursor:pointer;font-family:var(--font-plex,'IBM Plex Sans'),'Segoe UI',system-ui,sans-serif;background:var(--surface,#ffffff);color:var(--foreground,#0f0f0f);border:1px solid var(--border,#dedede);}.ds-secondary:hover{background:var(--surface-hover,#e5e5e5);}.ds-secondary:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:2px;}.ds-secondary:disabled{pointer-events:none;opacity:.5;}"
+    },
+    {
+      "name": "Reason field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Case reason textarea with shared field styling.",
+      "html": "<label class=\"ds-label\" for=\"ds-reason\">Reason</label><textarea class=\"ds-input\" id=\"ds-reason\" rows=\"5\" maxlength=\"2000\" required></textarea>",
+      "css": ".ds-label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;font-family:var(--font-plex,'IBM Plex Sans'),'Segoe UI',system-ui,sans-serif;}.ds-input{width:100%;min-height:120px;resize:vertical;border:1px solid var(--control-border,#898989);border-radius:5px;background:var(--surface,#ffffff);color:var(--foreground,#0f0f0f);padding:10px 12px;font-size:15px;line-height:1.5;caret-color:var(--primary,#7c3aed);font-family:var(--font-plex,'IBM Plex Sans'),'Segoe UI',system-ui,sans-serif;}.ds-input:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:3px;}.ds-input:disabled{background:var(--surface-muted,#f2f2f2);}"
+    },
+    {
+      "name": "Sidebar selection",
+      "kind": "nav",
+      "refersTo": "navigation-active",
+      "description": "Square active overview link with the implemented icon and focus treatment.",
+      "html": "<nav aria-label=\"Primary navigation\"><a class=\"ds-nav\" href=\"/overview\" aria-current=\"page\"><svg width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"2\"/><path d=\"M4 10h16M10 10v10\"/></svg> Overview</a></nav>",
+      "css": ".ds-nav{display:flex;align-items:center;gap:12px;min-height:44px;padding:10px 12px;border:0;border-radius:0;box-shadow:none;color:var(--secondary-text,#606060);font-size:14px;font-weight:500;text-decoration:none;font-family:var(--font-plex,'IBM Plex Sans'),'Segoe UI',system-ui,sans-serif;}.ds-nav:hover{background:var(--surface-muted,#f2f2f2);color:var(--foreground,#0f0f0f);}.ds-nav[aria-current=page]{background:var(--selection,#e5e5e5);color:var(--foreground,#0f0f0f);font-weight:600;}.ds-nav:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:3px;} .ds-nav[aria-current=page] svg{color:var(--primary,#7c3aed);}"
+    },
+    {
+      "name": "Status label",
+      "kind": "chip",
+      "refersTo": "status-label",
+      "description": "Passive transaction status label.",
+      "html": "<span class=\"ds-status\">posted</span>",
+      "css": ".ds-status{display:inline-block;font-size:12px;background:var(--surface-muted,#f2f2f2);border-radius:4px;color:var(--secondary-text,#606060);padding:3px 7px;font-family:var(--font-plex,'IBM Plex Sans'),'Segoe UI',system-ui,sans-serif;}"
+    },
+    {
+      "name": "Work panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "Bordered section heading using the implemented transaction explorer label.",
+      "html": "<section class=\"ds-panel\" aria-labelledby=\"ds-panel-title\"><div class=\"ds-panel-heading\"><h2 id=\"ds-panel-title\">Recorded transactions</h2></div></section>",
+      "css": ".ds-panel{background:var(--surface,#ffffff);color:var(--foreground,#0f0f0f);border:1px solid var(--border,#dedede);border-radius:8px;overflow:hidden;font-family:var(--font-plex,'IBM Plex Sans'),'Segoe UI',system-ui,sans-serif;}.ds-panel-heading{padding:20px 24px;border-bottom:1px solid var(--border,#dedede);}.ds-panel h2{margin:0;font-size:18px;font-weight:650;line-height:1.4;}"
+    },
+    {
+      "name": "Theme control",
+      "kind": "button",
+      "refersTo": "theme-switch",
+      "description": "Static preview of the light-mode theme control; application behavior lives in ThemeSwitch.",
+      "html": "<button class=\"ds-theme\" type=\"button\" aria-label=\"Switch to dark mode\" title=\"Switch to dark mode\"><svg width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M20.8 13A9 9 0 0 1 11 3.2 9 9 0 1 0 20.8 13Z\"/></svg></button>",
+      "css": ".ds-theme{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;width:44px;height:44px;color:var(--secondary-text,#606060);border:1px solid var(--border,#dedede);border-radius:5px;background:var(--surface,#ffffff);cursor:pointer;}.ds-theme:hover{background:var(--surface-hover,#e5e5e5);color:var(--foreground,#0f0f0f);}.ds-theme:focus-visible{outline:2px solid var(--ring,#7c3aed);outline-offset:3px;}"
+    }
+  ],
+  "narrative": {
+    "northStar": "",
+    "overview": "This design record describes the implemented UI in [globals.css](src/app/globals.css), [layout.tsx](src/app/layout.tsx), and the [workspace shell](src/components/workspace/app-shell.tsx). The user accepted this visual direction on 2026-10-27; its scope is recorded in [PRODUCT.md](PRODUCT.md#user-commitments).\n\nThe transaction workspace uses violet accents, bordered work panels and a persistent desktop sidebar. Light and dark modes share layout and component shapes. No brand metaphor has been established.",
+    "keyCharacteristics": [
+      "Square active sidebar items with a filled selection surface.",
+      "Theme-aware neutral surfaces with violet action and focus colors.",
+      "Tables, masked context and recorded evidence lead the workspace.",
+      "IBM Plex Sans supplies the shared text family."
+    ],
+    "rules": [
+      {
+        "name": "The Theme Pair Rule",
+        "body": "Use the semantic CSS properties so a surface, its text and its border change together across themes.",
+        "section": "colors"
+      },
+      {
+        "name": "The Square Selection Rule",
+        "body": "Keep the sidebar and its square active item surface. Do not add a curved left active marker, a pill shape or an active-item shadow.",
+        "section": "shapes"
+      }
+    ],
+    "dos": [
+      "Do retain the desktop sidebar and the mobile menu for the implemented destinations.",
+      "Do use semantic theme properties for component colors.",
+      "Do retain visible keyboard focus and written risk labels.",
+      "Do preserve scrollable tables and access to full identifiers."
+    ],
+    "donts": [
+      "Don't add a curved left active marker or rounded active navigation items.",
+      "Don't treat a risk color as a fraud verdict.",
+      "Don't treat visual acceptance as proof of accessibility or workflow acceptance."
+    ]
+  }
+}

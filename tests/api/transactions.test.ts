@@ -11,6 +11,8 @@ import { getPool } from '../../src/server/db';
 import { listTransactions, transactionRiskDetail } from '../../src/server/financial-queries';
 import { GET as collection } from '../../src/app/api/v1/transactions/route';
 import { GET as detail } from '../../src/app/api/v1/transactions/[id]/route';
+import { overviewRead } from '../../src/server/overview';
+import { createSubjectCase } from '../../src/server/subject-case';
 
 let client:pg.Client;
 const users = [1,2,3,4,5].map(n=>`80000000-0000-0000-0000-${String(n).padStart(12,'0')}`);
@@ -66,6 +68,32 @@ test('requires active human authentication and uses a stable no-store error enve
   const session=await createSession(users[0],client); await revokeSession(session.sessionId,'sign_out',client);
   const revoked=await collection(new Request('http://localhost/api/v1/transactions',{headers:{cookie:`${SESSION_COOKIE_NAME}=${await encodeSessionToken(users[0],session.sessionId)}`}}));
   expect(revoked.status).toBe(401);
+});
+
+test('overview isolates assigned work, admin sees active team work, and no private reasons leak',async()=>{
+  const read=(who=0,query='')=>overviewRead(new Request('http://localhost/api/v1/overview'+query,{headers:{cookie:cookies[who]}}));
+  expect((await overviewRead(new Request('http://localhost/api/v1/overview'))).status).toBe(401);
+  const own=await read();expect(own.headers.get('cache-control')).toContain('no-store');
+  const body=await own.json();expect(body.data.map((r:{case_ref:string})=>r.case_ref)).toEqual(['OWN-CASE-A']);
+  expect(body.data[0].owner_label).toBeNull();noLeak(body);
+  const team=await (await read(2)).json();expect(team.data).toHaveLength(3);expect(team.data.some((r:{case_ref:string})=>r.case_ref==='TERMINAL-PRIVATE')).toBe(false);
+  expect(JSON.stringify(team)).not.toContain('PRIVATE_CASE_REASON');
+  expect((await read(0,'?scope=all')).status).toBe(400);
+});
+
+test('subject creation authenticates and binds actor, preserves idempotency, and rejects duplicate subjects',async()=>{
+  const req=(who=0,origin='http://localhost')=>new Request('http://localhost/actions/create',{method:'POST',headers:{origin,cookie:cookies[who]}});
+  const input={transactionId:id(101),idempotencyKey:'80000000-0000-0000-0000-000000000909',priority:'medium',reason:'Synthetic UI creation'};
+  expect(await createSubjectCase(new Request('http://localhost/actions/create',{headers:{origin:'http://localhost'}}),input)).toMatchObject({ok:false,status:401});
+  expect(await createSubjectCase(req(0,'https://unrelated.invalid'),input)).toMatchObject({ok:false,status:403});
+  expect(await createSubjectCase(req(2),input)).toMatchObject({ok:false,status:403});
+  expect(await createSubjectCase(req(),{...input,actorUserId:users[1]})).toMatchObject({ok:false,status:400});
+  expect(await createSubjectCase(req(),{...input,reason:'   '})).toMatchObject({ok:false,status:400});
+  const saved=await createSubjectCase(req(),input);expect(saved).toMatchObject({ok:true,replayed:false});
+  expect(await createSubjectCase(req(),input)).toMatchObject({ok:true,replayed:true});
+  expect(await createSubjectCase(req(1),{...input,idempotencyKey:'80000000-0000-0000-0000-000000000910'})).toMatchObject({ok:false,status:409});
+  if(saved.ok){const row=(await client.query('SELECT assigned_to_user_id,transaction_id FROM public.investigation_case WHERE case_id=$1',[saved.caseId])).rows[0];expect(row).toEqual({assigned_to_user_id:users[0],transaction_id:id(101)});
+  }
 });
 
 test('returns SQL-backed masked facts, decimal strings and zero-signal transactions',async()=>{

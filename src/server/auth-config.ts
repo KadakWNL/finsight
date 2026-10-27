@@ -54,7 +54,7 @@ export const authOptions: NextAuthOptions = {
     },
   },
   pages: {
-    signIn: '/login',
+    signIn: '/sign-in',
   },
   cookies: { sessionToken: { name: sessionCookieName(), options: sessionCookieOptions() } },
   get secret() { return getAuthSecret(); },
