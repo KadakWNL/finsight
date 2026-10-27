@@ -1,6 +1,6 @@
-# Investigation Queue, Lifecycle Dialogs, and Event History
+# Investigation queue, lifecycle dialogs and event history
 
-The investigation workspace components in `src/components/workspace` and routes in `src/app/(workspace)/cases` implement the user interface for Issue #15, connecting the shared discovery workspace to the PostgreSQL 17-backed case command service and API endpoints.
+The investigation workspace components in `src/components/workspace` and routes in `src/app/(workspace)/cases` implement the case user interface, connecting the shared discovery workspace to the PostgreSQL 17-backed case command service and API endpoints.
 
 | Route | Access | Behavior |
 |---|---|---|
@@ -13,11 +13,11 @@ The investigation workspace components in `src/components/workspace` and routes 
 
 ## 1. Investigation Queue (`/cases`)
 
-The queue is backed by `GET /api/v1/cases`, using `scope`, `status`, `priority`, `page_size`, and `offset`. Ownership scope and status are applied before pagination. The escalated tab fixes the status to `escalated`.
+The queue is backed by `GET /api/v1/cases`, using `scope`, `status`, `priority`, `page_size`, and `offset`. Ownership scope and status are applied before pagination. The escalated tab fixes the status to `escalated`. Queue view buttons use a segmented selector with a visible selection and accessible pressed state.
 
 ### Role-Scoped Visibility & Projections
 - **Analyst:**
-  - Default tab (**Assigned to me**): Displays active cases assigned to the authenticated analyst (`assigned_to_user_id === user.userId`).
+  - Default tab (**Assigned to me**): Displays cases assigned to the authenticated analyst (`assigned_to_user_id === user.userId`).
   - **Unassigned summaries** tab: Shows unassigned cases using the server's minimal projection (`case_ref`, `transaction_id`, `priority`, `status`, `due_at`). In accordance with security contracts, `case_id` is omitted for unassigned cases to prevent unauthorized inspection prior to administrative assignment.
   - **All permitted** tab: Combines assigned cases with unassigned summaries. Cases owned by peer analysts are never revealed.
 - **Admin:**
@@ -38,9 +38,9 @@ The queue is backed by `GET /api/v1/cases`, using `scope`, `status`, `priority`,
 Case detail is backed by `GET /api/v1/cases/:id`, returning `{data: CaseDetail, request_id}`.
 
 ### Concealed 404 Enforcement
-If an analyst navigates directly to a case assigned to another analyst (or a non-existent UUID), the server and UI respond with HTTP 404:
+If an analyst requests a case assigned to another analyst (or a non-existent UUID), the API returns a concealed HTTP 404:
 - The page renders the standard `ErrorState` titled **"Case not found"**.
-- No indication is given whether the case exists, who owns it, or why access is unavailable, completely preventing peer case enumeration.
+- No indication is given whether the case exists, who owns it, or why access is unavailable, without disclosing private case existence.
 
 ### Facts & Metadata Display
 - Prominent case reference header with copyable UUID disclosure (`RecordIdentifier kind="case"`).
@@ -54,7 +54,7 @@ If an analyst navigates directly to a case assigned to another analyst (or a non
 
 ## 3. Chronological Audit Event History
 
-Case events are fetched from `GET /api/v1/cases/:id/events`, reading from the append-only `public.case_event` table. Previous events and Next events controls page through history in groups of 50.
+Case events are fetched from `GET /api/v1/cases/:id/events`, reading from the append-only `public.case_event` table. Previous events and Next events controls page through history in groups of 50. Timestamp labels follow the [workspace display preferences](discovery-ui.md#settings-and-display-preferences); recorded state snapshots retain their source values.
 
 Events are presented chronologically with three strictly separated sections:
 1. **Field Changes:**
@@ -65,7 +65,7 @@ Events are presented chronologically with three strictly separated sections:
    - For automatic/empty notes (such as initial review start), explicitly indicates that no note was required.
 3. **Evidence Reference:**
    - Direct link to the subject transaction UUID.
-   - Monotonic event ordinal (`#1`, `#2`, …) and cryptographic operation ID (`operation_id`).
+   - Per-operation event ordinal and operation identifier (`operation_id`).
 
 ---
 
@@ -79,19 +79,19 @@ All state mutations are dispatched via `POST /api/v1/cases/:id/commands` backed 
    - Transitions status to `in_review`. No operational reason required.
 2. **Escalate (`escalate`):**
    - Permitted: Assigned Analyst or Admin when status is `in_review`.
-   - Transitions status to `escalated`. Requires operational rationale (1–2,000 characters).
+   - Transitions status to `escalated`. Requires operational rationale (1-2,000 characters).
 3. **Return to Review (`return_to_review`):**
    - Permitted: Admin only when status is `escalated`.
-   - Transitions status back to `in_review`. Requires administrative rationale (1–2,000 characters).
+   - Transitions status back to `in_review`. Requires administrative rationale (1-2,000 characters).
 4. **Resolve (`resolve`):**
    - Permitted: Assigned Analyst or Admin when status is `in_review`; Admin when `escalated`.
-   - Derives terminal status `closed` with resolution code `confirmed_suspicious` and required resolution notes (1–5,000 characters).
+   - Derives terminal status `closed` with resolution code `confirmed_suspicious` and required resolution notes (1-5,000 characters).
 5. **Dismiss (`dismiss`):**
    - Permitted: Assigned Analyst or Admin when status is `in_review`; Admin when `escalated`.
-   - Derives terminal status `dismissed` with resolution code `false_positive` or `insufficient_evidence` and required resolution notes (1–5,000 characters).
+   - Derives terminal status `dismissed` with resolution code `false_positive` or `insufficient_evidence` and required resolution notes (1-5,000 characters).
 6. **Reopen (`reopen`):**
    - Permitted: Admin only when status is `closed` or `dismissed`.
-   - Transitions status to `open`. Requires operational reason (1–2,000 characters).
+   - Transitions status to `open`. Requires operational reason (1-2,000 characters).
    - In accordance with the technical contract, reopening cleans `resolution_code`, `resolution_notes`, `closed_at`, and `due_at`; preserves the original `case_id`, `case_ref`, `opened_at`, and `priority`; and resets an inactive assignee to `NULL`.
 
 ### Optimistic Concurrency Protocol (HTTP 409)
@@ -108,8 +108,9 @@ All state mutations are dispatched via `POST /api/v1/cases/:id/commands` backed 
 ## 5. Accessibility & Responsive Design
 
 - Dialogs conform to WAI-ARIA modal patterns with `role="dialog"`, `aria-modal="true"`, and `aria-labelledby`.
+- Dismissal uses native radio inputs with clickable label rows, aligned controls, selected borders and keyboard focus indicators.
 - Opening a dialog moves focus to the primary input or action button.
 - Pressing `Escape` cancels and closes the dialog.
-- Closing or cancelling a dialog restores focus to the triggering button.
+- Closing or cancelling a dialog restores focus to its triggering button while that action remains available.
 - The sidebar and mobile disclosure menu provide high-contrast, accessible links to `/cases` with briefcase icon indicators.
 - Responsive breakpoints down to 390px prevent horizontal scrollbar clipping.

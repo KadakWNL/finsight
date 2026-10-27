@@ -167,7 +167,7 @@ The frontmatter records the sign-in display, page heading, panel title, body, fi
 
 ## Layout
 
-The desktop sidebar is fixed at 216px, and the workspace body reserves the same left margin. It contains the brand, implemented navigation and role context. The header contains the environment label, theme control and session actions.
+The desktop sidebar is 216px expanded and 72px collapsed; the workspace body reserves the corresponding left margin. A button beside the brand toggles these states. It contains implemented navigation, role context and a Settings gear. The header contains the environment label, theme control and session actions.
 
 Main content has a maximum width of 1480px and desktop padding of 40px. Repeated panel insets use the frontmatter spacing steps. Filters use four columns, reduce to two at 1200px, and become one at 480px. Detail content reduces from two columns to one at 900px.
 
@@ -197,7 +197,7 @@ Keyboard focus uses a visible ring. The primary button has no distinct hover col
 
 ### Inputs and fields
 
-Inputs, selects and textareas use a surface fill with a control border and the control radius. Their minimum height is 44px; textareas start at 120px. Invalid inputs and selects use the error line. Disabled controls use the muted surface, while placeholders use subtle text.
+Text inputs, selects and textareas use a surface fill with a control border and the control radius. Their minimum height is 44px; textareas start at 120px. Native radio controls are 18px inside clickable choice rows at least 64px high, with a selected border and focus ring. Invalid inputs and selects use the error line. Disabled controls use the muted surface, while placeholders use subtle text.
 
 ### Panels and tables
 
@@ -209,7 +209,7 @@ Status labels use a muted surface and supporting text. Risk labels pair their se
 
 ### Navigation and theme switch
 
-The sidebar links use an icon with a text label, subdued default text and a muted hover fill. `aria-current=page` selects the full square item surface. The mobile menu exposes the same links in a bordered surface.
+Expanded sidebar links pair an icon with a text label, subdued default text and a muted hover fill. Collapsed links keep accessible names and show labels on hover or keyboard focus. `aria-current=page` selects the full square item surface. The mobile menu exposes full labels in a bordered surface. [Workspace preferences](docs/discovery-ui.md#settings-and-display-preferences) document persistence and defaults.
 
 The [theme switch](src/components/workspace/theme-switch.tsx) is a 44px square control with the control radius and an accessible action label. Initialization reads `finsight-theme` from local storage before rendering; without a valid stored choice it uses the system color preference.
 

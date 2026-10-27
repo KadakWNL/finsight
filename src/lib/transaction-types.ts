@@ -18,5 +18,5 @@ export interface RiskSignal {
 }
 export interface TransactionDetail extends TransactionRow {signals:RiskSignal[];coverage:string;signal_summary:string;configuration_label:string}
 export interface TransactionPage {data:TransactionRow[];page_size:number;next_cursor:string|null;request_id:string}
-export interface WorkRow {case_id:string;case_ref:string;status:string;priority:string;due_at:string|null;transaction_id:string;amount:string;currency_code:string;merchant_name:string;owner_label:string|null}
+export interface WorkRow {case_id:string;case_ref:string;status:string;priority:string;due_at:string|null;transaction_id:string;amount:string;amount_base:string;currency_code:string;merchant_name:string;owner_label:string|null}
 export interface OverviewData {data:WorkRow[];has_more:boolean;request_id:string}

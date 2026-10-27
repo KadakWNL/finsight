@@ -667,35 +667,35 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
             Dismissing marks case <strong>{caseData.case_ref}</strong> as <strong>dismissed</strong>. Select the
             disposition:
           </p>
-          <fieldset style={{ marginBottom: '16px' }}>
-            <legend style={{ fontSize: '13px', fontWeight: 600, marginBottom: '8px' }}>Outcome resolution code</legend>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 400, cursor: 'pointer' }}>
+          <fieldset className="choice-group">
+            <legend>Outcome resolution code</legend>
+            <div className="choice-list">
+              <label className="choice-option">
                 <input
                   type="radio"
                   name="dismiss_code"
                   value="false_positive"
                   checked={code === 'false_positive'}
                   onChange={() => setCode('false_positive')}
-                  style={{ width: 'auto', minHeight: 'auto' }}
                   disabled={pending}
                 />
                 <span>
-                  <strong>False positive</strong> — Signals explained as non-actionable or legitimate.
+                  <strong>False positive</strong>
+                  <span className="choice-description">Signals explained as non-actionable or legitimate.</span>
                 </span>
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 400, cursor: 'pointer' }}>
+              <label className="choice-option">
                 <input
                   type="radio"
                   name="dismiss_code"
                   value="insufficient_evidence"
                   checked={code === 'insufficient_evidence'}
                   onChange={() => setCode('insufficient_evidence')}
-                  style={{ width: 'auto', minHeight: 'auto' }}
                   disabled={pending}
                 />
                 <span>
-                  <strong>Insufficient evidence</strong> — Inconclusive; does not mark transaction safe.
+                  <strong>Insufficient evidence</strong>
+                  <span className="choice-description">Inconclusive; does not mark the transaction safe.</span>
                 </span>
               </label>
             </div>

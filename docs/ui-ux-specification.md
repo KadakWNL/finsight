@@ -1,5 +1,7 @@
 # UI/UX specification
 
+> This document retains the proposed screen designs. Current implemented behavior is documented in the [discovery workspace](discovery-ui.md) and [case workspace](case-ui.md).
+
 FinSight uses searchable tables, explainable evidence panels, and case workspaces. The interface helps an operator choose work and record decisions. All screens are designed proposals; no frontend is implemented. [Information architecture](information-architecture.md) owns routes and page inventory; [product workflows](product-workflows.md) owns action permissions.
 
 Wireframes below use field placeholders rather than production figures. There are no fabricated financial metrics. Future demo fixtures must carry a persistent “Synthetic demo data” label.

@@ -9,7 +9,7 @@ export function safeWorkspacePath(value: string | null | undefined, fallback = '
   if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\') || [...value].some(c=>c.charCodeAt(0)<32||c.charCodeAt(0)===127)) return fallback;
   try {
     const url = new URL(value,'https://workspace.invalid');
-    if (url.origin !== 'https://workspace.invalid' || !/^\/(overview|admin|access-denied|transactions(?:\/[0-9a-f-]{36})?|cases(?:\/[0-9a-f-]{36})?)$/i.test(url.pathname)) return fallback;
+    if (url.origin !== 'https://workspace.invalid' || !/^\/(overview|admin|settings|access-denied|transactions(?:\/[0-9a-f-]{36})?|cases(?:\/[0-9a-f-]{36})?)$/i.test(url.pathname)) return fallback;
     return url.pathname + url.search;
   } catch { return fallback; }
 }
@@ -24,9 +24,9 @@ export function formatMoney(value: string, currency: string) {
   if (!/^\d+$/.test(whole) || !/^\d{0,2}$/.test(fraction)) return `${currency} ${value}`;
   return `${currency} ${new Intl.NumberFormat(currency === 'INR' ? 'en-IN' : 'en-US').format(BigInt(whole))}.${fraction.padEnd(2,'0')}`;
 }
-export function formatTime(value: string | null) {
+export function formatTime(value: string | null, timeZone = 'UTC') {
   if (!value) return 'Not set';
   const date = new Date(value);
   if (!Number.isFinite(date.getTime())) return 'Not recorded';
-  return new Intl.DateTimeFormat('en-GB',{timeZone:'UTC',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(date);
+  return new Intl.DateTimeFormat('en-GB',{timeZone,day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}).format(date);
 }

@@ -6,6 +6,7 @@ import type { TransactionPage } from '@/lib/transaction-types';
 import { useApi } from './use-api';
 import { PageHeading, ErrorState, LoadingState, EmptyState } from './ui';
 import { TransactionTable } from './transaction-table';
+import { useDisplayPreferences } from './display-preferences';
 
 const advanced=['from','to','account_id','merchant_id','device_id','currency','amount_mode','amount_min','amount_max'];
 function utcInput(value:string|null) {
@@ -42,6 +43,7 @@ function FilterForm({params,fields,loading,apply,reset}:{params:URLSearchParams;
 }
 
 export function ExplorerScreen() {
+  const { timeZone } = useDisplayPreferences();
   const searchParams=useSearchParams();const search=searchParams.toString();const router=useRouter();
   const [previous,setPrevious]=useState<string[]>([]);
   const result=useApi<TransactionPage>('/api/v1/transactions'+(search?'?'+search:''));
@@ -64,7 +66,7 @@ export function ExplorerScreen() {
     {filters.length?<p className="applied-filters">Applied filters: {filters.map(([key,value])=>`${key.replaceAll('_',' ')}: ${value}`).join('; ')}</p>:null}
     {result.error?<ErrorState status={result.error.status} message={result.error.message} returnTo={returnTo} retry={result.reload}/>:null}
     {result.error?.status===400?<div className="action-row"><Button className="secondary" onClick={()=>{const params=new URLSearchParams(search);params.delete('cursor');setPrevious([]);navigate(params);}}>Restart from first page</Button></div>:null}
-    <section className="work-panel" aria-busy={result.loading} aria-label="Transaction results"><div className="panel-heading"><div><h2>Recorded transactions</h2><p>No recorded signals does not mean a transaction is safe.</p></div><span className="muted">UTC</span></div>
+    <section className="work-panel" aria-busy={result.loading} aria-label="Transaction results"><div className="panel-heading"><div><h2>Recorded transactions</h2><p>No recorded signals does not mean a transaction is safe.</p></div><span className="muted">{timeZone}</span></div>
       {result.loading?<LoadingState label="Loading transactions…"/>:null}
       {result.data&&!result.loading?<>{result.error?<p className="notice" role="status">Previous results shown. The latest request did not succeed.</p>:null}
         {result.data.data.length?<TransactionTable rows={result.data.data} returnTo={returnTo} sort={new URLSearchParams(result.loadedUrl?.split('?')[1]).get('sort')??'occurred_at'} order={new URLSearchParams(result.loadedUrl?.split('?')[1]).get('order')??'desc'}/>:<EmptyState title={filters.length?'No transactions match these filters':'No transactions available'}><p>{filters.length?'Reset or adjust the filters to broaden your search.':'Transactions will appear when financial data is available.'}</p></EmptyState>}
