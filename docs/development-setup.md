@@ -9,10 +9,10 @@ Use Node.js 24, pinned by `.nvmrc`, and npm with the committed lockfile. Run the
 ```powershell
 npm ci
 Copy-Item .env.example .env.local
-npm run dev
+npm run dev -- --port 3014
 ```
 
-Open `http://localhost:3000`. The landing page requires no database. Set local values in `.env.local` before running database tooling; the committed example contains placeholders. Never prefix database credentials with `NEXT_PUBLIC_` or commit local environment files.
+Open `http://localhost:3014`. The landing page requires no database. Set local values in `.env.local` before running database tooling; the committed example contains placeholders. Never prefix database credentials with `NEXT_PUBLIC_` or commit local environment files.
 
 The local visual system is recorded in [DESIGN.md](../DESIGN.md) and records the accepted visual direction. `src/app/globals.css` defines light/dark semantic colors, violet accents, bordered surfaces, visible keyboard focus and square sidebar selection. `src/app/layout.tsx` loads local IBM Plex Sans and initializes the theme from a stored choice or system preference. Shared primitives live in `src/components/ui`; `components.json` defines shadcn-compatible paths and Tailwind configuration. Workspace components live in `src/components/workspace`. Open `/sign-in` after configuring the database and [provisioning identities](authentication.md).
 
@@ -56,6 +56,8 @@ The migration harness requires a database without `public.schema_migrations`; it
 | `npm run db:migrate` | Apply/verify ordered migrations with the dedicated migrator connection |
 | `npm run db:migrate:test` | Apply/verify migrations in an explicitly permitted isolated test database |
 | `npm run db:seed` | Verify eight deterministic synthetic scenarios and once-only signals in an explicitly permitted local demo/test database; see [risk SQL](deterministic-risk.md) |
+| `npm run demo:fx -- --out=data/local/fx.json` | Save daily historical FX reference observations for the [reproducible demo](demo-dataset.md) |
+| `npm run demo:import -- --snapshot=data/local/fx.json --manifest=data/local/demo.json` | Add a bounded synthetic dataset using the saved rate snapshot and an isolated demo/test database |
 | `npm run auth:provision -- --bootstrap-admin` | Provision the first admin through migrator credentials and local credential input |
 | `npm run auth:provision -- --demo` | Provision explicit-password demo identities in an opted-in local isolated database |
 | `npm run test:acceptance` | Fail explicitly because feature acceptance is not implemented |
