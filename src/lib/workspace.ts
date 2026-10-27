@@ -1,7 +1,7 @@
 export type HumanRole = 'analyst' | 'admin';
-export type RecordKind = 'transaction' | 'account' | 'device' | 'merchant';
+export type RecordKind = 'transaction' | 'account' | 'device' | 'merchant' | 'case';
 export function compactRecordId(kind:RecordKind,id:string) {
-  const prefix={transaction:'TXN',account:'ACC',device:'DEV',merchant:'MCH'}[kind];
+  const prefix={transaction:'TXN',account:'ACC',device:'DEV',merchant:'MCH',case:'CASE'}[kind];
   return `${prefix} · …${id.slice(-6)}`;
 }
 export function roleHome(role: HumanRole) { return role === 'admin' ? '/admin' : '/overview'; }
@@ -9,7 +9,7 @@ export function safeWorkspacePath(value: string | null | undefined, fallback = '
   if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\') || [...value].some(c=>c.charCodeAt(0)<32||c.charCodeAt(0)===127)) return fallback;
   try {
     const url = new URL(value,'https://workspace.invalid');
-    if (url.origin !== 'https://workspace.invalid' || !/^\/(overview|admin|access-denied|transactions(?:\/[0-9a-f-]{36})?)$/i.test(url.pathname)) return fallback;
+    if (url.origin !== 'https://workspace.invalid' || !/^\/(overview|admin|access-denied|transactions(?:\/[0-9a-f-]{36})?|cases(?:\/[0-9a-f-]{36})?)$/i.test(url.pathname)) return fallback;
     return url.pathname + url.search;
   } catch { return fallback; }
 }

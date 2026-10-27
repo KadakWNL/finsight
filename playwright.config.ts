@@ -10,6 +10,7 @@ const testSecret = randomBytes(32).toString('hex');
 
 export default defineConfig({
   testDir: './tests/e2e',
+  workers: 1,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 1 : 0,
   use: { baseURL: 'http://127.0.0.1:3100', trace: 'retain-on-failure' },

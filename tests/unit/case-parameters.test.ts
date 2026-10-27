@@ -28,6 +28,13 @@ describe('Case Parameter Validation Unit Tests', () => {
   });
 
   describe('parseCaseQuery', () => {
+    it('accepts only supported queue scopes', () => {
+      expect(parseCaseQuery(new URLSearchParams('scope=mine')).scope).toBe('mine');
+      expect(parseCaseQuery(new URLSearchParams('scope=unassigned')).scope).toBe('unassigned');
+      expect(() => parseCaseQuery(new URLSearchParams('scope=peer'))).toThrow(CaseParameterError);
+      expect(() => parseCaseQuery(new URLSearchParams('scope=mine&scope=unassigned'))).toThrow(CaseParameterError);
+    });
+
     it('applies default limit and offset', () => {
       const parsed = parseCaseQuery(new URLSearchParams());
       expect(parsed).toEqual({

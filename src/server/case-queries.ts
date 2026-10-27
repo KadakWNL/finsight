@@ -48,6 +48,13 @@ export async function listCases(
     conditions.push(`(c.assigned_to_user_id = $${values.length} OR c.assigned_to_user_id IS NULL)`);
   }
 
+  if (options.scope === 'mine') {
+    values.push(user.userId);
+    conditions.push(`c.assigned_to_user_id = $${values.length}`);
+  } else if (options.scope === 'unassigned') {
+    conditions.push('c.assigned_to_user_id IS NULL');
+  }
+
   if (options.status) {
     values.push(options.status);
     conditions.push(`c.status = $${values.length}`);

@@ -17,6 +17,12 @@ paths:
         - Admins see all cases with full details.
         - Analysts see cases assigned to themselves with full details, plus unassigned cases projected with minimal summaries (case_ref, transaction_id, priority, status, due_at). Cases assigned to other analysts are excluded.
       parameters:
+        - name: scope
+          in: query
+          description: Filter ownership before pagination. mine uses the authenticated user; unassigned retains the role-specific projection. Omit for all permitted cases.
+          schema:
+            type: string
+            enum: [mine, unassigned]
         - name: status
           in: query
           schema:
