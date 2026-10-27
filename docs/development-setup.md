@@ -60,6 +60,6 @@ The migration harness requires a database without `public.schema_migrations`; it
 | `npm run demo:import -- --snapshot=data/local/fx.json --manifest=data/local/demo.json` | Add a bounded synthetic dataset using the saved rate snapshot and an isolated demo/test database |
 | `npm run auth:provision -- --bootstrap-admin` | Provision the first admin through migrator credentials and local credential input |
 | `npm run auth:provision -- --demo` | Provision explicit-password demo identities in an opted-in local isolated database |
-| `npm run test:acceptance` | Fail explicitly because feature acceptance is not implemented |
+| `npm run test:acceptance` | Run the [MVP acceptance matrix](mvp-acceptance.md) against a fresh isolated database and separate runtime login; retain evidence for human cross-review |
 
 Run `npx playwright install chromium` once before browser checks. Port 3100 must be free; Playwright starts its own server and does not reuse an unrelated process. Desktop/mobile captures and failure traces appear under ignored `test-results`. `.github/workflows/checks.yml` runs these scaffold checks with Node 24 and a disposable PostgreSQL 17 service using a non-superuser test role.

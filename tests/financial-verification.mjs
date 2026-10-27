@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { setTimeout } from 'node:timers/promises';
 import pg from 'pg';
 import { requireTestDatabase } from '../scripts/database-safety.mjs';
@@ -79,11 +79,14 @@ try {
     ['device activity', "SELECT transaction_id FROM public.transaction WHERE device_id='20000000-0000-0000-0000-000000000040' ORDER BY occurred_at DESC, transaction_id DESC LIMIT 25", 'transaction_device_activity'],
     ['description FTS', "SELECT transaction_id FROM public.transaction WHERE search_vector @@ plainto_tsquery('english','uncommonkeyword')", 'transaction_description_search'],
   ];
+  const plans = [];
   for (const [name, sql, index] of queries) {
     const plan = (await owner.query(`EXPLAIN (ANALYZE, BUFFERS, FORMAT JSON) ${sql}`)).rows[0]['QUERY PLAN'];
     assert.ok(JSON.stringify(plan).includes(index), `Missing expected index for ${name}: ${JSON.stringify(plan)}`);
+    plans.push({ name, sql, expectedIndex: index, plan });
     console.log(`PASS EXPLAIN ${name}: ${index}; execution ${plan[0]['Execution Time']} ms`);
   }
+  if (process.env.ACCEPTANCE_PLAN_OUTPUT) await writeFile(process.env.ACCEPTANCE_PLAN_OUTPUT, JSON.stringify(plans, null, 2) + '\n');
   const existing = (await owner.query(`SELECT indexname FROM pg_indexes WHERE schemaname='public'
     AND tablename IN ('transaction','risk_signal','payment_method') ORDER BY indexname`)).rows.map(r => r.indexname);
   assert.ok(existing.includes('risk_signal_transaction_id_rule_id_key'));
