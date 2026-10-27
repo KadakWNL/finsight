@@ -105,7 +105,7 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             <button
               type="button"
               className="tab-button"
-              aria-selected={tab === 'mine'}
+              aria-pressed={tab === 'mine'}
               onClick={() => setTab('mine')}
             >
               Assigned to me
@@ -113,7 +113,7 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             <button
               type="button"
               className="tab-button"
-              aria-selected={tab === 'unassigned'}
+              aria-pressed={tab === 'unassigned'}
               onClick={() => setTab('unassigned')}
             >
               Unassigned summaries
@@ -121,7 +121,7 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             <button
               type="button"
               className="tab-button"
-              aria-selected={tab === 'all'}
+              aria-pressed={tab === 'all'}
               onClick={() => setTab('all')}
             >
               All permitted
@@ -132,7 +132,7 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             <button
               type="button"
               className="tab-button"
-              aria-selected={tab === 'all'}
+              aria-pressed={tab === 'all'}
               onClick={() => setTab('all')}
             >
               All cases
@@ -140,7 +140,7 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             <button
               type="button"
               className="tab-button"
-              aria-selected={tab === 'unassigned'}
+              aria-pressed={tab === 'unassigned'}
               onClick={() => setTab('unassigned')}
             >
               Unassigned
@@ -148,7 +148,7 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             <button
               type="button"
               className="tab-button"
-              aria-selected={tab === 'escalated'}
+              aria-pressed={tab === 'escalated'}
               onClick={() => setTab('escalated')}
             >
               Escalated
@@ -230,7 +230,6 @@ export function CaseQueueScreen({ role, userId }: CaseQueueScreenProps) {
             </h2>
             <p>Ordered by opened timestamp (newest first).</p>
           </div>
-          <span className="muted">Live PostgreSQL 17</span>
         </div>
 
         {result.loading ? <LoadingState label="Loading investigation queue…" /> : null}

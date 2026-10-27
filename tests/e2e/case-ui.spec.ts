@@ -150,6 +150,9 @@ test.describe('Issue #15 — Case Queue, Lifecycle Dialogs, and Event History', 
     await page.getByRole('link', { name: 'Cases' }).first().click();
     await expect(page).toHaveURL(/\/cases/);
     await expect(page.getByRole('heading', { name: 'Investigation Cases' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Assigned to me' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Live PostgreSQL 17')).toHaveCount(0);
+    await page.screenshot({ path: 'test-results/case-queue-desktop.png', fullPage: true });
 
     // In "Assigned to me" tab (default for analyst)
     await expect(page.getByRole('link', { name: case1Ref })).toBeVisible();
@@ -162,6 +165,7 @@ test.describe('Issue #15 — Case Queue, Lifecycle Dialogs, and Event History', 
 
     // Switch to "Unassigned summaries" tab
     await page.getByRole('button', { name: 'Unassigned summaries' }).click();
+    await expect(page.getByRole('button', { name: 'Unassigned summaries' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByText(unassignedCaseRef)).toBeVisible();
     await expect(page.getByText('Unassigned summary')).toBeVisible();
 
@@ -329,6 +333,14 @@ test.describe('Issue #15 — Case Queue, Lifecycle Dialogs, and Event History', 
     await page.getByRole('button', { name: 'Dismiss case' }).click();
     const dismissDialog = page.getByRole('dialog', { name: 'Dismiss case' });
     await expect(dismissDialog).toBeVisible();
+    await dismissDialog.screenshot({ path: 'test-results/dismiss-dialog-desktop.png' });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.screenshot({ path: 'test-results/dismiss-dialog-mobile.png' });
+    expect(await page.getByRole('radio').first().evaluate(input => {
+      const radio = input.getBoundingClientRect();
+      const label = input.closest('label')!.getBoundingClientRect();
+      return radio.width === 18 && radio.height === 18 && radio.top - label.top < 20;
+    })).toBe(true);
 
     // Select false_positive
     await page.getByLabel(/False positive/i).check();

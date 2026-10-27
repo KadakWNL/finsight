@@ -149,6 +149,40 @@ test('theme follows the system and preserves explicit choices across reloads and
   await page.emulateMedia({colorScheme:'light'});await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
 });
 
+test('settings preserves return paths, synchronizes appearance controls and works on mobile',async({page})=>{
+  await page.emulateMedia({colorScheme:'dark'});
+  await page.goto('/settings');
+  await expect(page).toHaveURL(/\/sign-in\?next=%2Fsettings/);
+  await page.getByLabel('Email address').fill(uiEmail);
+  await page.getByLabel('Password',{exact:true}).fill(password);
+  await page.getByRole('button',{name:'Sign in',exact:true}).click();
+  await expect(page.getByRole('heading',{name:'Settings',exact:true})).toBeVisible();
+  await expect(page.getByText(uiEmail,{exact:true})).toBeVisible();
+  await expect(page.getByRole('radio',{name:/System/})).toBeChecked();
+  await expect(page.locator('html')).toHaveAttribute('data-theme','dark');
+  await expect(page.locator('.sidebar-settings')).toHaveAttribute('aria-current','page');
+  await page.screenshot({path:'test-results/settings-desktop-dark.png',fullPage:true});
+  await page.getByRole('radio',{name:/Light/}).check();
+  await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+  await expect(page.getByRole('button',{name:'Switch to dark mode'})).toBeVisible();
+  await page.screenshot({path:'test-results/settings-desktop-light.png',fullPage:true});
+  await page.reload();
+  await expect(page.getByRole('radio',{name:/Light/})).toBeChecked();
+  await page.getByRole('button',{name:'Switch to dark mode'}).click();
+  await expect(page.getByRole('radio',{name:/Dark/})).toBeChecked();
+  await page.getByRole('radio',{name:/System/}).check();
+  await page.emulateMedia({colorScheme:'light'});
+  await expect(page.locator('html')).toHaveAttribute('data-theme','light');
+  await page.setViewportSize({width:390,height:844});
+  await page.screenshot({path:'test-results/settings-mobile.png',fullPage:true});
+  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
+  await page.goto('/transactions');
+  await page.getByText('Menu',{exact:true}).click();
+  await page.getByRole('navigation',{name:'Mobile navigation'}).getByRole('link',{name:'Settings'}).click();
+  await expect(page.getByRole('heading',{name:'Settings',exact:true})).toBeVisible();
+  await expect(page.locator('.mobile-menu')).not.toHaveAttribute('open','');
+});
+
 test('Auth.js login protects transaction reads and shares sign-out with JSON endpoints',async({request,playwright})=>{
   const csrf=await (await request.get('/api/auth/csrf')).json();
   expect(csrf.csrfToken).toBeTruthy();
@@ -162,9 +196,10 @@ test('Auth.js login protects transaction reads and shares sign-out with JSON end
   expect(session.user.role).toBe('analyst'); expect(session.expires).toBeTruthy();
   expect(JSON.stringify(session)).not.toContain('sessionId'); expect(JSON.stringify(session)).not.toContain('sid');
   const state=await request.storageState();
-  const cookie=state.cookies.find(c=>c.name==='next-auth.session-token');
+  const cookie=state.cookies.find(c=>['next-auth.session-token','__Host-next-auth.session-token'].includes(c.name));
   expect(cookie?.httpOnly).toBe(true); expect(cookie?.sameSite).toBe('Lax');
-  const staleCookie=`next-auth.session-token=${cookie!.value}`;
+  if(cookie!.name.startsWith('__Host-')) expect(cookie!.secure).toBe(true);
+  const staleCookie=`${cookie!.name}=${cookie!.value}`;
   const anonymous=await playwright.request.newContext({baseURL:origin});
   try { expect((await anonymous.get('/api/v1/transactions')).status()).toBe(401); }
   finally { await anonymous.dispose(); }
