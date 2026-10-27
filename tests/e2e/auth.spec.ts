@@ -105,7 +105,7 @@ test('admin UI lands on team oversight without analyst creation or unavailable n
   await page.goto('/transactions/'+syntheticId(105));await expect(page.getByRole('heading',{name:'Risk evidence'})).toBeVisible();
   await expect(page.getByRole('button',{name:'Create case',exact:true})).toHaveCount(0);
   await expect(page.getByText('An analyst can create a case for this transaction.')).toBeVisible();
-  await expect(page.getByRole('navigation',{name:'Primary navigation'}).getByRole('link')).toHaveCount(2);
+  await expect(page.getByRole('navigation',{name:'Primary navigation'}).getByRole('link')).toHaveCount(3);
 });
 
 test('UI failures retain filters and stale labels; duplicate case recheck preserves the draft',async({page})=>{

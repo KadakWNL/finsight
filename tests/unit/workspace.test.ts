@@ -3,6 +3,8 @@ import { formatMoney, landingPath, safeWorkspacePath } from '../../src/lib/works
 test('recovery destinations keep only local workspace routes and preserve filters',()=>{
   const path='/transactions/30000000-0000-0000-0000-000000000100?returnTo=%2Ftransactions%3Frisk%3Dhigh';
   expect(safeWorkspacePath(path)).toBe(path);
+  expect(safeWorkspacePath('/cases')).toBe('/cases');
+  expect(safeWorkspacePath('/cases/40000000-0000-0000-0000-000000000100')).toBe('/cases/40000000-0000-0000-0000-000000000100');
   for(const value of ['https://example.com','//example.com','/\\example.com','/%2f%2fexample.com','/api/auth/logout','/transactions\n','/transactions/../../admin/users']) expect(safeWorkspacePath(value)).toBe('/transactions');
   expect(landingPath('admin','/overview')).toBe('/admin');
   expect(landingPath('analyst','/admin')).toBe('/overview');

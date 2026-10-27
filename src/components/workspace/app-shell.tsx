@@ -8,8 +8,10 @@ import type { HumanRole } from '@/lib/workspace';
 import { ThemeSwitch } from './theme-switch';
 
 type Profile={displayName:string;role:HumanRole};
-function NavigationIcon({kind}:{kind:'overview'|'transactions'}) {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{kind==='overview'?<><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 10v10"/></>:<><path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4"/></>}</svg>;
+function NavigationIcon({kind}:{kind:'overview'|'transactions'|'cases'}) {
+  if(kind==='overview') return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 10v10"/></svg>;
+  if(kind==='cases') return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>;
+  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M4 8h15m-4-4 4 4-4 4M20 16H5m4-4-4 4 4 4"/></svg>;
 }
 export function AppShell({initialUser,children}:{initialUser:Profile;children:React.ReactNode}) {
   const pathname=usePathname();
@@ -37,6 +39,7 @@ export function AppShell({initialUser,children}:{initialUser:Profile;children:Re
   const home=roleHome(profile?.role ?? initialUser.role);
   const closeMenu=()=>{if(menu.current) menu.current.open=false;};
   const links=<><Link href={home} onClick={closeMenu} aria-current={pathname===home?'page':undefined}><NavigationIcon kind="overview"/> Overview</Link>
+    <Link href="/cases" onClick={closeMenu} aria-current={pathname.startsWith('/cases')?'page':undefined}><NavigationIcon kind="cases"/> Cases</Link>
     <Link href="/transactions" onClick={closeMenu} aria-current={pathname.startsWith('/transactions')?'page':undefined}><NavigationIcon kind="transactions"/> Transactions</Link></>;
   return <div className="workspace"><aside className="sidebar"><Link className="workspace-brand" href={home}>FinSight<span>Transaction intelligence</span></Link><nav aria-label="Primary navigation">{links}</nav><div className="sidebar-context"><strong>{profile?.role==='admin'?'Administrator':profile?.role==='analyst'?'Analyst':'Session ended'}</strong><span>Synthetic demo data</span></div></aside>
     <div className="workspace-body"><header className="workspace-header"><div className="workspace-identity"><details ref={menu} className="mobile-menu"><summary>Menu</summary><nav aria-label="Mobile navigation">{links}</nav></details><span className="workspace-context">{pathname.startsWith('/transactions')?'Transaction workspace':'Investigation workspace'}</span><span className="environment-label">Synthetic demo data</span></div>

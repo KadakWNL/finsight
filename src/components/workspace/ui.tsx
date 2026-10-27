@@ -6,6 +6,13 @@ import type { RiskBand } from '@/lib/transaction-types';
 export function RiskBadge({band}:{band:RiskBand}) {
   return <span className={`risk-badge risk-${band}`}><span aria-hidden="true">●</span> {band[0].toUpperCase()+band.slice(1)}</span>;
 }
+export function StatusBadge({status}:{status:string}) {
+  const label=status.replaceAll('_',' ');
+  return <span className={`status-badge status-${status}`}><span className="status-dot" aria-hidden="true"/>{label[0].toUpperCase()+label.slice(1)}</span>;
+}
+export function PriorityBadge({priority}:{priority:string}) {
+  return <span className={`priority-badge priority-${priority}`}>{priority[0].toUpperCase()+priority.slice(1)}</span>;
+}
 export function PageHeading({title,description,children}:{title:string;description:string;children?:React.ReactNode}) {
   return <header className="page-heading"><div><h1>{title}</h1><p>{description}</p></div>{children}</header>;
 }
@@ -17,7 +24,7 @@ export function LoadingState({label}:{label:string}) {
 }
 export function ErrorState({status,message,returnTo,retry,newTab=false}:{status:number;message?:string;returnTo:string;retry?:()=>void;newTab?:boolean}) {
   const expired=status===401;
-  const title=expired?'Your session ended':status===403?'Access is restricted':status===404?'Transaction not found':status===400?'Check the request':'This information is unavailable';
+  const title=expired?'Your session ended':status===403?'Access is restricted':status===404?(returnTo.includes('/cases')?'Case not found':'Transaction not found'):status===400?'Check the request':'This information is unavailable';
   return <div className="notice notice-error" role="alert"><h2>{title}</h2>
     <p>{expired?'Sign in again to continue. Your current filters are preserved.':message ?? 'Try again. If the problem continues, contact your project administrator.'}</p>
     <div className="action-row">{expired?<Link className="button-link" href={'/sign-in?next='+encodeURIComponent(safeWorkspacePath(returnTo))} target={newTab?'_blank':undefined} rel={newTab?'noopener':undefined}>Sign in again{newTab?' in a new tab':''}</Link>:retry?<Button className="secondary" onClick={retry}>Try again</Button>:null}
