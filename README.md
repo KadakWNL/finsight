@@ -135,7 +135,7 @@ npm run build
 
 Vitest covers validation, migration behavior and PostgreSQL-backed handlers. Playwright checks real sign-in, discovery, masks, role denial, case lifecycle, recovery, keyboard/mobile behavior, sidebar collapse and Settings preferences. Browser checks start their own server on port 3100; stop another development server for this checkout before running them.
 
-[GitHub Actions](https://github.com/KadakWNL/finsight/actions) records the reproducible checks. `npm run test:acceptance` deliberately fails until the complete VS01-VS16 acceptance work is implemented; component tests do not establish final academic acceptance.
+[GitHub Actions](https://github.com/KadakWNL/finsight/actions) records the reproducible checks. The separate [MVP acceptance command](docs/mvp-acceptance.md) runs VS01-VS16 against a fresh database with a restricted application login and produces a result matrix, query plans and browser recordings. Technical success still requires teammate cross-review; component and MVP tests do not establish final academic acceptance.
 
 ## Course requirements
 
@@ -164,6 +164,7 @@ The [requirements traceability](docs/requirements-traceability.md) and [testing 
 | [Development setup](docs/development-setup.md) | Environment, roles, database isolation and command reference |
 | [Discovery workspace](docs/discovery-ui.md) / [design system](DESIGN.md) | Routes, themed shell, interaction boundaries and visual tokens |
 | [Case workspace](docs/case-ui.md) | Queue views, lifecycle dialogs, conflict recovery and audit history |
+| [MVP acceptance](docs/mvp-acceptance.md) | Fresh database requirements, VS01-VS16 evidence, recordings and human review gates |
 | [Authentication](docs/authentication.md) | Provisioning, cookies, sessions, grants and role checks |
 | [Transaction API](docs/transaction-api.md) / [Case API](docs/case-api.md) | Request validation, scoping, pagination and guarded commands |
 | [Demo dataset](docs/demo-dataset.md) / [deterministic risk](docs/deterministic-risk.md) | Generated activity, historical conversion and exact regression fixtures |

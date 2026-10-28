@@ -5,6 +5,8 @@ import path from 'node:path';
 import { randomBytes } from 'node:crypto';
 
 if (existsSync('.env.local')) loadEnvFile('.env.local');
+// Route fixtures supply their own origins instead of inheriting the running demo's URL.
+delete process.env.NEXTAUTH_URL;
 process.env.AUTH_SECRET = randomBytes(32).toString('hex');
 
 export default defineConfig({

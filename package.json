@@ -17,7 +17,7 @@
     "test:api": "vitest run --project api",
     "test:e2e": "playwright test",
     "test:discovery": "vitest list && playwright test --list",
-    "test:acceptance": "node scripts/pending.mjs acceptance",
+    "test:acceptance": "node scripts/acceptance.mjs",
     "db:migrate": "node --env-file-if-exists=.env.local scripts/migrate.mjs",
     "db:migrate:test": "node --env-file-if-exists=.env.local scripts/migrate.mjs --test",
     "db:seed": "node --env-file-if-exists=.env.local scripts/seed.mjs",

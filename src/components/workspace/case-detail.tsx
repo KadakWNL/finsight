@@ -351,91 +351,35 @@ export function CaseDetailScreen({ id, returnTo, role, userId }: CaseDetailScree
                   </div>
                 </div>
                 <div className="panel-content">
-                  {/* Action controls based on status and role */}
-                  {caseData.status === 'open' ? (
-                    isAdmin || isAssigned ? (
-                      <div className="case-actions-bar" style={{ marginTop: 0, paddingTop: 0, borderTop: 0 }}>
-                        <StartReviewDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                      </div>
-                    ) : (
-                      <p className="muted">Only the assigned analyst or an admin can start review.</p>
-                    )
+                  <div
+                    className="case-actions-bar"
+                    style={{ marginTop: 0, paddingTop: 0, borderTop: 0, flexDirection: 'column', alignItems: 'stretch' }}
+                  >
+                    <StartReviewDialog available={caseData.status === 'open' && (isAdmin || isAssigned)}
+                      caseData={caseData} onSuccess={reloadAll} onRefresh={reloadAll} />
+                    <EscalateCaseDialog available={caseData.status === 'in_review' && (isAdmin || isAssigned)}
+                      caseData={caseData} onSuccess={reloadAll} onRefresh={reloadAll} />
+                    <ReturnToReviewDialog available={caseData.status === 'escalated' && isAdmin}
+                      caseData={caseData} onSuccess={reloadAll} onRefresh={reloadAll} />
+                    <ResolveCaseDialog available={(caseData.status === 'in_review' && (isAdmin || isAssigned)) || (caseData.status === 'escalated' && isAdmin)}
+                      caseData={caseData} onSuccess={reloadAll} onRefresh={reloadAll} />
+                    <DismissCaseDialog available={(caseData.status === 'in_review' && (isAdmin || isAssigned)) || (caseData.status === 'escalated' && isAdmin)}
+                      caseData={caseData} onSuccess={reloadAll} onRefresh={reloadAll} />
+                    <ReopenCaseDialog available={(caseData.status === 'closed' || caseData.status === 'dismissed') && isAdmin}
+                      caseData={caseData} onSuccess={reloadAll} onRefresh={reloadAll} />
+                  </div>
+                  {(caseData.status === 'open' || caseData.status === 'in_review') && !isAdmin && !isAssigned ? (
+                    <p className="muted">Only the assigned analyst or an admin can progress this case.</p>
                   ) : null}
-
-                  {caseData.status === 'in_review' ? (
-                    isAdmin || isAssigned ? (
-                      <div
-                        className="case-actions-bar"
-                        style={{ marginTop: 0, paddingTop: 0, borderTop: 0, flexDirection: 'column', alignItems: 'stretch' }}
-                      >
-                        <EscalateCaseDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                        <ResolveCaseDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                        <DismissCaseDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                      </div>
-                    ) : (
-                      <p className="muted">Only the assigned analyst or an admin can progress this case.</p>
-                    )
+                  {caseData.status === 'escalated' && !isAdmin ? (
+                    <div className="notice" role="status">
+                      This case is escalated to administration. Actions are reserved for administrators until returned to review.
+                    </div>
                   ) : null}
-
-                  {caseData.status === 'escalated' ? (
-                    isAdmin ? (
-                      <div
-                        className="case-actions-bar"
-                        style={{ marginTop: 0, paddingTop: 0, borderTop: 0, flexDirection: 'column', alignItems: 'stretch' }}
-                      >
-                        <ReturnToReviewDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                        <ResolveCaseDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                        <DismissCaseDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                      </div>
-                    ) : (
-                      <div className="notice" role="status">
-                        This case is escalated to administration. Actions are reserved for administrators until returned to review.
-                      </div>
-                    )
-                  ) : null}
-
-                  {caseData.status === 'closed' || caseData.status === 'dismissed' ? (
-                    isAdmin ? (
-                      <div className="case-actions-bar" style={{ marginTop: 0, paddingTop: 0, borderTop: 0 }}>
-                        <ReopenCaseDialog
-                          caseData={caseData}
-                          onSuccess={reloadAll}
-                          onRefresh={reloadAll}
-                        />
-                      </div>
-                    ) : (
-                      <div className="notice" role="status">
-                        This case is {caseData.status}. Terminal cases can only be reopened by an administrator.
-                      </div>
-                    )
+                  {(caseData.status === 'closed' || caseData.status === 'dismissed') && !isAdmin ? (
+                    <div className="notice" role="status">
+                      This case is {caseData.status}. Terminal cases can only be reopened by an administrator.
+                    </div>
                   ) : null}
                 </div>
               </section>

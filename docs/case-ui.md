@@ -97,7 +97,7 @@ All state mutations are dispatched via `POST /api/v1/cases/:id/commands` backed 
 ### Optimistic Concurrency Protocol (HTTP 409)
 - Every command payload transmits `expected_version` and a client-generated UUID `idempotency_key`.
 - If the case is modified concurrently by another process, the server returns HTTP 409 `version_conflict`.
-- The dialog displays a conflict warning and automatically reloads the case version. When the action remains available, the entered draft is preserved for review and resubmission.
+- The dialog displays a conflict warning and automatically reloads the case version. The entered draft remains open even if the refreshed state removes the action. Submission is disabled until the action is available again; the analyst can copy the draft before closing.
 - A network failure clears the submitting state, displays a connection error, and preserves the draft and idempotency key for retry.
 
 ### Idempotency & Replay
@@ -111,6 +111,6 @@ All state mutations are dispatched via `POST /api/v1/cases/:id/commands` backed 
 - Dismissal uses native radio inputs with clickable label rows, aligned controls, selected borders and keyboard focus indicators.
 - Opening a dialog moves focus to the primary input or action button.
 - Pressing `Escape` cancels and closes the dialog.
-- Closing or cancelling a dialog restores focus to its triggering button while that action remains available.
+- Closing or cancelling a dialog restores focus to its triggering button while that action remains available, or to the main content when the triggering action has disappeared.
 - The sidebar and mobile disclosure menu provide high-contrast, accessible links to `/cases` with briefcase icon indicators.
 - Responsive breakpoints down to 390px prevent horizontal scrollbar clipping.

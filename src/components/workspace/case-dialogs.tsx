@@ -6,6 +6,7 @@ import type { CaseDetail, CaseCommandType, ResolutionCode } from '@/lib/case-typ
 
 interface DialogProps {
   caseData: CaseDetail;
+  available: boolean;
   onSuccess: () => void;
   onRefresh: () => void;
 }
@@ -43,7 +44,7 @@ async function sendCommand(
   }
 }
 
-export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProps) {
+export function StartReviewDialog({ caseData, available, onSuccess, onRefresh }: DialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const key = useRef('');
@@ -59,13 +60,13 @@ export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProp
   function close() {
     if (!pending) {
       dialog.current?.close();
-      trigger.current?.focus();
+      (trigger.current ?? document.getElementById('main-content'))?.focus();
     }
   }
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (pending) return;
+    if (pending || !available) return;
     if (!key.current) key.current = crypto.randomUUID();
     setPending(true);
     setError(null);
@@ -78,11 +79,13 @@ export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProp
 
     setPending(false);
     if (result.ok) {
+      key.current = '';
       close();
       onSuccess();
     } else {
       if (result.status === 409) {
         onRefresh();
+        key.current = crypto.randomUUID();
         setError({
           status: 409,
           message:
@@ -104,9 +107,11 @@ export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProp
 
   return (
     <>
-      <Button ref={trigger} onClick={open}>
-        Start review
-      </Button>
+      {available ? (
+        <Button ref={trigger} onClick={open}>
+          Start review
+        </Button>
+      ) : null}
       <dialog
         ref={dialog}
         aria-labelledby="start-review-title"
@@ -128,6 +133,11 @@ export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProp
             Starting review transitions case <strong>{caseData.case_ref}</strong> from <code>open</code> to{' '}
             <code>in_review</code>.
           </p>
+          {!available ? (
+            <div className="notice" role="status">
+              This action is no longer available for the current case state. Your draft is preserved; copy it before closing.
+            </div>
+          ) : null}
           {error ? (
             <div className="notice notice-error" role="alert">
               <p>{error.message}</p>
@@ -142,7 +152,7 @@ export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProp
             <Button type="button" className="secondary" disabled={pending} onClick={close}>
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || !available}>
               {pending ? 'Starting review…' : 'Confirm start review'}
             </Button>
           </div>
@@ -152,7 +162,7 @@ export function StartReviewDialog({ caseData, onSuccess, onRefresh }: DialogProp
   );
 }
 
-export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps) {
+export function EscalateCaseDialog({ caseData, available, onSuccess, onRefresh }: DialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -172,7 +182,7 @@ export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogPro
   function close() {
     if (!pending) {
       dialog.current?.close();
-      trigger.current?.focus();
+      (trigger.current ?? document.getElementById('main-content'))?.focus();
     }
   }
 
@@ -183,7 +193,7 @@ export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogPro
       setError({ status: 400, message: 'Escalation reason must be between 1 and 2,000 characters.' });
       return;
     }
-    if (pending) return;
+    if (pending || !available) return;
     if (!key.current) key.current = crypto.randomUUID();
     setPending(true);
     setError(null);
@@ -197,6 +207,8 @@ export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogPro
 
     setPending(false);
     if (result.ok) {
+      key.current = '';
+      setReason('');
       close();
       onSuccess();
     } else {
@@ -224,9 +236,11 @@ export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogPro
 
   return (
     <>
-      <Button ref={trigger} className="secondary" onClick={open}>
-        Escalate
-      </Button>
+      {available ? (
+        <Button ref={trigger} className="secondary" onClick={open}>
+          Escalate
+        </Button>
+      ) : null}
       <dialog
         ref={dialog}
         aria-labelledby="escalate-case-title"
@@ -267,6 +281,11 @@ export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogPro
             Provide the investigation rationale for escalation (1 to 2,000 characters). Do not include customer PII or
             passwords.
           </p>
+          {!available ? (
+            <div className="notice" role="status">
+              This action is no longer available for the current case state. Your draft is preserved; copy it before closing.
+            </div>
+          ) : null}
           {error ? (
             <div className="notice notice-error" role="alert">
               <p>{error.message}</p>
@@ -281,7 +300,7 @@ export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogPro
             <Button type="button" className="secondary" disabled={pending} onClick={close}>
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || !available}>
               {pending ? 'Escalating…' : 'Confirm escalation'}
             </Button>
           </div>
@@ -291,7 +310,7 @@ export function EscalateCaseDialog({ caseData, onSuccess, onRefresh }: DialogPro
   );
 }
 
-export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogProps) {
+export function ReturnToReviewDialog({ caseData, available, onSuccess, onRefresh }: DialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -311,7 +330,7 @@ export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogP
   function close() {
     if (!pending) {
       dialog.current?.close();
-      trigger.current?.focus();
+      (trigger.current ?? document.getElementById('main-content'))?.focus();
     }
   }
 
@@ -322,7 +341,7 @@ export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogP
       setError({ status: 400, message: 'Return reason must be between 1 and 2,000 characters.' });
       return;
     }
-    if (pending) return;
+    if (pending || !available) return;
     if (!key.current) key.current = crypto.randomUUID();
     setPending(true);
     setError(null);
@@ -336,6 +355,8 @@ export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogP
 
     setPending(false);
     if (result.ok) {
+      key.current = '';
+      setReason('');
       close();
       onSuccess();
     } else {
@@ -363,9 +384,11 @@ export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogP
 
   return (
     <>
-      <Button ref={trigger} className="secondary" onClick={open}>
-        Return to review
-      </Button>
+      {available ? (
+        <Button ref={trigger} className="secondary" onClick={open}>
+          Return to review
+        </Button>
+      ) : null}
       <dialog
         ref={dialog}
         aria-labelledby="return-review-title"
@@ -405,6 +428,11 @@ export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogP
           <p id="return-reason-help" className="muted">
             Explain what additional verification or steps are requested (1 to 2,000 characters).
           </p>
+          {!available ? (
+            <div className="notice" role="status">
+              This action is no longer available for the current case state. Your draft is preserved; copy it before closing.
+            </div>
+          ) : null}
           {error ? (
             <div className="notice notice-error" role="alert">
               <p>{error.message}</p>
@@ -419,7 +447,7 @@ export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogP
             <Button type="button" className="secondary" disabled={pending} onClick={close}>
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || !available}>
               {pending ? 'Returning…' : 'Confirm return to review'}
             </Button>
           </div>
@@ -429,7 +457,7 @@ export function ReturnToReviewDialog({ caseData, onSuccess, onRefresh }: DialogP
   );
 }
 
-export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps) {
+export function ResolveCaseDialog({ caseData, available, onSuccess, onRefresh }: DialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -449,7 +477,7 @@ export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
   function close() {
     if (!pending) {
       dialog.current?.close();
-      trigger.current?.focus();
+      (trigger.current ?? document.getElementById('main-content'))?.focus();
     }
   }
 
@@ -460,7 +488,7 @@ export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
       setError({ status: 400, message: 'Resolution notes must be between 1 and 5,000 characters.' });
       return;
     }
-    if (pending) return;
+    if (pending || !available) return;
     if (!key.current) key.current = crypto.randomUUID();
     setPending(true);
     setError(null);
@@ -475,6 +503,8 @@ export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
 
     setPending(false);
     if (result.ok) {
+      key.current = '';
+      setNotes('');
       close();
       onSuccess();
     } else {
@@ -502,9 +532,11 @@ export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
 
   return (
     <>
-      <Button ref={trigger} onClick={open}>
-        Resolve case
-      </Button>
+      {available ? (
+        <Button ref={trigger} onClick={open}>
+          Resolve case
+        </Button>
+      ) : null}
       <dialog
         ref={dialog}
         aria-labelledby="resolve-case-title"
@@ -545,6 +577,11 @@ export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
             Document findings and recorded signals supporting this determination (1 to 5,000 characters). This rationale
             becomes permanent audit history.
           </p>
+          {!available ? (
+            <div className="notice" role="status">
+              This action is no longer available for the current case state. Your draft is preserved; copy it before closing.
+            </div>
+          ) : null}
           {error ? (
             <div className="notice notice-error" role="alert">
               <p>{error.message}</p>
@@ -559,7 +596,7 @@ export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
             <Button type="button" className="secondary" disabled={pending} onClick={close}>
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || !available}>
               {pending ? 'Resolving…' : 'Confirm resolution (Closed)'}
             </Button>
           </div>
@@ -569,7 +606,7 @@ export function ResolveCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
   );
 }
 
-export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps) {
+export function DismissCaseDialog({ caseData, available, onSuccess, onRefresh }: DialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -590,7 +627,7 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
   function close() {
     if (!pending) {
       dialog.current?.close();
-      trigger.current?.focus();
+      (trigger.current ?? document.getElementById('main-content'))?.focus();
     }
   }
 
@@ -601,7 +638,7 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
       setError({ status: 400, message: 'Dismissal notes must be between 1 and 5,000 characters.' });
       return;
     }
-    if (pending) return;
+    if (pending || !available) return;
     if (!key.current) key.current = crypto.randomUUID();
     setPending(true);
     setError(null);
@@ -616,6 +653,9 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
 
     setPending(false);
     if (result.ok) {
+      key.current = '';
+      setNotes('');
+      setCode('false_positive');
       close();
       onSuccess();
     } else {
@@ -643,9 +683,11 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
 
   return (
     <>
-      <Button ref={trigger} className="secondary" onClick={open}>
-        Dismiss case
-      </Button>
+      {available ? (
+        <Button ref={trigger} className="secondary" onClick={open}>
+          Dismiss case
+        </Button>
+      ) : null}
       <dialog
         ref={dialog}
         aria-labelledby="dismiss-case-title"
@@ -718,6 +760,11 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
           <p id="dismiss-notes-help" className="muted">
             Provide the explanation for closing this investigation without action (1 to 5,000 characters).
           </p>
+          {!available ? (
+            <div className="notice" role="status">
+              This action is no longer available for the current case state. Your draft is preserved; copy it before closing.
+            </div>
+          ) : null}
           {error ? (
             <div className="notice notice-error" role="alert">
               <p>{error.message}</p>
@@ -732,7 +779,7 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
             <Button type="button" className="secondary" disabled={pending} onClick={close}>
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || !available}>
               {pending ? 'Dismissing…' : 'Confirm dismissal'}
             </Button>
           </div>
@@ -742,7 +789,7 @@ export function DismissCaseDialog({ caseData, onSuccess, onRefresh }: DialogProp
   );
 }
 
-export function ReopenCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps) {
+export function ReopenCaseDialog({ caseData, available, onSuccess, onRefresh }: DialogProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const trigger = useRef<HTMLButtonElement>(null);
   const textarea = useRef<HTMLTextAreaElement>(null);
@@ -762,7 +809,7 @@ export function ReopenCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps
   function close() {
     if (!pending) {
       dialog.current?.close();
-      trigger.current?.focus();
+      (trigger.current ?? document.getElementById('main-content'))?.focus();
     }
   }
 
@@ -773,7 +820,7 @@ export function ReopenCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps
       setError({ status: 400, message: 'Reopening reason must be between 1 and 2,000 characters.' });
       return;
     }
-    if (pending) return;
+    if (pending || !available) return;
     if (!key.current) key.current = crypto.randomUUID();
     setPending(true);
     setError(null);
@@ -787,6 +834,8 @@ export function ReopenCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps
 
     setPending(false);
     if (result.ok) {
+      key.current = '';
+      setReason('');
       close();
       onSuccess();
     } else {
@@ -816,9 +865,11 @@ export function ReopenCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps
 
   return (
     <>
-      <Button ref={trigger} onClick={open}>
-        Reopen case
-      </Button>
+      {available ? (
+        <Button ref={trigger} onClick={open}>
+          Reopen case
+        </Button>
+      ) : null}
       <dialog
         ref={dialog}
         aria-labelledby="reopen-case-title"
@@ -875,6 +926,11 @@ export function ReopenCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps
           <p id="reopen-reason-help" className="muted">
             State the justification for reopening this closed investigation (1 to 2,000 characters).
           </p>
+          {!available ? (
+            <div className="notice" role="status">
+              This action is no longer available for the current case state. Your draft is preserved; copy it before closing.
+            </div>
+          ) : null}
           {error ? (
             <div className="notice notice-error" role="alert">
               <p>{error.message}</p>
@@ -889,7 +945,7 @@ export function ReopenCaseDialog({ caseData, onSuccess, onRefresh }: DialogProps
             <Button type="button" className="secondary" disabled={pending} onClick={close}>
               Cancel
             </Button>
-            <Button type="submit" disabled={pending}>
+            <Button type="submit" disabled={pending || !available}>
               {pending ? 'Reopening…' : 'Confirm reopen (Open)'}
             </Button>
           </div>

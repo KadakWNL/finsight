@@ -1,0 +1,27 @@
+[
+  {
+    "path": "test-results/acceptance/20261027165817388-1db90c/browser/mvp-acceptance-recorded-an-7d119-calation-outcome-and-reopen-chromium/investigation-journey.png",
+    "bytes": 321633,
+    "sha256": "b5ee416f8bed5ffbe7a296db128b46443393c0f8837d9c0a964d57d8df9a3095"
+  },
+  {
+    "path": "test-results/acceptance/20261027165817388-1db90c/browser/mvp-acceptance-recorded-an-7d119-calation-outcome-and-reopen-chromium/video.webm",
+    "bytes": 1119683,
+    "sha256": "407d70599f836ab18085f4f4f5284b86c61777ef2c9ed59dc8a01c3d5295ee3b"
+  },
+  {
+    "path": "test-results/acceptance/20261027165817388-1db90c/browser/mvp-acceptance-VS14-two-re-999c7-nsition-removes-that-action-chromium/video-1.webm",
+    "bytes": 245547,
+    "sha256": "8c3ba0cd2325a7244e974b7ecd6f7963501047536c99f36d1216a5149473b094"
+  },
+  {
+    "path": "test-results/acceptance/20261027165817388-1db90c/browser/mvp-acceptance-VS14-two-re-999c7-nsition-removes-that-action-chromium/video.webm",
+    "bytes": 572329,
+    "sha256": "80196d7a430d8a8f80cf36e77a42010a56b74042dbfd07774e19e7a22ee0e260"
+  },
+  {
+    "path": "test-results/acceptance/20261027165817388-1db90c/browser/mvp-acceptance-VS16-admin--41075-ta-changes-or-actionable-UI-chromium/video.webm",
+    "bytes": 202662,
+    "sha256": "50562a3fc073b01bb09eaf534d735e65e15f90992776ed88f71f997e1369a529"
+  }
+]
