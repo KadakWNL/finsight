@@ -19,7 +19,7 @@ jobs:
           --health-cmd "pg_isready -U postgres"
           --health-interval 5s --health-timeout 5s --health-retries 10
       mongodb:
-        image: mongo:8.0
+        image: mongo:7.0
         ports: ['27017:27017']
         options: >-
           --health-cmd "mongosh --eval 'db.runCommand({ ping: 1 })'"
