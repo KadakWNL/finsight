@@ -23,11 +23,14 @@
     "db:seed": "node --env-file-if-exists=.env.local scripts/seed.mjs",
     "demo:fx": "node --env-file-if-exists=.env.local scripts/demo-cli.mjs fx",
     "demo:import": "node --env-file-if-exists=.env.local scripts/demo-cli.mjs import",
-    "auth:provision": "node --env-file-if-exists=.env.local scripts/provision-identities.mjs"
+    "auth:provision": "node --env-file-if-exists=.env.local scripts/provision-identities.mjs",
+    "telemetry:setup": "node --env-file-if-exists=.env.local scripts/mongo-telemetry-setup.mjs",
+    "telemetry:seed": "node --env-file-if-exists=.env.local scripts/mongo-telemetry-seed.mjs"
   },
   "dependencies": {
     "argon2": "^0.45.1",
     "clsx": "^2.1.1",
+    "mongodb": "^7.7.0",
     "next": "^16.4.2",
     "next-auth": "^4.24.15",
     "pg": "^8.23.1",

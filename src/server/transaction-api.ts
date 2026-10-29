@@ -5,6 +5,7 @@ import { authenticateRequest } from './authentication';
 import { getPool } from './db';
 import { listTransactions, transactionRiskDetail } from './financial-queries';
 import { parseTransactionQuery, transactionNextCursor, transactionUuid, TransactionParameterError } from './transaction-parameters';
+import { getTransactionTelemetry } from './telemetry';
 
 const headers = { 'Cache-Control': 'private, no-store' };
 function failure(status: number, code: string, message: string, requestId: string, fields?: Record<string,string>) {
@@ -23,7 +24,8 @@ export async function transactionRead(request: Request, resourceId?: string) {
       if (new URL(request.url).search) throw new TransactionParameterError({ query: 'Detail requests do not accept query parameters.' });
       const data = await transactionRiskDetail(getPool(),id,actor);
       if (!data) return failure(404,'not_found','Transaction not found.',requestId);
-      return NextResponse.json({ data, request_id: requestId },{ headers });
+      const telemetry = await getTransactionTelemetry(getPool(), id);
+      return NextResponse.json({ data: { ...data, telemetry }, request_id: requestId },{ headers });
     }
     const query = parseTransactionQuery(new URL(request.url).searchParams,actor);
     const rows = await listTransactions(getPool(),{...query.options,fetchExtra:true},actor);
