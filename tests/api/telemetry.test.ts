@@ -37,9 +37,9 @@ describe('Issue #17: MongoDB Telemetry Integration and API Tests', () => {
   let analystCookie: string;
   let adminCookie: string;
 
-  const txn100Id = syntheticId(100); // 20000000-0000-0000-0000-000000000100 (occurred 00:00:00Z)
-  const txn105Id = syntheticId(105); // 20000000-0000-0000-0000-000000000105 (occurred 00:05:00Z)
-  const canonicalDeviceId = syntheticId(40); // 20000000-0000-0000-0000-000000000040
+  const txn100Id = syntheticId(100); // 30000000-0000-0000-0000-000000000100 (occurred 00:00:00Z)
+  const txn105Id = syntheticId(105); // 30000000-0000-0000-0000-000000000105 (occurred 00:05:00Z)
+  const canonicalDeviceId = syntheticId(40); // 30000000-0000-0000-0000-000000000040
 
   const emptyTxnId = '20000000-0000-0000-0000-000000000999';
   const emptyDeviceId = '20000000-0000-0000-0000-000000000998';

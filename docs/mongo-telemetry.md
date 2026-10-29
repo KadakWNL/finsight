@@ -188,7 +188,7 @@ npm run telemetry:setup
 ```
 
 ### Seeding Canonical Fixtures
-Generates 12 deterministic, reproducible telemetry documents (6 connection, 6 client environment) for the canonical demo device `20000000-0000-0000-0000-000000000040`:
+Generates 12 deterministic, reproducible telemetry documents (6 connection, 6 client environment) for the canonical demo device `30000000-0000-0000-0000-000000000040`:
 ```powershell
 npm run telemetry:seed
 ```

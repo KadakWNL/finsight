@@ -1,3 +1,4 @@
+import { syntheticId } from './financial-seed.mjs';
 import { MongoClient } from 'mongodb';
 import {
   TELEMETRY_COLLECTION,
@@ -5,11 +6,11 @@ import {
 } from './telemetry-schema.mjs';
 import { setupMongoTelemetry } from './mongo-telemetry-setup.mjs';
 
-export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-0000-0000-000000000040') {
+export function generateCanonicalTelemetryFixtures(deviceId = syntheticId(40)) {
   const connectionSamples = [
     {
       id: '70000000-0000-0000-0000-000000000001',
-      transaction_id: '20000000-0000-0000-0000-000000000100',
+      transaction_id: syntheticId(100),
       captured_at: new Date('2025-12-28T14:22:10Z'),
       shape_type: 'connection_telemetry',
       retention_eligible: false,
@@ -23,7 +24,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000002',
-      transaction_id: '20000000-0000-0000-0000-000000000101',
+      transaction_id: syntheticId(101),
       captured_at: new Date('2025-12-29T09:15:40Z'),
       shape_type: 'connection_telemetry',
       retention_eligible: false,
@@ -37,7 +38,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000003',
-      transaction_id: '20000000-0000-0000-0000-000000000102',
+      transaction_id: syntheticId(102),
       captured_at: new Date('2025-12-30T18:44:00Z'),
       shape_type: 'connection_telemetry',
       retention_eligible: false,
@@ -51,7 +52,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000004',
-      transaction_id: '20000000-0000-0000-0000-000000000103',
+      transaction_id: syntheticId(103),
       captured_at: new Date('2025-12-31T22:10:05Z'),
       shape_type: 'connection_telemetry',
       retention_eligible: false,
@@ -65,7 +66,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000005',
-      transaction_id: '20000000-0000-0000-0000-000000000104',
+      transaction_id: syntheticId(104),
       captured_at: new Date('2026-01-01T00:02:30Z'),
       shape_type: 'connection_telemetry',
       retention_eligible: false,
@@ -96,7 +97,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
   const environmentSamples = [
     {
       id: '70000000-0000-0000-0000-000000000007',
-      transaction_id: '20000000-0000-0000-0000-000000000100',
+      transaction_id: syntheticId(100),
       captured_at: new Date('2025-12-28T14:22:15Z'),
       shape_type: 'client_environment',
       retention_eligible: false,
@@ -111,7 +112,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000008',
-      transaction_id: '20000000-0000-0000-0000-000000000101',
+      transaction_id: syntheticId(101),
       captured_at: new Date('2025-12-29T09:15:45Z'),
       shape_type: 'client_environment',
       retention_eligible: false,
@@ -126,7 +127,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000009',
-      transaction_id: '20000000-0000-0000-0000-000000000102',
+      transaction_id: syntheticId(102),
       captured_at: new Date('2025-12-30T18:44:05Z'),
       shape_type: 'client_environment',
       retention_eligible: false,
@@ -141,7 +142,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000010',
-      transaction_id: '20000000-0000-0000-0000-000000000103',
+      transaction_id: syntheticId(103),
       captured_at: new Date('2025-12-31T22:10:10Z'),
       shape_type: 'client_environment',
       retention_eligible: false,
@@ -156,7 +157,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
     },
     {
       id: '70000000-0000-0000-0000-000000000011',
-      transaction_id: '20000000-0000-0000-0000-000000000104',
+      transaction_id: syntheticId(104),
       captured_at: new Date('2026-01-01T00:02:35Z'),
       shape_type: 'client_environment',
       retention_eligible: false,
@@ -206,7 +207,7 @@ export function generateCanonicalTelemetryFixtures(deviceId = '20000000-0000-000
   });
 }
 
-export async function seedMongoTelemetry(db, deviceId = '20000000-0000-0000-0000-000000000040') {
+export async function seedMongoTelemetry(db, deviceId = syntheticId(40)) {
   await setupMongoTelemetry(db);
   const collection = db.collection(TELEMETRY_COLLECTION);
   const fixtures = generateCanonicalTelemetryFixtures(deviceId);

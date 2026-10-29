@@ -1,3 +1,4 @@
+import { syntheticId } from '../../scripts/financial-seed.mjs';
 import { describe, expect, it } from 'vitest';
 import type {
   ConnectionTelemetryPayload,
@@ -213,6 +214,15 @@ describe('Issue #17: MongoDB Telemetry Schema and Validation Unit Tests', () => 
     expect(indexNames).toContain('idx_device_captured_at');
     expect(indexNames).toContain('idx_transaction_id');
     expect(indexNames).toContain('idx_retention_eligibility');
+  });
+
+  it('uses the PostgreSQL canonical device and transaction identifiers by default', () => {
+    const fixtures = generateCanonicalTelemetryFixtures();
+    expect(fixtures.every(doc => doc?.device_id === syntheticId(40))).toBe(true);
+    const transactionIds = new Set(Array.from({ length: 8 }, (_, index) => syntheticId(100 + index)));
+    for (const doc of fixtures) {
+      if (doc?.transaction_id) expect(transactionIds.has(doc.transaction_id)).toBe(true);
+    }
   });
 
   it('generates 12 deterministic canonical fixtures with both shapes', () => {
