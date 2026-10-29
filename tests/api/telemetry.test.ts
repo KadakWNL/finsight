@@ -281,9 +281,31 @@ describe('Issue #17: MongoDB Telemetry Integration and API Tests', () => {
     }
   });
 
+  it('excludes telemetry with unknown transaction references or a mismatched SQL device', async () => {
+    const db = mongoClient.db(mongoDbName);
+    const collection = db.collection<Document & { _id: string }>(TELEMETRY_COLLECTION);
+    const template = await collection.findOne({ shape_type: 'connection_telemetry' });
+    expect(template).not.toBeNull();
+    const ids = [randomUUID(), randomUUID()];
+    try {
+      await collection.insertMany([
+        { ...template!, _id: ids[0], transaction_id: randomUUID() },
+        { ...template!, _id: ids[1], transaction_id: emptyTxnId },
+      ]);
+      const state = await getTransactionTelemetry(pgClient, txn105Id);
+      expect(state.status).toBe('available');
+      if (state.status === 'available') {
+        expect(state.summary.total_observations).toBe(12);
+        expect(state.summary.connection_summary.count).toBe(6);
+      }
+    } finally {
+      await collection.deleteMany({ _id: { $in: ids } });
+    }
+  });
+
   it('VS-TELEMETRY-07: verifies strict MongoDB schema validator and collection indexes', async () => {
     const db = mongoClient.db(mongoDbName);
-    const collection = db.collection(TELEMETRY_COLLECTION);
+    const collection = db.collection<Document & { _id: string }>(TELEMETRY_COLLECTION);
 
     // Verify indexes exist
     const indexes = await collection.indexes();
@@ -303,7 +325,15 @@ describe('Issue #17: MongoDB Telemetry Integration and API Tests', () => {
       payload: {},
     };
 
-    await expect(collection.insertOne(invalidDoc as unknown as Document)).rejects.toThrow();
+    await expect(collection.insertOne(invalidDoc)).rejects.toThrow();
+
+    const validDocs = await collection.find().limit(12).toArray();
+    for (const doc of validDocs) {
+      await expect(collection.insertOne({ ...doc, _id: randomUUID(), payload: {} })).rejects.toMatchObject({ code: 121 });
+      await expect(collection.insertOne({ ...doc, _id: randomUUID(), payload: { ...doc.payload, raw_ip: '192.0.2.1' } })).rejects.toMatchObject({ code: 121 });
+      const wrongPayload = validDocs.find(other => other.shape_type !== doc.shape_type)!.payload;
+      await expect(collection.insertOne({ ...doc, _id: randomUUID(), payload: wrongPayload })).rejects.toMatchObject({ code: 121 });
+    }
 
     // Read path never mutates collection count
     const countBefore = await collection.countDocuments();

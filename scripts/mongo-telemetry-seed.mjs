@@ -226,11 +226,11 @@ if (process.argv[1]?.endsWith('mongo-telemetry-seed.mjs')) {
   const client = new MongoClient(uri, { serverSelectionTimeoutMS: 3000 });
   try {
     await client.connect();
-    console.log(`Connected to MongoDB at ${uri}, database: ${dbName}`);
+    console.log(`Connected to MongoDB database: ${dbName}`);
     await seedMongoTelemetry(client.db(dbName));
     console.log('MongoDB telemetry seed completed successfully.');
-  } catch (error) {
-    console.error('Failed to seed MongoDB telemetry:', error);
+  } catch {
+    console.error('Failed to seed MongoDB telemetry. Check connectivity, schema and seed privileges.');
     process.exitCode = 1;
   } finally {
     await client.close();

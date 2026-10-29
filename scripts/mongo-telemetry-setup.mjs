@@ -40,11 +40,11 @@ if (process.argv[1]?.endsWith('mongo-telemetry-setup.mjs')) {
   const client = new MongoClient(uri, { serverSelectionTimeoutMS: 3000 });
   try {
     await client.connect();
-    console.log(`Connected to MongoDB at ${uri}, database: ${dbName}`);
+    console.log(`Connected to MongoDB database: ${dbName}`);
     await setupMongoTelemetry(client.db(dbName));
     console.log('MongoDB telemetry collection setup completed successfully.');
-  } catch (error) {
-    console.error('Failed to setup MongoDB telemetry:', error);
+  } catch {
+    console.error('Failed to setup MongoDB telemetry. Check connectivity and setup privileges.');
     process.exitCode = 1;
   } finally {
     await client.close();

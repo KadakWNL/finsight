@@ -14,7 +14,8 @@ type SqlClient = Pick<Client, 'query'>;
 
 export async function fetchDeviceTelemetryByDeviceId(
   deviceId: string,
-  maxDate?: Date
+  maxDate?: Date,
+  sqlClient?: SqlClient
 ): Promise<TelemetryState> {
   if (!isValidUuid(deviceId)) {
     return {
@@ -38,8 +39,27 @@ export async function fetchDeviceTelemetryByDeviceId(
       matchFilter.captured_at = { $lte: maxDate };
     }
 
+    // Resolve optional document references against SQL within the same bounded window.
+    // The transaction endpoint supplies SQL authority; direct device reads omit linked samples.
+    const candidates = await collection.find(matchFilter, {
+      projection: { _id: 1, transaction_id: 1 },
+      maxTimeMS: 2000,
+    }).sort({ captured_at: -1 }).limit(100).toArray();
+    const references = [...new Set(candidates.map(doc => doc.transaction_id).filter(isValidUuid))];
+    const verified = new Set<string>();
+    if (sqlClient && references.length) {
+      const result = await sqlClient.query<{ transaction_id: string }>(
+        `SELECT transaction_id FROM public.transaction WHERE device_id = $1 AND transaction_id = ANY($2::uuid[])`,
+        [deviceId, references]
+      );
+      for (const row of result.rows) verified.add(row.transaction_id);
+    }
+    const allowedIds = candidates
+      .filter(doc => doc.transaction_id == null || verified.has(doc.transaction_id))
+      .map(doc => doc._id);
+
     const pipeline = [
-      { $match: matchFilter },
+      { $match: { ...matchFilter, _id: { $in: allowedIds } } },
       { $sort: { captured_at: -1 } },
       { $limit: 100 },
       {
@@ -193,5 +213,5 @@ export async function getTransactionTelemetry(
   const maxDate = new Date(occurred_at);
 
   // 2. Query MongoDB with the verified device_id
-  return fetchDeviceTelemetryByDeviceId(device_id, maxDate);
+  return fetchDeviceTelemetryByDeviceId(device_id, maxDate, sqlClient);
 }

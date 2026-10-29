@@ -138,6 +138,44 @@ export const DEVICE_TELEMETRY_VALIDATOR = {
   $jsonSchema: {
     bsonType: 'object',
     required: ['_id', 'device_id', 'captured_at', 'schema_version', 'shape_type', 'retention_eligible', 'payload'],
+    additionalProperties: false,
+    oneOf: [
+      {
+        properties: {
+          shape_type: { enum: ['connection_telemetry'] },
+          payload: {
+            bsonType: 'object',
+            additionalProperties: false,
+            required: ['ip_routing_hash', 'connection_type', 'latency_ms', 'tls_cipher', 'vpn_detected'],
+            properties: {
+              ip_routing_hash: { bsonType: 'string', pattern: '^[0-9a-f]{64}$' },
+              connection_type: { enum: ['cellular', 'broadband', 'vpn', 'dialup'] },
+              latency_ms: { bsonType: 'int', minimum: 0, maximum: 10000 },
+              tls_cipher: { bsonType: 'string', minLength: 1, maxLength: 100 },
+              vpn_detected: { bsonType: 'bool' },
+            },
+          },
+        },
+      },
+      {
+        properties: {
+          shape_type: { enum: ['client_environment'] },
+          payload: {
+            bsonType: 'object',
+            additionalProperties: false,
+            required: ['screen_resolution', 'battery_level', 'battery_charging', 'os_patch_level', 'hardware_concurrency', 'user_agent_category'],
+            properties: {
+              screen_resolution: { bsonType: 'string', pattern: '^\\d{3,5}x\\d{3,5}$' },
+              battery_level: { bsonType: 'int', minimum: 0, maximum: 100 },
+              battery_charging: { bsonType: 'bool' },
+              os_patch_level: { bsonType: 'string', pattern: '^\\d{4}-\\d{2}-\\d{2}$' },
+              hardware_concurrency: { bsonType: 'int', minimum: 1, maximum: 256 },
+              user_agent_category: { enum: ['mobile_browser', 'desktop_browser', 'native_app'] },
+            },
+          },
+        },
+      },
+    ],
     properties: {
       _id: {
         bsonType: 'string',
