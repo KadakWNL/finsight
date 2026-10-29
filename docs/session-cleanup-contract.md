@@ -39,3 +39,44 @@ Reserve migration `060_session_cleanup.sql`, owned by ShrikarDesai07 and reviewe
 | Protected-table counts before/after | User, financial, risk, case, event and receipt records unchanged |
 
 Retain real SQL results, API denial/idempotency results and browser evidence for academic verification. The preview and successful cleanup demonstrate a meaningful application DELETE; naming this feature or writing its contract does not complete that requirement. Mongo telemetry reads/aggregation remain the separate NoSQL workload. Telemetry deletion, general admin mutations, rule editing and redaction remain deferred.
+
+## Implemented Objects and Verification Evidence (Issue #23)
+
+### Delivered Schema and Migration
+- **Migration:** `migrations/060_session_cleanup.sql` (forward-only numbering following `055_auth_session_validation.sql`).
+- **Audit Table:** `public.app_session_cleanup`
+  - Columns: `operation_id` (UUID PK), `admin_user_id` (UUID FK to `app_user`), `preview_at` (timestamptz), `cutoff_at` (timestamptz), `expires_at` (timestamptz), `candidate_session_ids` (UUID array), `candidate_count` (integer), `status` (text: `'preview'` or `'completed'`), `idempotency_key` (UUID nullable), `request_hash` (text nullable), `completed_at` (timestamptz nullable), `deleted_count` (integer nullable).
+  - Integrity Constraints:
+    - Status lifecycle constraints: `status = 'preview'` requires null completion fields; `status = 'completed'` requires all completion fields non-null with `deleted_count <= candidate_count`.
+    - Unique `(admin_user_id, idempotency_key)` index for committed operations.
+    - Strict immutability triggers (`reject_cleanup_audit_mutation`) blocking direct application INSERT/UPDATE/DELETE.
+- **Database Functions & Procedures:**
+  - `preview_app_session_cleanup(p_admin_user_id uuid)`:
+    - Verifies caller is an active administrator.
+    - Evaluates 7-day unusable cutoff: `LEAST(idle_expires_at, absolute_expires_at, revoked_at) < clock_timestamp() - interval '7 days'`.
+    - Captures deterministic preview of up to 100 candidate session IDs ordered by `LEAST(...) ASC, session_id ASC`.
+    - Records preview audit row with 10-minute expiry (`clock_timestamp() + interval '10 minutes'`).
+    - Returns bounded candidate summary without exposing session secrets or sensitive identifiers.
+  - `confirm_app_session_cleanup(p_operation_id uuid, p_admin_user_id uuid, p_idempotency_key uuid, p_request_hash text)`:
+    - Atomically locks the preview operation record and validates admin ownership and active status.
+    - Validates 10-minute preview window (`clock_timestamp() <= expires_at`).
+    - Handles idempotency replay: returns committed result if `(admin_user_id, idempotency_key)` matches; raises 409 conflict if payload hash differs.
+    - Locks candidate sessions in ascending order (`session_id ASC`), rechecks eligibility under lock against the original captured `cutoff_at`.
+    - Executes atomic `DELETE FROM public.app_session ... RETURNING session_id` and records the exact deleted count.
+    - Updates audit record to status `'completed'` within the same transaction.
+  - `grant_cleanup_privileges(regrole)`:
+    - Procedure granting `EXECUTE` privileges on `preview_app_session_cleanup` and `confirm_app_session_cleanup` to the specified runtime role.
+    - Direct `DELETE` on `public.app_session` is explicitly REVOKED and withheld from the runtime role.
+
+### API Routes & Components
+- `POST /api/v1/session-cleanups/preview`: Authenticated, active-admin-only Route Handler with CSRF protection, returning bounded preview metadata.
+- `POST /api/v1/session-cleanups/[id]/confirm`: Authenticated confirmation Route Handler with cryptographic idempotency key support and strict payload validation (rejects client-supplied candidate IDs or cutoff overrides).
+- `SessionCleanupPanel` (`src/components/workspace/session-cleanup.tsx`): Administrative maintenance panel mounted in `/admin` with real-time preview, countdown warnings, confirmation action, idempotent replays, and zero credential exposure.
+
+### Verification Results
+All 25 contract conditions verified across database, API, and end-to-end test suites:
+- `npm run test:db`: 20/20 tests passed (`tests/db/session-cleanup.test.ts`, `tests/db/case-guards.test.ts`, `tests/db/migrations.test.ts`).
+- `npm run test:api`: 88/88 tests passed across 10 suites (`tests/api/session-cleanup.test.ts` 15 tests passed).
+- `npm run test:e2e`: 16/16 passed (`tests/e2e/session-cleanup.spec.ts` passed; deferred acceptance role test skipped as expected).
+- `npm run typecheck` & `npm run lint`: 0 errors.
+- `npm run build`: Production Next.js build clean with dynamically rendered cleanup API routes.

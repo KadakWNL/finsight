@@ -77,6 +77,7 @@ describe('Issue #9 Case Guards and Concurrency Integration Tests', () => {
     try {
       await client.query(`
         DROP TABLE IF EXISTS
+          public.app_session_cleanup,
           public.case_command_receipt,
           public.case_event,
           public.investigation_case,
@@ -98,6 +99,10 @@ describe('Issue #9 Case Guards and Concurrency Integration Tests', () => {
         DROP VIEW IF EXISTS public.v_transaction_risk CASCADE;
         DROP PROCEDURE IF EXISTS public.grant_runtime_privileges(regrole) CASCADE;
         DROP PROCEDURE IF EXISTS public.grant_auth_privileges(regrole) CASCADE;
+        DROP PROCEDURE IF EXISTS public.grant_cleanup_privileges(regrole) CASCADE;
+        DROP FUNCTION IF EXISTS public.preview_app_session_cleanup(uuid) CASCADE;
+        DROP FUNCTION IF EXISTS public.confirm_app_session_cleanup(uuid, uuid, uuid, text) CASCADE;
+        DROP FUNCTION IF EXISTS public.reject_cleanup_audit_mutation CASCADE;
         DROP FUNCTION IF EXISTS public.validate_app_session(uuid, uuid) CASCADE;
         DROP FUNCTION IF EXISTS public.execute_case_command(text, uuid, uuid, text, bigint, uuid, uuid, text, text, text, text, text) CASCADE;
         DROP FUNCTION IF EXISTS
