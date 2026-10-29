@@ -21,13 +21,13 @@ The captures show the running application with generated synthetic data. The wor
 |---|---|
 | Authentication | Provisioned analyst/admin identities, Argon2id passwords, encrypted cookies, PostgreSQL-backed session expiry and sign-out |
 | Discovery | Role overview, description/exact-ID search, date/status/risk/entity/amount filters, stable signed cursor paging |
-| Transaction evidence | Masked customer/account context, original currency and INR base amounts, recorded contributions, rule context and completeness caveats |
+| Transaction evidence | Masked customer/account context, original currency and INR base amounts, recorded contributions, rule context, scoped MongoDB device telemetry, and completeness caveats |
 | Investigation | Case creation, scoped queue/detail/history, and role-aware lifecycle dialogs backed by guarded APIs |
 | Workspace preferences | [Settings and collapsible navigation](docs/discovery-ui.md#settings-and-display-preferences), browser appearance, time zone and original/INR amount display |
 | Demo data | Reproducible linked activity, saved historical FX observations, conflict-safe import and offline replay |
 | Integrity | PK/FK/check constraints, retained financial facts, unique active cases, version conflicts, idempotent commands and immutable events |
 
-The [case screens](docs/case-ui.md) support investigation and lifecycle review. MongoDB telemetry and analyst notes, general administration and semantic search are not exposed as working features. A recorded risk score supports review; it is not a fraud verdict.
+The [case screens](docs/case-ui.md) support investigation and lifecycle review. Scoped [MongoDB device telemetry](docs/mongo-telemetry.md) reads and bounded aggregation are demonstrated under transaction evidence. Analyst notes, general administration and semantic search are not exposed as working features. A recorded risk score supports review; it is not a fraud verdict.
 
 ## Get started
 
@@ -103,12 +103,12 @@ flowchart LR
   API --> SQL[(PostgreSQL 17)]
   Import[Bounded demo import] --> SQL
   FX[Historical FX snapshot] --> Import
-  API -. planned telemetry / notes .-> Mongo[(MongoDB)]
+  API --> Mongo[(MongoDB 8)]
 ```
 
 PostgreSQL stores related financial facts, rules/signals, operator identities, sessions, cases, command receipts and history. Hand-written parameterized SQL and stored functions own integrity and state changes; the project uses no ORM.
 
-MongoDB is the planned second database for heterogeneous device telemetry, scoped aggregation and later analyst notes. It is **not connected yet**. Collection validators, indexes, authorization and failure recovery must precede its feature panels. Vector retrieval is optional and deferred.
+MongoDB is the second database for heterogeneous device telemetry (connection and client environment shapes) with strict JSON schema validation, compound and sparse indexes, and scoped read-only aggregation ([MongoDB telemetry](docs/mongo-telemetry.md)). Analyst notes and vector retrieval remain deferred.
 
 The [ER design and relational mapping](docs/er-diagram.md) links to the field dictionary and three report figures:
 
@@ -145,17 +145,17 @@ FinSight follows the locally supplied **DBMS Experiential Learning, Level 3 Proj
 |---|---|---|
 | 1, 17: meaningful problem beyond CRUD | Explainable risk review, guarded investigations, concurrency and immutable decisions | Confirm section title uniqueness; retain final demonstration and acceptance evidence |
 | 2, 14, 15: two-member team, Git and contribution evidence | [Commit history](https://github.com/KadakWNL/finsight/commits/main/), [pull requests](https://github.com/KadakWNL/finsight/pulls), [project board](https://github.com/users/KadakWNL/projects/5) | Course team approval, individual database/application contribution evidence and timed demonstration |
-| 3: multiple database paradigms | Implemented PostgreSQL model; documented MongoDB boundary | MongoDB integration and scoped aggregation |
-| 4: database design | ER figures, relational mapping, dictionaries and constraints | Executable NoSQL collections, validators and indexes |
+| 3: multiple database paradigms | Implemented PostgreSQL model; implemented MongoDB schema, indexes, and bounded aggregation | Complete academic acceptance run |
+| 4: database design | ER figures, relational mapping, dictionaries and constraints; executable MongoDB schema validators and compound indexes | Final academic demonstration |
 | 5: DDL | Ordered CREATE/ALTER migrations; disposable DROP checks | Final demonstration evidence |
 | 6: meaningful DML and queries | Financial/case INSERT, guarded UPDATE, scoped SELECT, joins, grouping, ordering and aggregates | Audited nonfinancial DELETE and final query evidence; financial DELETE stays blocked |
-| 7: four SQL advanced concepts plus a NoSQL/vector concept | Transactions, views, stored functions, triggers, indexes and full-text search | NoSQL aggregation demonstration |
+| 7: four SQL advanced concepts plus a NoSQL/vector concept | Transactions, views, stored functions, triggers, indexes, full-text search, and MongoDB bounded multi-facet aggregation | Academic verification |
 | 8: optional vector search | Deferred retrieval design | Optional embedding/model/storage/metric evidence if implemented |
 | 9-12: Next.js, backend integration, roles and integrity | Discovery and case UI, authenticated APIs, analyst/admin policy and database constraints | Complete academic acceptance run |
 | 13: soft-copy documentation | Architecture, schema, API contracts, screenshots and reproducible checks | Final report, measured test results and conclusion |
 | 16: originality | Project-specific schema, workflow guards and independently authored demo generator | Preserve source attribution and individual implementation evidence |
 
-The [requirements traceability](docs/requirements-traceability.md) and [testing contract](docs/development-and-testing-contract.md) own the detailed acceptance plan. [Mongo telemetry](https://github.com/KadakWNL/finsight/issues/17), [session cleanup](https://github.com/KadakWNL/finsight/issues/23) and [academic verification](https://github.com/KadakWNL/finsight/issues/18) track material remaining work. This README does not claim the full course submission is complete.
+The [requirements traceability](docs/requirements-traceability.md) and [testing contract](docs/development-and-testing-contract.md) own the detailed acceptance plan. [Mongo telemetry](docs/mongo-telemetry.md) is implemented under Issue #17. [Session cleanup](https://github.com/KadakWNL/finsight/issues/23) and [academic verification](https://github.com/KadakWNL/finsight/issues/18) track remaining work. This README does not claim the full course submission is complete.
 
 ## Documentation
 
@@ -174,5 +174,6 @@ The [requirements traceability](docs/requirements-traceability.md) and [testing 
 | [Risk contract](docs/risk-formula-contract.md) / [case-auth contracts](docs/case-auth-contracts.md) | Approved formulas and state/session invariants |
 | [Architecture assessment](docs/architecture-gaps.md) / [requirements](docs/requirements-traceability.md) | Design decisions, capability gates and academic mapping |
 | [Session cleanup contract](docs/session-cleanup-contract.md) | Scoped nonfinancial deletion and audit requirements |
+| [MongoDB telemetry](docs/mongo-telemetry.md) | Document model, validators, indexes, bounded aggregation and graceful degradation |
 
 Design documents retain proposed or historical sections. Executable migrations, source, API references and current check results establish implemented behavior.

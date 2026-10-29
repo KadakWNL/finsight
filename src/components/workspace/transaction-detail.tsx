@@ -33,6 +33,43 @@ export function TransactionDetailScreen({id,returnTo,role}:{id:string;returnTo:s
         {role==='analyst'?<div hidden={tx.active_case.exists}><CreateCaseDialog transactionId={tx.transaction_id} onCreated={()=>{setCreated(true);read.reload();requestAnimationFrame(()=>confirmation.current?.focus());}}/></div>:!tx.active_case.exists?<p className="muted">An analyst can create a case for this transaction.</p>:null}</div></section>
         <section className="work-panel" aria-labelledby="context-title"><div className="panel-heading"><h2 id="context-title">Masked context</h2></div><div className="context-section"><h3>Customer / account</h3><p>{tx.customer.display_label}</p><p>{tx.account.number_masked} · {tx.account.account_type}</p><p className="muted">{tx.account.currency_code} · {tx.account.status}</p><RecordIdentifier kind="account" id={tx.account_id}/><Link className="transaction-link" href={'/transactions?account_id='+tx.account_id}>Related account transactions</Link></div>
         <div className="context-section"><h3>Merchant</h3><p>{tx.merchant.name}</p><p>{tx.merchant.city??'City not recorded'} · {tx.merchant.country_code}</p><p className="muted">Current tier: {tx.merchant.current_risk_tier} · {tx.merchant.category_code}</p><RecordIdentifier kind="merchant" id={tx.merchant_id}/><Link className="transaction-link" href={'/transactions?merchant_id='+tx.merchant_id}>Related merchant transactions</Link></div>
-        <div className="context-section"><h3>Device / payment</h3><p>{tx.device.os_family} · {tx.device.first_seen_country??'Country not recorded'}</p><p>{tx.payment_method?tx.payment_method.method_type+(tx.payment_method.last4?' · ending '+tx.payment_method.last4:''):'Payment method not recorded'}</p><RecordIdentifier kind="device" id={tx.device_id}/><Link className="transaction-link" href={'/transactions?device_id='+tx.device_id}>Related device transactions</Link></div></section></aside></div>
+        <div className="context-section"><h3>Device / payment</h3><p>{tx.device.os_family} · {tx.device.first_seen_country??'Country not recorded'}</p><p>{tx.payment_method?tx.payment_method.method_type+(tx.payment_method.last4?' · ending '+tx.payment_method.last4:''):'Payment method not recorded'}</p><RecordIdentifier kind="device" id={tx.device_id}/><Link className="transaction-link" href={'/transactions?device_id='+tx.device_id}>Related device transactions</Link></div></section>
+        <section className="work-panel" aria-labelledby="telemetry-title"><div className="panel-heading"><h2 id="telemetry-title">Device telemetry (MongoDB)</h2></div><div className="panel-content">
+          {tx.telemetry?.status === 'available' ? (
+            <>
+              <Facts rows={[
+                ['Observations', `${tx.telemetry.summary.total_observations} recorded`],
+                ['Window', `${displayTime(tx.telemetry.summary.time_window.earliest)} – ${displayTime(tx.telemetry.summary.time_window.latest)}`],
+                ['Connection types', tx.telemetry.summary.connection_summary.connection_types.length ? tx.telemetry.summary.connection_summary.connection_types.join(', ') : 'None'],
+                ['Avg latency', tx.telemetry.summary.connection_summary.avg_latency_ms !== null ? `${tx.telemetry.summary.connection_summary.avg_latency_ms} ms` : 'N/A'],
+                ['VPN detected', tx.telemetry.summary.connection_summary.vpn_count > 0 ? `${tx.telemetry.summary.connection_summary.vpn_count} observation(s)` : 'None detected'],
+                ['OS patch levels', tx.telemetry.summary.environment_summary.os_patch_levels.length ? tx.telemetry.summary.environment_summary.os_patch_levels.join(', ') : 'None'],
+                ['User agent categories', tx.telemetry.summary.environment_summary.user_agent_categories.length ? tx.telemetry.summary.environment_summary.user_agent_categories.join(', ') : 'None'],
+              ]} />
+              {tx.telemetry.summary.recent_samples.length ? (
+                <details style={{ marginTop: '0.75rem' }}>
+                  <summary className="muted" style={{ cursor: 'pointer' }}>Recent observations ({tx.telemetry.summary.recent_samples.length})</summary>
+                  <ul style={{ margin: '0.5rem 0 0 1.25rem', padding: 0, fontSize: '0.875rem' }}>
+                    {tx.telemetry.summary.recent_samples.map((s, idx) => (
+                      <li key={idx} style={{ marginBottom: '0.25rem' }}>
+                        <strong>{s.shape_type === 'connection_telemetry' ? 'Network' : 'Environment'}</strong> · {displayTime(s.captured_at)}
+                        {s.connection_type ? ` · ${s.connection_type} (${s.latency_ms}ms)` : ''}
+                        {s.vpn_detected ? ' · [VPN]' : ''}
+                        {s.os_patch_level ? ` · Patch ${s.os_patch_level}` : ''}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
+            </>
+          ) : tx.telemetry?.status === 'no_data' ? (
+            <p className="muted">{tx.telemetry.message}</p>
+          ) : (
+            <div className="notice" role="status">
+              <p>{tx.telemetry?.message ?? 'Telemetry unavailable (offline/unreachable); core transaction and risk evidence retained.'}</p>
+            </div>
+          )}
+        </div></section>
+      </aside></div>
     </>:null}</>;
 }
