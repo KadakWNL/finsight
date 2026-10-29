@@ -21,7 +21,16 @@ describe('Issue #17: MongoDB Telemetry Integration and API Tests', () => {
   let pgClient: pg.Client;
   let mongoClient: MongoClient;
   const mongoUri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017';
-  const mongoDbName = 'finsight_telemetry_test';
+  const mongoDbName = (process.env.MONGODB_TEST_DB_NAME || process.env.MONGODB_DB_NAME || '').endsWith('_test')
+    ? (process.env.MONGODB_TEST_DB_NAME || process.env.MONGODB_DB_NAME)!
+    : 'finsight_telemetry_test';
+
+  if (!mongoDbName.endsWith('_test')) {
+    throw new Error('MongoDB test database name must end in _test');
+  }
+
+  let initialMongoUri: string | undefined;
+  let initialMongoDbName: string | undefined;
 
   const analystId = '98000000-0000-0000-0000-000000000001';
   const adminId = '98000000-0000-0000-0000-000000000002';
@@ -36,6 +45,9 @@ describe('Issue #17: MongoDB Telemetry Integration and API Tests', () => {
   const emptyDeviceId = '20000000-0000-0000-0000-000000000998';
 
   beforeAll(async () => {
+    initialMongoUri = process.env.MONGODB_URI;
+    initialMongoDbName = process.env.MONGODB_DB_NAME;
+
     process.env.MONGODB_URI = mongoUri;
     process.env.MONGODB_DB_NAME = mongoDbName;
 
@@ -91,6 +103,16 @@ describe('Issue #17: MongoDB Telemetry Integration and API Tests', () => {
       await mongoClient.close().catch(() => {});
     }
     await closeMongoClient().catch(() => {});
+    if (initialMongoUri !== undefined) {
+      process.env.MONGODB_URI = initialMongoUri;
+    } else {
+      delete process.env.MONGODB_URI;
+    }
+    if (initialMongoDbName !== undefined) {
+      process.env.MONGODB_DB_NAME = initialMongoDbName;
+    } else {
+      delete process.env.MONGODB_DB_NAME;
+    }
     if (pgClient) {
       await pgClient.query('DROP SCHEMA public CASCADE; CREATE SCHEMA public;').catch(() => {});
       await pgClient.end().catch(() => {});
@@ -251,7 +273,11 @@ describe('Issue #17: MongoDB Telemetry Integration and API Tests', () => {
       });
     } finally {
       await closeMongoClient();
-      process.env.MONGODB_URI = originalUri;
+      if (originalUri !== undefined) {
+        process.env.MONGODB_URI = originalUri;
+      } else {
+        delete process.env.MONGODB_URI;
+      }
     }
   });
 

@@ -28,17 +28,18 @@ export async function getMongoClient(): Promise<MongoClient | null> {
 
   if (!clientPromise) {
     clientPromise = (async () => {
+      const client = new MongoClient(uri, {
+        serverSelectionTimeoutMS: 2000,
+        connectTimeoutMS: 2000,
+        socketTimeoutMS: 5000,
+        maxPoolSize: 10,
+      });
       try {
-        const client = new MongoClient(uri, {
-          serverSelectionTimeoutMS: 2000,
-          connectTimeoutMS: 2000,
-          socketTimeoutMS: 5000,
-          maxPoolSize: 10,
-        });
         await client.connect();
         clientInstance = client;
         return client;
       } catch {
+        await client.close().catch(() => {});
         clientPromise = null;
         clientInstance = null;
         return null;
@@ -58,9 +59,21 @@ export async function getMongoDb(): Promise<Db | null> {
 }
 
 export async function closeMongoClient(): Promise<void> {
-  if (clientInstance) {
-    await clientInstance.close();
-    clientInstance = null;
-    clientPromise = null;
+  const promise = clientPromise;
+  const instance = clientInstance;
+  clientInstance = null;
+  clientPromise = null;
+
+  if (instance) {
+    await instance.close().catch(() => {});
+  } else if (promise) {
+    try {
+      const client = await promise;
+      if (client) {
+        await client.close().catch(() => {});
+      }
+    } catch {
+      // Ignore errors closing client
+    }
   }
 }
