@@ -226,26 +226,26 @@ Embedding selection, Mongo notes/recovery, and general administrative mutations 
 
 ## Academic coverage
 
-References below point to the inspected local [DBMS brief](<DBMS Level 3 Project Requirements.pdf>). Compliance remains unverified until implementation and demonstration evidence exist.
+References below point to the inspected local [DBMS brief](<DBMS Level 3 Project Requirements.pdf>), which is not redistributed. The executable [academic verification matrix](academic-verification.md#commands-and-result-matrix) and its pinned run artifacts establish current implementation evidence. This table retains the original brief mapping; design plans elsewhere in this document do not establish delivered behavior. Instructor acceptance and independent teammate demonstration remain separate gates.
 
-| Brief item / page | Planned evidence | Current gap |
+| Brief item / page | Runtime/source evidence | Remaining gate |
 |---|---|---|
-| 1, title/problem; p1 | Synthetic suspicious-transaction intelligence with evidence-based investigation | Title exists; section uniqueness needs instructor confirmation |
-| 2, two members; p1 | Both implement database and application work, cross-review, identifiable commits | Responsibility proposal in architecture gaps; team confirmation pending |
-| 3, SQL + second paradigm; p1 | PostgreSQL relational integrity plus heterogeneous Mongo telemetry/notes; pgvector retrieval | No databases implemented; justified workloads and contracts documented |
-| 4, relational and nonrelational models; p1-2 | Corrected ER/relational DDL and data dictionary; Mongo validator/index docs; embedding metadata/retrieval | Cardinality/source gaps; no executable schema or complete Mongo model |
-| 5, DDL; p2 | CREATE tables/indexes/views; ALTER migration; reversible DROP of disposable staging/demo object | No migrations; DROP never used for retained financial data |
-| 6, DML/queries; p2 | Case/note/signal INSERT, case/user/PII UPDATE, expired-session SQL DELETE, evidence SELECT; JOIN/GROUP BY/HAVING/ORDER BY/aggregates/subqueries | Delivered in migration `060_session_cleanup.sql` and verified across DB/API/E2E suites ([Session cleanup](session-cleanup-contract.md)); Issue #23 |
-| 7, advanced features; p2-3 | SQL transactions, views, triggers, indexing, full-text search, guarded functions; Mongo aggregation and/or vector similarity | At least four SQL plus one NoSQL/vector must run and be demonstrated |
-| 8, vector optional; p3 | At semantic retrieval, select/document model and dimension, source text, cosine retrieval, and authorized provenance | Model/source-aware dedup delivered at that milestone; foundational SQL and slice do not depend on them |
-| 9, Next.js; p3 | Task screens with filters, tables, forms, readable explanations | No application scaffold |
-| 10, integration/config; p3 | Shared backend services/Route Handlers; environment-managed credentials | No backend/configuration exists |
-| 11, auth/two roles; p3 | Active human analyst/admin sign-in; backend role/resource enforcement | No authentication/authorization exists |
-| 12, database validation; p4 | Direct DB constraint tests, state functions/guards, concurrency tests | Checks documented only; enforcement unimplemented |
-| 13, soft-copy documentation; p4 | Objectives/scope/FRs here and workflows; ER; future schema/data dictionary, implementation/queries, architecture, screenshots, tests, conclusion | Five design documents do not replace implementation report and evidence |
-| 14, Git/GitHub; p4 | Setup/execution README and individual contribution commits | Git repository exists; runnable setup/contribution evidence pending |
-| 15, demo; p4-5 | Seeded investigation, DB rejection, concurrency, retrieval, recovery, UI, individual work | Tests/screenshots/live demonstration absent |
-| 16, originality; p5 | Team-authored problem, schema rationale, code and demonstration | Requires implementation/contribution review; cannot certify from design alone |
-| 17, beyond CRUD; p5 | Explainable risk, joins/aggregates, governed case state, concurrency, cross-store recovery and authorized retrieval | Proposed workflows exceed CRUD; runtime evidence missing |
+| 1, title/problem; p1 | Synthetic suspicious-transaction review with explainable risk and guarded investigations | Instructor confirms section title uniqueness |
+| 2, two members; p1 | [Merged contribution ledger](academic/contributions.json): both members have multiple database issues and application/test changes | Team approval and independent demonstrations |
+| 3, SQL + second paradigm; p1 | PostgreSQL migrations and Mongo telemetry validation/aggregation; `npm run test:academic` | Technical run and cross-review; vectors not required for the selected SQL + NoSQL scope |
+| 4, relational/nonrelational models; p1-2 | Executable migrations, ER/dictionaries, two validated Mongo shapes and indexes | Final documentation/demo under #19 |
+| 5, DDL; p2 | `ddl-create`, `ddl-alter`, `ddl-drop` on a disposable temporary table; ordered application migrations | Retain actual execution results |
+| 6, DML/queries; p2 | Guarded case INSERT/UPDATE, session cleanup DELETE, SELECT/JOIN/GROUP BY/HAVING/ORDER BY/aggregates/subquery in the [command matrix](academic-verification.md#commands-and-result-matrix) | Instructor acceptance of the approved DELETE workload is not confirmed |
+| 7, advanced features; p2-3 | Transactions/rollback, aggregate view, protected functions, immutable triggers, indexed plans/FTS, Mongo aggregation | Reproducible run and independent review |
+| 8, optional vector; p3 | Deferred; no embedding, similarity or retrieval result claimed | Optional scope, excluded from completion evidence |
+| 9, Next.js; p3 | Integrated discovery/case/admin screens and production browser tests | Final timed demonstration |
+| 10, integration/config; p3 | Authenticated Route Handlers, shared SQL/Mongo services, environment configuration and fresh CI services | Independent clean-machine setup under #19 |
+| 11, auth/two roles; p3 | Analyst/admin API/browser denials and current-role/session tests | Retain passing regression evidence |
+| 12, validation; p4 | Real SQL constraints, privilege checks, state functions, rollback/concurrency and Mongo validators | Retain passing regression evidence |
+| 13, soft-copy documentation; p4 | Architecture, ER, dictionaries, contracts, command matrix and retained result artifacts | Final report, screenshots, measured demo and conclusion under #19 |
+| 14, Git/GitHub; p4 | README, merged PR/commit ledger, source hashes and reviewer handoff | Independent review record |
+| 15, demo; p4-5 | Recorded analyst/admin investigation, cleanup browser test, SQL denials/rollback and Mongo aggregation | Each member demonstrates their own work; timed final presentation under #19 |
+| 16, originality; p5 | Project-specific schema/workflow and identifiable source contributions | Human originality assessment; automated tests do not certify originality |
+| 17, beyond CRUD; p5 | Explainable risk, lifecycle guards, concurrency, immutable history and heterogeneous telemetry aggregation | Final demonstration; deferred cross-store notes/recovery and vectors are not counted |
 
-The first slice demonstrates sign-in, seeded signal explanation, self-owned investigation, escalation, resolution/reopening, denial, concurrency, and event immutability. The full academic demonstration subsequently adds confirmed Mongo notes, document aggregation and/or authorized vector retrieval, cross-store retry, and nonfinancial deletion. Each team member presents their own database and application contribution.
+The first slice demonstrates sign-in, seeded signal explanation, self-owned investigation, escalation, resolution/reopening, denial, concurrency, and event immutability. The approved academic scope adds Mongo telemetry aggregation and audited expired-session deletion. Confirmed notes, cross-store recovery and vector retrieval remain deferred. Each team member presents their own database and application contribution.

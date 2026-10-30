@@ -148,14 +148,14 @@ FinSight follows the locally supplied **DBMS Experiential Learning, Level 3 Proj
 | 3: multiple database paradigms | Implemented PostgreSQL model; implemented MongoDB schema, indexes, and bounded aggregation | Complete academic acceptance run |
 | 4: database design | ER figures, relational mapping, dictionaries and constraints; executable MongoDB schema validators and compound indexes | Final academic demonstration |
 | 5: DDL | Ordered CREATE/ALTER migrations; disposable DROP checks | Final demonstration evidence |
-| 6: meaningful DML and queries | Financial/case INSERT, guarded UPDATE, scoped SELECT, joins, grouping, ordering and aggregates | Audited nonfinancial DELETE and final query evidence; financial DELETE stays blocked |
+| 6: meaningful DML and queries | Financial/case INSERT, guarded UPDATE, scoped SELECT, joins, grouping, ordering and aggregates | Audited session DELETE is implemented; retain final query evidence and instructor acceptance; financial DELETE stays blocked |
 | 7: four SQL advanced concepts plus a NoSQL/vector concept | Transactions, views, stored functions, triggers, indexes, full-text search, and MongoDB bounded multi-facet aggregation | Academic verification |
 | 8: optional vector search | Deferred retrieval design | Optional embedding/model/storage/metric evidence if implemented |
 | 9-12: Next.js, backend integration, roles and integrity | Discovery and case UI, authenticated APIs, analyst/admin policy and database constraints | Complete academic acceptance run |
 | 13: soft-copy documentation | Architecture, schema, API contracts, screenshots and reproducible checks | Final report, measured test results and conclusion |
 | 16: originality | Project-specific schema, workflow guards and independently authored demo generator | Preserve source attribution and individual implementation evidence |
 
-The [requirements traceability](docs/requirements-traceability.md) and [testing contract](docs/development-and-testing-contract.md) own the detailed acceptance plan. [Mongo telemetry](docs/mongo-telemetry.md) is implemented under Issue #17. [Session cleanup](https://github.com/KadakWNL/finsight/issues/23) and [academic verification](https://github.com/KadakWNL/finsight/issues/18) track remaining work. This README does not claim the full course submission is complete.
+The [requirements traceability](docs/requirements-traceability.md) and [testing contract](docs/development-and-testing-contract.md) own the detailed acceptance plan. [Mongo telemetry](docs/mongo-telemetry.md) is implemented under Issue #17. [Session cleanup](docs/session-cleanup-contract.md) is implemented. [Academic verification](docs/academic-verification.md) records executable SQL/Mongo evidence and the remaining human gates under [#18](https://github.com/KadakWNL/finsight/issues/18). This README does not claim the full course submission is complete.
 
 ## Documentation
 
@@ -164,6 +164,7 @@ The [requirements traceability](docs/requirements-traceability.md) and [testing 
 | [Development setup](docs/development-setup.md) | Environment, roles, database isolation and command reference |
 | [Discovery workspace](docs/discovery-ui.md) / [design system](DESIGN.md) | Routes, themed shell, interaction boundaries and visual tokens |
 | [Case workspace](docs/case-ui.md) | Queue views, lifecycle dialogs, conflict recovery and audit history |
+| [Academic verification](docs/academic-verification.md) | Course requirement-to-command matrix, SQL/Mongo outputs, contribution evidence and pending sign-offs |
 | [MVP acceptance](docs/mvp-acceptance.md) | Fresh database requirements, VS01-VS16 evidence, recordings and human review gates |
 | [Authentication](docs/authentication.md) | Provisioning, cookies, sessions, grants and role checks |
 | [Transaction API](docs/transaction-api.md) / [Case API](docs/case-api.md) | Request validation, scoping, pagination and guarded commands |
