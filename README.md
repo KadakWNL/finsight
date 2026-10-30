@@ -4,7 +4,7 @@ Financial transaction review and traceable investigation, built with Next.js and
 
 [![Checks](https://github.com/KadakWNL/finsight/actions/workflows/checks.yml/badge.svg)](https://github.com/KadakWNL/finsight/actions/workflows/checks.yml)
 
-[Get started](#get-started) · [Demo data](#demo-data-and-currency-conversion) · [Database design](#architecture-and-database-design) · [Verification](#verification) · [Course requirements](#course-requirements) · [Documentation](#documentation)
+[Get started](#get-started) · [Demo data](#demo-data-and-currency-conversion) · [Database design](#architecture-and-database-design) · [Academic report](docs/academic/submission-report.md) · [Timed demo](docs/academic/timed-demonstration.md) · [Printable diagrams](docs/printable/README.md) · [Verification](#verification) · [Course requirements](#course-requirements) · [Documentation](#documentation)
 
 FinSight helps an analyst find unusual transactions, inspect the recorded signals behind a risk score, and open an investigation. Admins oversee case activity. Database constraints and guarded SQL commands preserve financial facts, enforce case transitions and retain an immutable decision history.
 
@@ -60,7 +60,7 @@ Synthetic tooling requires a local database name ending in `_demo` or `_test`. [
 npm run db:migrate
 ```
 
-Migrations through 055 supply financial/operational tables, guarded writes and protected session validation. Existing standard role names receive runtime grants automatically. For custom role names, the migration owner must call both runtime and authentication grant procedures described in [authentication setup](docs/authentication.md#configure-and-provision).
+Migrations through 060 supply financial/operational tables, guarded writes, protected session validation, and audited session cleanup. Existing standard role names receive runtime grants automatically. For custom role names, the migration owner must call both runtime and authentication grant procedures described in [authentication setup](docs/authentication.md#configure-and-provision).
 
 Set `DEMO_ANALYST_PASSWORD` and `DEMO_ADMIN_PASSWORD` in ignored local configuration, then run:
 
@@ -110,13 +110,15 @@ PostgreSQL stores related financial facts, rules/signals, operator identities, s
 
 MongoDB is the second database for heterogeneous device telemetry (connection and client environment shapes) with strict JSON schema validation, compound and sparse indexes, and scoped read-only aggregation ([MongoDB telemetry](docs/mongo-telemetry.md)). Analyst notes and vector retrieval remain deferred.
 
-The [ER design and relational mapping](docs/er-diagram.md) links to the field dictionary and three report figures:
+For the compulsory academic evaluation and demonstration hard copies, use the **[current single-page A4 print masters](docs/printable/README.md)** (`FinSight-ER-A4-Revised.pdf` and `FinSight-Schema-A4-Revised.pdf`), generated from the implemented schema with both team members' names and 100% attribute coverage.
+
+Historical design figures and dictionaries are documented in [ER design and relational mapping](docs/er-diagram.md) and its three component figures:
 
 - [Identity and banking](docs/er-diagram-1-identity-banking.svg)
 - [Transactions and risk](docs/er-diagram-2-transactions-risk.svg)
 - [Investigation](docs/er-diagram-3-investigation.svg)
 
-The canonical diagram source is [Mermaid](docs/er-diagram.mmd); derived figures are reproduced by [the rendering script](scripts/render_er.py). The historical PlantUML draft is excluded from implementation/report use.
+The canonical printable masters are the A4 PDF print masters; derived diagram figures are reproduced by the diagram scripts. Historical PlantUML and initial Mermaid drafts are preserved as design context.
 
 ## Verification
 
@@ -152,7 +154,7 @@ FinSight follows the locally supplied **DBMS Experiential Learning, Level 3 Proj
 | 7: four SQL advanced concepts plus a NoSQL/vector concept | Transactions, views, stored functions, triggers, indexes, full-text search, and MongoDB bounded multi-facet aggregation | Academic verification |
 | 8: optional vector search | Deferred retrieval design | Optional embedding/model/storage/metric evidence if implemented |
 | 9-12: Next.js, backend integration, roles and integrity | Discovery and case UI, authenticated APIs, analyst/admin policy and database constraints | Complete academic acceptance run |
-| 13: soft-copy documentation | Architecture, schema, API contracts, screenshots and reproducible checks | Final report, measured test results and conclusion |
+| 13: soft-copy documentation | Architecture, schema, API contracts, screenshots and reproducible checks | [Final submission report](docs/academic/submission-report.md), [timed demonstration script](docs/academic/timed-demonstration.md), and [reproducible setup guide](docs/development-setup.md) |
 | 16: originality | Project-specific schema, workflow guards and independently authored demo generator | Preserve source attribution and individual implementation evidence |
 
 The [requirements traceability](docs/requirements-traceability.md) and [testing contract](docs/development-and-testing-contract.md) own the detailed acceptance plan. [Mongo telemetry](docs/mongo-telemetry.md) is implemented under Issue #17. [Session cleanup](docs/session-cleanup-contract.md) is implemented. [Academic verification](docs/academic-verification.md) records executable SQL/Mongo evidence and the remaining human gates under [#18](https://github.com/KadakWNL/finsight/issues/18). This README does not claim the full course submission is complete.
@@ -163,7 +165,10 @@ For the compulsory demonstration hard copies, use the [current ER and relational
 
 | Read this | For |
 |---|---|
-| [Development setup](docs/development-setup.md) | Environment, roles, database isolation and command reference |
+| [Academic submission report](docs/academic/submission-report.md) | Comprehensive academic report covering course item 13, system architecture, SQL/NoSQL concepts, measured results, and contributions |
+| [Timed demonstration script](docs/academic/timed-demonstration.md) | Practical 14-stage presenter guide (14–16 min) for live evaluators and peer review |
+| [Printable A4 diagrams](docs/printable/README.md) | Single-page A4 landscape Chen ER and Relational Schema print masters with team member names |
+| [Development setup](docs/development-setup.md) | Clean setup sequence, demo/test role isolation, and verification commands |
 | [Discovery workspace](docs/discovery-ui.md) / [design system](DESIGN.md) | Routes, themed shell, interaction boundaries and visual tokens |
 | [Case workspace](docs/case-ui.md) | Queue views, lifecycle dialogs, conflict recovery and audit history |
 | [Academic verification](docs/academic-verification.md) | Course requirement-to-command matrix, SQL/Mongo outputs, contribution evidence and pending sign-offs |
