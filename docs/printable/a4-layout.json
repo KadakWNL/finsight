@@ -1,0 +1,4322 @@
+[
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "user_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      513.6255905511812,
+      111.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "email",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      505.32559055118116,
+      111.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "password_hash",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      497.02559055118115,
+      111.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "display_name",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      488.7255905511812,
+      111.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "role",
+    "font": 6.45,
+    "box": [
+      116.2,
+      513.6255905511812,
+      200.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "is_active",
+    "font": 6.45,
+    "box": [
+      116.2,
+      505.32559055118116,
+      200.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "last_login_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      497.02559055118115,
+      200.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_user",
+    "attribute": "created_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      488.7255905511812,
+      200.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "customer_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      513.6255905511812,
+      314.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "user_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      505.32559055118116,
+      314.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "full_name",
+    "font": 6.45,
+    "box": [
+      230.2,
+      497.02559055118115,
+      314.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "date_of_birth",
+    "font": 6.45,
+    "box": [
+      230.2,
+      488.7255905511812,
+      314.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "email",
+    "font": 6.45,
+    "box": [
+      230.2,
+      480.4255905511812,
+      314.8,
+      487.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "phone",
+    "font": 6.45,
+    "box": [
+      319.2,
+      513.6255905511812,
+      403.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "country_code",
+    "font": 6.45,
+    "box": [
+      319.2,
+      505.32559055118116,
+      403.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "status",
+    "font": 6.45,
+    "box": [
+      319.2,
+      497.02559055118115,
+      403.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "kyc_verified_on",
+    "font": 6.45,
+    "box": [
+      319.2,
+      488.7255905511812,
+      403.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "customer",
+    "attribute": "updated_at",
+    "font": 6.45,
+    "box": [
+      319.2,
+      480.4255905511812,
+      403.8,
+      487.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "account_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      513.6255905511812,
+      517.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "customer_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      505.32559055118116,
+      517.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "account_number",
+    "font": 6.45,
+    "box": [
+      433.2,
+      497.02559055118115,
+      517.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "account_type",
+    "font": 6.45,
+    "box": [
+      433.2,
+      488.7255905511812,
+      517.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "currency_code",
+    "font": 6.45,
+    "box": [
+      433.2,
+      480.4255905511812,
+      517.8,
+      487.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "balance",
+    "font": 6.45,
+    "box": [
+      522.2,
+      513.6255905511812,
+      606.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "status",
+    "font": 6.45,
+    "box": [
+      522.2,
+      505.32559055118116,
+      606.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "opened_at",
+    "font": 6.45,
+    "box": [
+      522.2,
+      497.02559055118115,
+      606.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "account",
+    "attribute": "updated_at",
+    "font": 6.45,
+    "box": [
+      522.2,
+      488.7255905511812,
+      606.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "method_id",
+    "font": 6.45,
+    "box": [
+      636.2,
+      513.6255905511812,
+      720.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "account_id",
+    "font": 6.45,
+    "box": [
+      636.2,
+      505.32559055118116,
+      720.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "method_type",
+    "font": 6.45,
+    "box": [
+      636.2,
+      497.02559055118115,
+      720.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "token",
+    "font": 6.45,
+    "box": [
+      636.2,
+      488.7255905511812,
+      720.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "last4",
+    "font": 6.45,
+    "box": [
+      725.2,
+      513.6255905511812,
+      809.8,
+      520.9255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "expiry_date",
+    "font": 6.45,
+    "box": [
+      725.2,
+      505.32559055118116,
+      809.8,
+      512.6255905511812
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "status",
+    "font": 6.45,
+    "box": [
+      725.2,
+      497.02559055118115,
+      809.8,
+      504.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "payment_method",
+    "attribute": "updated_at",
+    "font": 6.45,
+    "box": [
+      725.2,
+      488.7255905511812,
+      809.8,
+      496.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "session_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      435.6255905511812,
+      111.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "user_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      427.32559055118116,
+      111.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "created_at",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      419.02559055118115,
+      111.8,
+      426.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "last_seen_at",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      410.7255905511812,
+      111.8,
+      418.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "idle_expires_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      435.6255905511812,
+      200.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "absolute_expires_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      427.32559055118116,
+      200.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "revoked_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      419.02559055118115,
+      200.8,
+      426.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session",
+    "attribute": "revocation_reason",
+    "font": 6.45,
+    "box": [
+      116.2,
+      410.7255905511812,
+      200.8,
+      418.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "address_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      435.6255905511812,
+      314.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "customer_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      427.32559055118116,
+      314.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "line1",
+    "font": 6.45,
+    "box": [
+      230.2,
+      419.02559055118115,
+      314.8,
+      426.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "city",
+    "font": 6.45,
+    "box": [
+      230.2,
+      410.7255905511812,
+      314.8,
+      418.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "state",
+    "font": 6.45,
+    "box": [
+      230.2,
+      402.4255905511812,
+      314.8,
+      409.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "postal_code",
+    "font": 6.45,
+    "box": [
+      319.2,
+      435.6255905511812,
+      403.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "country_code",
+    "font": 6.45,
+    "box": [
+      319.2,
+      427.32559055118116,
+      403.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "latitude",
+    "font": 6.45,
+    "box": [
+      319.2,
+      419.02559055118115,
+      403.8,
+      426.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "longitude",
+    "font": 6.45,
+    "box": [
+      319.2,
+      410.7255905511812,
+      403.8,
+      418.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "address",
+    "attribute": "is_primary",
+    "font": 6.45,
+    "box": [
+      319.2,
+      402.4255905511812,
+      403.8,
+      409.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "merchant_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      435.6255905511812,
+      517.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "merchant_name",
+    "font": 6.45,
+    "box": [
+      433.2,
+      427.32559055118116,
+      517.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "category_code",
+    "font": 6.45,
+    "box": [
+      433.2,
+      419.02559055118115,
+      517.8,
+      426.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "country_code",
+    "font": 6.45,
+    "box": [
+      433.2,
+      410.7255905511812,
+      517.8,
+      418.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "city",
+    "font": 6.45,
+    "box": [
+      433.2,
+      402.4255905511812,
+      517.8,
+      409.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "latitude",
+    "font": 6.45,
+    "box": [
+      522.2,
+      435.6255905511812,
+      606.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "longitude",
+    "font": 6.45,
+    "box": [
+      522.2,
+      427.32559055118116,
+      606.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "risk_tier",
+    "font": 6.45,
+    "box": [
+      522.2,
+      419.02559055118115,
+      606.8,
+      426.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "is_watchlisted",
+    "font": 6.45,
+    "box": [
+      522.2,
+      410.7255905511812,
+      606.8,
+      418.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "merchant",
+    "attribute": "updated_at",
+    "font": 6.45,
+    "box": [
+      522.2,
+      402.4255905511812,
+      606.8,
+      409.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_fingerprint",
+    "attribute": "device_id",
+    "font": 6.45,
+    "box": [
+      636.2,
+      435.6255905511812,
+      720.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_fingerprint",
+    "attribute": "device_hash",
+    "font": 6.45,
+    "box": [
+      636.2,
+      427.32559055118116,
+      720.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_fingerprint",
+    "attribute": "os_family",
+    "font": 6.45,
+    "box": [
+      636.2,
+      419.02559055118115,
+      720.8,
+      426.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_fingerprint",
+    "attribute": "first_seen_country",
+    "font": 6.45,
+    "box": [
+      725.2,
+      435.6255905511812,
+      809.8,
+      442.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_fingerprint",
+    "attribute": "first_seen_at",
+    "font": 6.45,
+    "box": [
+      725.2,
+      427.32559055118116,
+      809.8,
+      434.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "operation_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      357.6255905511812,
+      111.8,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "admin_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      349.32559055118116,
+      111.8,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "preview_at",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      341.02559055118115,
+      111.8,
+      348.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "cutoff_at",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      332.7255905511812,
+      111.8,
+      340.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "expires_at",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      324.4255905511812,
+      111.8,
+      331.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "candidate_session_ids",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      316.1255905511812,
+      111.8,
+      323.42559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "candidate_count",
+    "font": 6.45,
+    "box": [
+      116.2,
+      357.6255905511812,
+      200.8,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "status",
+    "font": 6.45,
+    "box": [
+      116.2,
+      349.32559055118116,
+      200.8,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "idempotency_key",
+    "font": 6.45,
+    "box": [
+      116.2,
+      341.02559055118115,
+      200.8,
+      348.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "request_hash",
+    "font": 6.45,
+    "box": [
+      116.2,
+      332.7255905511812,
+      200.8,
+      340.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "completed_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      324.4255905511812,
+      200.8,
+      331.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "app_session_cleanup",
+    "attribute": "deleted_count",
+    "font": 6.45,
+    "box": [
+      116.2,
+      316.1255905511812,
+      200.8,
+      323.42559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "transaction_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      357.6255905511812,
+      321.05,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "account_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      349.32559055118116,
+      321.05,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "method_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      341.02559055118115,
+      321.05,
+      348.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "merchant_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      332.7255905511812,
+      321.05,
+      340.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "device_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      324.4255905511812,
+      321.05,
+      331.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "amount",
+    "font": 6.45,
+    "box": [
+      325.45,
+      357.6255905511812,
+      416.3,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "currency_code",
+    "font": 6.45,
+    "box": [
+      325.45,
+      349.32559055118116,
+      416.3,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "exchange_rate",
+    "font": 6.45,
+    "box": [
+      325.45,
+      341.02559055118115,
+      416.3,
+      348.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "amount_base",
+    "font": 6.45,
+    "box": [
+      325.45,
+      332.7255905511812,
+      416.3,
+      340.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "direction",
+    "font": 6.45,
+    "box": [
+      325.45,
+      324.4255905511812,
+      416.3,
+      331.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "txn_type",
+    "font": 6.45,
+    "box": [
+      420.7,
+      357.6255905511812,
+      511.55,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "status",
+    "font": 6.45,
+    "box": [
+      420.7,
+      349.32559055118116,
+      511.55,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "occurred_at",
+    "font": 6.45,
+    "box": [
+      420.7,
+      341.02559055118115,
+      511.55,
+      348.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "merchant_country_code",
+    "font": 6.45,
+    "box": [
+      420.7,
+      332.7255905511812,
+      511.55,
+      340.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "merchant_city",
+    "font": 6.45,
+    "box": [
+      420.7,
+      324.4255905511812,
+      511.55,
+      331.72559055118114
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "latitude",
+    "font": 6.45,
+    "box": [
+      515.95,
+      357.6255905511812,
+      606.8,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "longitude",
+    "font": 6.45,
+    "box": [
+      515.95,
+      349.32559055118116,
+      606.8,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "description",
+    "font": 6.45,
+    "box": [
+      515.95,
+      341.02559055118115,
+      606.8,
+      348.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction",
+    "attribute": "search_vector",
+    "font": 6.45,
+    "box": [
+      515.95,
+      332.7255905511812,
+      606.8,
+      340.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "fraud_scenario",
+    "attribute": "scenario_id",
+    "font": 6.45,
+    "box": [
+      636.2,
+      357.6255905511812,
+      720.8,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "fraud_scenario",
+    "attribute": "scenario_code",
+    "font": 6.45,
+    "box": [
+      636.2,
+      349.32559055118116,
+      720.8,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "fraud_scenario",
+    "attribute": "scenario_name",
+    "font": 6.45,
+    "box": [
+      725.2,
+      357.6255905511812,
+      809.8,
+      364.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "fraud_scenario",
+    "attribute": "description",
+    "font": 6.45,
+    "box": [
+      725.2,
+      349.32559055118116,
+      809.8,
+      356.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "case_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      279.6255905511812,
+      111.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "case_ref",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      271.32559055118116,
+      111.8,
+      278.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "transaction_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      263.02559055118115,
+      111.8,
+      270.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "assigned_to_user_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      254.72559055118117,
+      111.8,
+      262.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "status",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      246.42559055118116,
+      111.8,
+      253.72559055118117
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "priority",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      238.12559055118115,
+      111.8,
+      245.42559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "resolution_code",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      229.82559055118114,
+      111.8,
+      237.12559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "resolution_notes",
+    "font": 6.45,
+    "box": [
+      116.2,
+      279.6255905511812,
+      200.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "opened_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      271.32559055118116,
+      200.8,
+      278.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "due_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      263.02559055118115,
+      200.8,
+      270.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "closed_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      254.72559055118117,
+      200.8,
+      262.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "updated_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      246.42559055118116,
+      200.8,
+      253.72559055118117
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "investigation_case",
+    "attribute": "version",
+    "font": 6.45,
+    "box": [
+      116.2,
+      238.12559055118115,
+      200.8,
+      245.42559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "rule_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      279.6255905511812,
+      314.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "rule_code",
+    "font": 6.45,
+    "box": [
+      230.2,
+      271.32559055118116,
+      314.8,
+      278.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "rule_name",
+    "font": 6.45,
+    "box": [
+      230.2,
+      263.02559055118115,
+      314.8,
+      270.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "dimension",
+    "font": 6.45,
+    "box": [
+      230.2,
+      254.72559055118117,
+      314.8,
+      262.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "weight",
+    "font": 6.45,
+    "box": [
+      319.2,
+      279.6255905511812,
+      403.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "threshold_value",
+    "font": 6.45,
+    "box": [
+      319.2,
+      271.32559055118116,
+      403.8,
+      278.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "is_active",
+    "font": 6.45,
+    "box": [
+      319.2,
+      263.02559055118115,
+      403.8,
+      270.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_rule",
+    "attribute": "version",
+    "font": 6.45,
+    "box": [
+      319.2,
+      254.72559055118117,
+      403.8,
+      262.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_signal",
+    "attribute": "signal_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      279.6255905511812,
+      517.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_signal",
+    "attribute": "transaction_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      271.32559055118116,
+      517.8,
+      278.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_signal",
+    "attribute": "rule_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      263.02559055118115,
+      517.8,
+      270.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_signal",
+    "attribute": "observed_value",
+    "font": 6.45,
+    "box": [
+      433.2,
+      254.72559055118117,
+      517.8,
+      262.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_signal",
+    "attribute": "score_contribution",
+    "font": 6.45,
+    "box": [
+      522.2,
+      279.6255905511812,
+      606.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_signal",
+    "attribute": "evidence",
+    "font": 6.45,
+    "box": [
+      522.2,
+      271.32559055118116,
+      606.8,
+      278.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "risk_signal",
+    "attribute": "triggered_at",
+    "font": 6.45,
+    "box": [
+      522.2,
+      263.02559055118115,
+      606.8,
+      270.3255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction_label",
+    "attribute": "transaction_id",
+    "font": 6.45,
+    "box": [
+      636.2,
+      279.6255905511812,
+      720.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction_label",
+    "attribute": "scenario_id",
+    "font": 6.45,
+    "box": [
+      636.2,
+      271.32559055118116,
+      720.8,
+      278.6255905511811
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "transaction_label",
+    "attribute": "is_suspicious",
+    "font": 6.45,
+    "box": [
+      725.2,
+      279.6255905511812,
+      809.8,
+      286.92559055118113
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "event_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      201.62559055118115,
+      111.8,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "case_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      193.32559055118114,
+      111.8,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "actor_user_id",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      185.02559055118115,
+      111.8,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "event_type",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      176.72559055118114,
+      111.8,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "from_state",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      168.42559055118116,
+      111.8,
+      175.72559055118117
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "to_state",
+    "font": 6.45,
+    "box": [
+      27.200000000000003,
+      160.12559055118115,
+      111.8,
+      167.42559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "reason",
+    "font": 6.45,
+    "box": [
+      116.2,
+      201.62559055118115,
+      200.8,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "metadata",
+    "font": 6.45,
+    "box": [
+      116.2,
+      193.32559055118114,
+      200.8,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "operation_id",
+    "font": 6.45,
+    "box": [
+      116.2,
+      185.02559055118115,
+      200.8,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "event_ordinal",
+    "font": 6.45,
+    "box": [
+      116.2,
+      176.72559055118114,
+      200.8,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_event",
+    "attribute": "occurred_at",
+    "font": 6.45,
+    "box": [
+      116.2,
+      168.42559055118116,
+      200.8,
+      175.72559055118117
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "operation_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      201.62559055118115,
+      314.8,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "actor_user_id",
+    "font": 6.45,
+    "box": [
+      230.2,
+      193.32559055118114,
+      314.8,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "idempotency_key",
+    "font": 6.45,
+    "box": [
+      230.2,
+      185.02559055118115,
+      314.8,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "command_type",
+    "font": 6.45,
+    "box": [
+      230.2,
+      176.72559055118114,
+      314.8,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "request_hash",
+    "font": 6.45,
+    "box": [
+      319.2,
+      201.62559055118115,
+      403.8,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "case_id",
+    "font": 6.45,
+    "box": [
+      319.2,
+      193.32559055118114,
+      403.8,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "response_status",
+    "font": 6.45,
+    "box": [
+      319.2,
+      185.02559055118115,
+      403.8,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "case_command_receipt",
+    "attribute": "completed_at",
+    "font": 6.45,
+    "box": [
+      319.2,
+      176.72559055118114,
+      403.8,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      201.62559055118115,
+      524.05,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "device_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      193.32559055118114,
+      524.05,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "transaction_id",
+    "font": 6.45,
+    "box": [
+      433.2,
+      185.02559055118115,
+      524.05,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "captured_at",
+    "font": 6.45,
+    "box": [
+      433.2,
+      176.72559055118114,
+      524.05,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "schema_version",
+    "font": 6.45,
+    "box": [
+      433.2,
+      168.42559055118116,
+      524.05,
+      175.72559055118117
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "shape_type",
+    "font": 6.45,
+    "box": [
+      528.45,
+      201.62559055118115,
+      619.3,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "retention_eligible",
+    "font": 6.45,
+    "box": [
+      528.45,
+      193.32559055118114,
+      619.3,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload",
+    "font": 6.45,
+    "box": [
+      528.45,
+      185.02559055118115,
+      619.3,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.ip_routing_hash",
+    "font": 6.45,
+    "box": [
+      528.45,
+      176.72559055118114,
+      619.3,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.connection_type",
+    "font": 6.45,
+    "box": [
+      528.45,
+      168.42559055118116,
+      619.3,
+      175.72559055118117
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.latency_ms",
+    "font": 6.45,
+    "box": [
+      623.7,
+      201.62559055118115,
+      714.55,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.tls_cipher",
+    "font": 6.45,
+    "box": [
+      623.7,
+      193.32559055118114,
+      714.55,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.vpn_detected",
+    "font": 6.45,
+    "box": [
+      623.7,
+      185.02559055118115,
+      714.55,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.screen_resolution",
+    "font": 6.45,
+    "box": [
+      623.7,
+      176.72559055118114,
+      714.55,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.battery_level",
+    "font": 6.45,
+    "box": [
+      623.7,
+      168.42559055118116,
+      714.55,
+      175.72559055118117
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.battery_charging",
+    "font": 6.45,
+    "box": [
+      718.95,
+      201.62559055118115,
+      809.8,
+      208.92559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.os_patch_level",
+    "font": 6.45,
+    "box": [
+      718.95,
+      193.32559055118114,
+      809.8,
+      200.62559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.hardware_concurrency",
+    "font": 6.154121863799282,
+    "box": [
+      718.95,
+      185.02559055118115,
+      809.8,
+      192.32559055118116
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "device_telemetry",
+    "attribute": "payload.user_agent_category",
+    "font": 6.45,
+    "box": [
+      718.95,
+      176.72559055118114,
+      809.8,
+      184.02559055118115
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "schema_migrations",
+    "attribute": "version",
+    "font": 5.9,
+    "box": [
+      83.35,
+      38,
+      110.36569999999999,
+      46
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "schema_migrations",
+    "attribute": "filename",
+    "font": 5.9,
+    "box": [
+      110.36569999999999,
+      38,
+      140.6618,
+      46
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "schema_migrations",
+    "attribute": "checksum",
+    "font": 5.9,
+    "box": [
+      140.6618,
+      38,
+      175.2177,
+      46
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "schema_migrations",
+    "attribute": "applied_at",
+    "font": 5.9,
+    "box": [
+      175.2177,
+      38,
+      210.4403,
+      46
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "v_transaction_risk",
+    "attribute": "transaction_id",
+    "font": 5.9,
+    "box": [
+      480.02,
+      38,
+      524.7475,
+      46
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "v_transaction_risk",
+    "attribute": "risk_score",
+    "font": 5.9,
+    "box": [
+      524.7475,
+      38,
+      559.6279,
+      46
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "v_transaction_risk",
+    "attribute": "signal_count",
+    "font": 5.9,
+    "box": [
+      559.6279,
+      38,
+      600.7505,
+      46
+    ]
+  },
+  {
+    "diagram": "ER",
+    "entity": "v_transaction_risk",
+    "attribute": "risk_band",
+    "font": 5.9,
+    "box": [
+      600.7505,
+      38,
+      634.327,
+      46
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "user_id",
+    "font": 7.2,
+    "box": [
+      29,
+      517.2755905511812,
+      60.6088,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "email",
+    "font": 7.2,
+    "box": [
+      60.6088,
+      517.2755905511812,
+      87.6088,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "password_hash",
+    "font": 7.2,
+    "box": [
+      87.6088,
+      517.2755905511812,
+      146.03040000000001,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "display_name",
+    "font": 7.2,
+    "box": [
+      146.03040000000001,
+      517.2755905511812,
+      198.4472,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "role",
+    "font": 7.2,
+    "box": [
+      198.4472,
+      517.2755905511812,
+      225.4472,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "is_active",
+    "font": 7.2,
+    "box": [
+      225.4472,
+      517.2755905511812,
+      261.4552,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "last_login_at",
+    "font": 7.2,
+    "box": [
+      29,
+      503.27559055118115,
+      77.4208,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_user",
+    "attribute": "created_at",
+    "font": 7.2,
+    "box": [
+      77.4208,
+      503.27559055118115,
+      119.4408,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "customer_id",
+    "font": 7.2,
+    "box": [
+      29,
+      456.17559055118113,
+      76.21119999999999,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "user_id",
+    "font": 7.2,
+    "box": [
+      76.21119999999999,
+      456.17559055118113,
+      107.82,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "full_name",
+    "font": 7.2,
+    "box": [
+      107.82,
+      456.17559055118113,
+      147.03199999999998,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "date_of_birth",
+    "font": 7.2,
+    "box": [
+      147.03199999999998,
+      456.17559055118113,
+      197.05839999999998,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "email",
+    "font": 7.2,
+    "box": [
+      197.05839999999998,
+      456.17559055118113,
+      224.05839999999998,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "phone",
+    "font": 7.2,
+    "box": [
+      224.05839999999998,
+      456.17559055118113,
+      252.07439999999997,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "country_code",
+    "font": 7.2,
+    "box": [
+      29,
+      442.17559055118113,
+      80.2216,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "status",
+    "font": 7.2,
+    "box": [
+      80.2216,
+      442.17559055118113,
+      107.43119999999999,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "kyc_verified_on",
+    "font": 7.2,
+    "box": [
+      107.43119999999999,
+      442.17559055118113,
+      165.44959999999998,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "customer",
+    "attribute": "updated_at",
+    "font": 7.2,
+    "box": [
+      165.44959999999998,
+      442.17559055118113,
+      209.47839999999997,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "address_id",
+    "font": 7.2,
+    "box": [
+      29,
+      395.07559055118116,
+      72.21520000000001,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "customer_id",
+    "font": 7.2,
+    "box": [
+      72.21520000000001,
+      395.07559055118116,
+      119.4264,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "line1",
+    "font": 7.2,
+    "box": [
+      119.4264,
+      395.07559055118116,
+      146.4264,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "city",
+    "font": 7.2,
+    "box": [
+      146.4264,
+      395.07559055118116,
+      173.4264,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "state",
+    "font": 7.2,
+    "box": [
+      173.4264,
+      395.07559055118116,
+      200.4264,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "postal_code",
+    "font": 7.2,
+    "box": [
+      200.4264,
+      395.07559055118116,
+      247.24880000000002,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "country_code",
+    "font": 7.2,
+    "box": [
+      29,
+      381.07559055118116,
+      80.2216,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "latitude",
+    "font": 7.2,
+    "box": [
+      80.2216,
+      381.07559055118116,
+      111.4344,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "longitude",
+    "font": 7.2,
+    "box": [
+      111.4344,
+      381.07559055118116,
+      148.652,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "address",
+    "attribute": "is_primary",
+    "font": 7.2,
+    "box": [
+      148.652,
+      381.07559055118116,
+      189.85119999999998,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "account_id",
+    "font": 7.2,
+    "box": [
+      29,
+      333.97559055118114,
+      71.8192,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "customer_id",
+    "font": 7.2,
+    "box": [
+      71.8192,
+      333.97559055118114,
+      119.03039999999999,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "account_number",
+    "font": 7.2,
+    "box": [
+      119.03039999999999,
+      333.97559055118114,
+      180.656,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "account_type",
+    "font": 7.2,
+    "box": [
+      180.656,
+      333.97559055118114,
+      231.48160000000001,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "currency_code",
+    "font": 7.2,
+    "box": [
+      29,
+      319.97559055118114,
+      84.2176,
+      331.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "balance",
+    "font": 7.2,
+    "box": [
+      84.2176,
+      319.97559055118114,
+      117.432,
+      331.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "status",
+    "font": 7.2,
+    "box": [
+      117.432,
+      319.97559055118114,
+      144.6416,
+      331.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "opened_at",
+    "font": 7.2,
+    "box": [
+      144.6416,
+      319.97559055118114,
+      186.6688,
+      331.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "account",
+    "attribute": "updated_at",
+    "font": 7.2,
+    "box": [
+      186.6688,
+      319.97559055118114,
+      230.69760000000002,
+      331.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "method_id",
+    "font": 7.2,
+    "box": [
+      29,
+      272.8755905511812,
+      70.61680000000001,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "account_id",
+    "font": 7.2,
+    "box": [
+      70.61680000000001,
+      272.8755905511812,
+      113.436,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "method_type",
+    "font": 7.2,
+    "box": [
+      113.436,
+      272.8755905511812,
+      163.0592,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "token",
+    "font": 7.2,
+    "box": [
+      163.0592,
+      272.8755905511812,
+      190.0592,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "last4",
+    "font": 7.2,
+    "box": [
+      190.0592,
+      272.8755905511812,
+      217.0592,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "expiry_date",
+    "font": 7.2,
+    "box": [
+      217.0592,
+      272.8755905511812,
+      262.276,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "status",
+    "font": 7.2,
+    "box": [
+      29,
+      258.8755905511812,
+      56.2096,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "payment_method",
+    "attribute": "updated_at",
+    "font": 7.2,
+    "box": [
+      56.2096,
+      258.8755905511812,
+      100.23840000000001,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "session_id",
+    "font": 7.2,
+    "box": [
+      29,
+      211.77559055118115,
+      71.0128,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "user_id",
+    "font": 7.2,
+    "box": [
+      71.0128,
+      211.77559055118115,
+      102.6216,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "created_at",
+    "font": 7.2,
+    "box": [
+      102.6216,
+      211.77559055118115,
+      144.6416,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "last_seen_at",
+    "font": 7.2,
+    "box": [
+      144.6416,
+      211.77559055118115,
+      193.4656,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "idle_expires_at",
+    "font": 7.2,
+    "box": [
+      193.4656,
+      211.77559055118115,
+      249.8856,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "absolute_expires_at",
+    "font": 7.2,
+    "box": [
+      29,
+      197.77559055118115,
+      101.4328,
+      209.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "revoked_at",
+    "font": 7.2,
+    "box": [
+      101.4328,
+      197.77559055118115,
+      145.0512,
+      209.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session",
+    "attribute": "revocation_reason",
+    "font": 7.2,
+    "box": [
+      145.0512,
+      197.77559055118115,
+      212.2784,
+      209.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "operation_id",
+    "font": 7.2,
+    "box": [
+      29,
+      150.67559055118113,
+      76.6216,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "admin_id",
+    "font": 7.2,
+    "box": [
+      76.6216,
+      150.67559055118113,
+      113.83200000000001,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "preview_at",
+    "font": 7.2,
+    "box": [
+      113.83200000000001,
+      150.67559055118113,
+      156.644,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "cutoff_at",
+    "font": 7.2,
+    "box": [
+      156.644,
+      150.67559055118113,
+      192.2632,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "expires_at",
+    "font": 7.2,
+    "box": [
+      192.2632,
+      150.67559055118113,
+      233.47680000000003,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "candidate_session_ids",
+    "font": 7.2,
+    "box": [
+      29,
+      136.67559055118113,
+      109.8352,
+      148.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "candidate_count",
+    "font": 7.2,
+    "box": [
+      109.8352,
+      136.67559055118113,
+      170.6688,
+      148.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "status",
+    "font": 7.2,
+    "box": [
+      170.6688,
+      136.67559055118113,
+      197.8784,
+      148.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "idempotency_key",
+    "font": 7.2,
+    "box": [
+      197.8784,
+      136.67559055118113,
+      261.90160000000003,
+      148.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "request_hash",
+    "font": 7.2,
+    "box": [
+      29,
+      122.67559055118113,
+      80.6248,
+      134.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "completed_at",
+    "font": 7.2,
+    "box": [
+      80.6248,
+      122.67559055118113,
+      131.8464,
+      134.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "app_session_cleanup",
+    "attribute": "deleted_count",
+    "font": 7.2,
+    "box": [
+      131.8464,
+      122.67559055118113,
+      185.0768,
+      134.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "schema_migrations",
+    "attribute": "version",
+    "font": 7.2,
+    "box": [
+      29,
+      89.57559055118116,
+      60.205600000000004,
+      101.57559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "schema_migrations",
+    "attribute": "filename",
+    "font": 7.2,
+    "box": [
+      60.205600000000004,
+      89.57559055118116,
+      95.4144,
+      101.57559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "schema_migrations",
+    "attribute": "checksum",
+    "font": 7.2,
+    "box": [
+      95.4144,
+      89.57559055118116,
+      135.8216,
+      101.57559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "schema_migrations",
+    "attribute": "applied_at",
+    "font": 7.2,
+    "box": [
+      135.8216,
+      89.57559055118116,
+      177.0424,
+      101.57559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "merchant_id",
+    "font": 7.2,
+    "box": [
+      300,
+      517.2755905511812,
+      347.6144,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "merchant_name",
+    "font": 7.2,
+    "box": [
+      347.6144,
+      517.2755905511812,
+      407.63439999999997,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "category_code",
+    "font": 7.2,
+    "box": [
+      407.63439999999997,
+      517.2755905511812,
+      462.8592,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "country_code",
+    "font": 7.2,
+    "box": [
+      462.8592,
+      517.2755905511812,
+      514.0808,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "city",
+    "font": 7.2,
+    "box": [
+      300,
+      503.27559055118115,
+      327,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "latitude",
+    "font": 7.2,
+    "box": [
+      327,
+      503.27559055118115,
+      358.2128,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "longitude",
+    "font": 7.2,
+    "box": [
+      358.2128,
+      503.27559055118115,
+      395.4304,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "risk_tier",
+    "font": 7.2,
+    "box": [
+      395.4304,
+      503.27559055118115,
+      428.6304,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "is_watchlisted",
+    "font": 7.2,
+    "box": [
+      428.6304,
+      503.27559055118115,
+      481.4432,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "merchant",
+    "attribute": "updated_at",
+    "font": 7.2,
+    "box": [
+      481.4432,
+      503.27559055118115,
+      525.472,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_fingerprint",
+    "attribute": "device_id",
+    "font": 7.2,
+    "box": [
+      300,
+      456.17559055118113,
+      338.4128,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_fingerprint",
+    "attribute": "device_hash",
+    "font": 7.2,
+    "box": [
+      338.4128,
+      456.17559055118113,
+      386.8336,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_fingerprint",
+    "attribute": "os_family",
+    "font": 7.2,
+    "box": [
+      386.8336,
+      456.17559055118113,
+      425.2392,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_fingerprint",
+    "attribute": "first_seen_country",
+    "font": 7.2,
+    "box": [
+      425.2392,
+      456.17559055118113,
+      492.0632,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_fingerprint",
+    "attribute": "first_seen_at",
+    "font": 7.2,
+    "box": [
+      300,
+      442.17559055118113,
+      349.22,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "transaction_id",
+    "font": 7.2,
+    "box": [
+      300,
+      395.07559055118116,
+      352.82,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "account_id",
+    "font": 7.2,
+    "box": [
+      352.82,
+      395.07559055118116,
+      395.6392,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "method_id",
+    "font": 7.2,
+    "box": [
+      395.6392,
+      395.07559055118116,
+      437.25600000000003,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "merchant_id",
+    "font": 7.2,
+    "box": [
+      437.25600000000003,
+      395.07559055118116,
+      484.8704,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "device_id",
+    "font": 7.2,
+    "box": [
+      484.8704,
+      395.07559055118116,
+      523.2832000000001,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "amount",
+    "font": 7.2,
+    "box": [
+      300,
+      381.07559055118116,
+      332.012,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "currency_code",
+    "font": 7.2,
+    "box": [
+      332.012,
+      381.07559055118116,
+      387.2296,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "exchange_rate",
+    "font": 7.2,
+    "box": [
+      387.2296,
+      381.07559055118116,
+      442.8576,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "amount_base",
+    "font": 7.2,
+    "box": [
+      442.8576,
+      381.07559055118116,
+      494.4824,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "direction",
+    "font": 7.2,
+    "box": [
+      494.4824,
+      381.07559055118116,
+      529.6912,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "txn_type",
+    "font": 7.2,
+    "box": [
+      300,
+      367.07559055118116,
+      335.216,
+      379.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "status",
+    "font": 7.2,
+    "box": [
+      335.216,
+      367.07559055118116,
+      362.42560000000003,
+      379.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "occurred_at",
+    "font": 7.2,
+    "box": [
+      362.42560000000003,
+      367.07559055118116,
+      408.44160000000005,
+      379.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "merchant_country_code",
+    "font": 7.2,
+    "box": [
+      408.44160000000005,
+      367.07559055118116,
+      493.67600000000004,
+      379.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "merchant_city",
+    "font": 7.2,
+    "box": [
+      300,
+      353.07559055118116,
+      352.8128,
+      365.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "latitude",
+    "font": 7.2,
+    "box": [
+      352.8128,
+      353.07559055118116,
+      384.0256,
+      365.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "longitude",
+    "font": 7.2,
+    "box": [
+      384.0256,
+      353.07559055118116,
+      421.2432,
+      365.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "description",
+    "font": 7.2,
+    "box": [
+      421.2432,
+      353.07559055118116,
+      464.0552,
+      365.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction",
+    "attribute": "search_vector",
+    "font": 7.2,
+    "box": [
+      464.0552,
+      353.07559055118116,
+      517.2712,
+      365.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "rule_id",
+    "font": 7.2,
+    "box": [
+      300,
+      272.8755905511812,
+      329.6072,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "rule_code",
+    "font": 7.2,
+    "box": [
+      329.6072,
+      272.8755905511812,
+      369.2224,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "rule_name",
+    "font": 7.2,
+    "box": [
+      369.2224,
+      272.8755905511812,
+      411.2352,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "dimension",
+    "font": 7.2,
+    "box": [
+      411.2352,
+      272.8755905511812,
+      452.04560000000004,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "weight",
+    "font": 7.2,
+    "box": [
+      452.04560000000004,
+      272.8755905511812,
+      480.85360000000003,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "threshold_value",
+    "font": 7.2,
+    "box": [
+      300,
+      258.8755905511812,
+      358.8248,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "is_active",
+    "font": 7.2,
+    "box": [
+      358.8248,
+      258.8755905511812,
+      394.83279999999996,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_rule",
+    "attribute": "version",
+    "font": 7.2,
+    "box": [
+      394.83279999999996,
+      258.8755905511812,
+      426.03839999999997,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_signal",
+    "attribute": "signal_id",
+    "font": 7.2,
+    "box": [
+      300,
+      211.77559055118115,
+      336.4112,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_signal",
+    "attribute": "transaction_id",
+    "font": 7.2,
+    "box": [
+      336.4112,
+      211.77559055118115,
+      389.2312,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_signal",
+    "attribute": "rule_id",
+    "font": 7.2,
+    "box": [
+      389.2312,
+      211.77559055118115,
+      418.8384,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_signal",
+    "attribute": "observed_value",
+    "font": 7.2,
+    "box": [
+      418.8384,
+      211.77559055118115,
+      477.66319999999996,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_signal",
+    "attribute": "score_contribution",
+    "font": 7.2,
+    "box": [
+      300,
+      197.77559055118115,
+      366.824,
+      209.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_signal",
+    "attribute": "evidence",
+    "font": 7.2,
+    "box": [
+      366.824,
+      197.77559055118115,
+      403.6384,
+      209.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "risk_signal",
+    "attribute": "triggered_at",
+    "font": 7.2,
+    "box": [
+      403.6384,
+      197.77559055118115,
+      450.0576,
+      209.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "fraud_scenario",
+    "attribute": "scenario_id",
+    "font": 7.2,
+    "box": [
+      300,
+      150.67559055118113,
+      344.8136,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "fraud_scenario",
+    "attribute": "scenario_code",
+    "font": 7.2,
+    "box": [
+      344.8136,
+      150.67559055118113,
+      399.6352,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "fraud_scenario",
+    "attribute": "scenario_name",
+    "font": 7.2,
+    "box": [
+      399.6352,
+      150.67559055118113,
+      456.8544,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "fraud_scenario",
+    "attribute": "description",
+    "font": 7.2,
+    "box": [
+      456.8544,
+      150.67559055118113,
+      499.6664,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction_label",
+    "attribute": "transaction_id",
+    "font": 7.2,
+    "box": [
+      300,
+      89.57559055118116,
+      352.82,
+      101.57559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction_label",
+    "attribute": "scenario_id",
+    "font": 7.2,
+    "box": [
+      352.82,
+      89.57559055118116,
+      397.6336,
+      101.57559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "transaction_label",
+    "attribute": "is_suspicious",
+    "font": 7.2,
+    "box": [
+      397.6336,
+      89.57559055118116,
+      448.4448,
+      101.57559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "case_id",
+    "font": 7.2,
+    "box": [
+      571,
+      517.2755905511812,
+      603.8112,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "case_ref",
+    "font": 7.2,
+    "box": [
+      603.8112,
+      517.2755905511812,
+      639.4232,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "transaction_id",
+    "font": 7.2,
+    "box": [
+      639.4232,
+      517.2755905511812,
+      692.2432,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "assigned_to_user_id",
+    "font": 7.2,
+    "box": [
+      692.2432,
+      517.2755905511812,
+      766.6776,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "status",
+    "font": 7.2,
+    "box": [
+      766.6776,
+      517.2755905511812,
+      793.8872,
+      529.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "priority",
+    "font": 7.2,
+    "box": [
+      571,
+      503.27559055118115,
+      600.6,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "resolution_code",
+    "font": 7.2,
+    "box": [
+      600.6,
+      503.27559055118115,
+      659.4248,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "resolution_notes",
+    "font": 7.2,
+    "box": [
+      659.4248,
+      503.27559055118115,
+      720.2512,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "opened_at",
+    "font": 7.2,
+    "box": [
+      720.2512,
+      503.27559055118115,
+      762.2784,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "due_at",
+    "font": 7.2,
+    "box": [
+      762.2784,
+      503.27559055118115,
+      792.296,
+      515.2755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "closed_at",
+    "font": 7.2,
+    "box": [
+      571,
+      489.27559055118115,
+      609.816,
+      501.27559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "updated_at",
+    "font": 7.2,
+    "box": [
+      609.816,
+      489.27559055118115,
+      653.8448000000001,
+      501.27559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "investigation_case",
+    "attribute": "version",
+    "font": 7.2,
+    "box": [
+      653.8448000000001,
+      489.27559055118115,
+      685.0504000000001,
+      501.27559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "event_id",
+    "font": 7.2,
+    "box": [
+      571,
+      456.17559055118113,
+      606.216,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "case_id",
+    "font": 7.2,
+    "box": [
+      606.216,
+      456.17559055118113,
+      639.0272,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "actor_user_id",
+    "font": 7.2,
+    "box": [
+      639.0272,
+      456.17559055118113,
+      690.6448,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "event_type",
+    "font": 7.2,
+    "box": [
+      690.6448,
+      456.17559055118113,
+      733.8672,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "from_state",
+    "font": 7.2,
+    "box": [
+      733.8672,
+      456.17559055118113,
+      775.88,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "to_state",
+    "font": 7.2,
+    "box": [
+      775.88,
+      456.17559055118113,
+      809.4976,
+      468.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "reason",
+    "font": 7.2,
+    "box": [
+      571,
+      442.17559055118113,
+      601.0104,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "metadata",
+    "font": 7.2,
+    "box": [
+      601.0104,
+      442.17559055118113,
+      639.0272,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "operation_id",
+    "font": 7.2,
+    "box": [
+      639.0272,
+      442.17559055118113,
+      686.6487999999999,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "event_ordinal",
+    "font": 7.2,
+    "box": [
+      686.6487999999999,
+      442.17559055118113,
+      737.8703999999999,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_event",
+    "attribute": "occurred_at",
+    "font": 7.2,
+    "box": [
+      737.8703999999999,
+      442.17559055118113,
+      783.8863999999999,
+      454.17559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "operation_id",
+    "font": 7.2,
+    "box": [
+      571,
+      395.07559055118116,
+      618.6216,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "actor_user_id",
+    "font": 7.2,
+    "box": [
+      618.6216,
+      395.07559055118116,
+      670.2392,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "idempotency_key",
+    "font": 7.2,
+    "box": [
+      670.2392,
+      395.07559055118116,
+      734.2624,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "command_type",
+    "font": 7.2,
+    "box": [
+      734.2624,
+      395.07559055118116,
+      791.4816,
+      407.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "request_hash",
+    "font": 7.2,
+    "box": [
+      571,
+      381.07559055118116,
+      622.6248,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "case_id",
+    "font": 7.2,
+    "box": [
+      622.6248,
+      381.07559055118116,
+      655.436,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "response_status",
+    "font": 7.2,
+    "box": [
+      655.436,
+      381.07559055118116,
+      716.2624000000001,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "case_command_receipt",
+    "attribute": "completed_at",
+    "font": 7.2,
+    "box": [
+      716.2624000000001,
+      381.07559055118116,
+      767.484,
+      393.07559055118116
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "v_transaction_risk",
+    "attribute": "transaction_id",
+    "font": 7.2,
+    "box": [
+      571,
+      333.97559055118114,
+      623.82,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "v_transaction_risk",
+    "attribute": "risk_score",
+    "font": 7.2,
+    "box": [
+      623.82,
+      333.97559055118114,
+      664.6232,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "v_transaction_risk",
+    "attribute": "signal_count",
+    "font": 7.2,
+    "box": [
+      664.6232,
+      333.97559055118114,
+      713.044,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "v_transaction_risk",
+    "attribute": "risk_band",
+    "font": 7.2,
+    "box": [
+      713.044,
+      333.97559055118114,
+      752.256,
+      345.97559055118114
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "_id",
+    "font": 7.2,
+    "box": [
+      571,
+      272.8755905511812,
+      598,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "device_id",
+    "font": 7.2,
+    "box": [
+      598,
+      272.8755905511812,
+      636.4128000000001,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "transaction_id",
+    "font": 7.2,
+    "box": [
+      636.4128000000001,
+      272.8755905511812,
+      689.2328000000001,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "captured_at",
+    "font": 7.2,
+    "box": [
+      689.2328000000001,
+      272.8755905511812,
+      735.2560000000001,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "schema_version",
+    "font": 7.2,
+    "box": [
+      735.2560000000001,
+      272.8755905511812,
+      795.6720000000001,
+      284.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "shape_type",
+    "font": 7.2,
+    "box": [
+      571,
+      258.8755905511812,
+      616.224,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "retention_eligible",
+    "font": 7.2,
+    "box": [
+      616.224,
+      258.8755905511812,
+      678.6488,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "device_telemetry [Mongo]",
+    "attribute": "payload",
+    "font": 7.2,
+    "box": [
+      678.6488,
+      258.8755905511812,
+      711.8632,
+      270.8755905511812
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "connection_telemetry : payload",
+    "attribute": "ip_routing_hash",
+    "font": 7.2,
+    "box": [
+      571,
+      211.77559055118115,
+      630.228,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "connection_telemetry : payload",
+    "attribute": "connection_type",
+    "font": 7.2,
+    "box": [
+      630.228,
+      211.77559055118115,
+      690.6583999999999,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "connection_telemetry : payload",
+    "attribute": "latency_ms",
+    "font": 7.2,
+    "box": [
+      690.6583999999999,
+      211.77559055118115,
+      735.0687999999999,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "connection_telemetry : payload",
+    "attribute": "tls_cipher",
+    "font": 7.2,
+    "box": [
+      735.0687999999999,
+      211.77559055118115,
+      773.8775999999999,
+      223.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "connection_telemetry : payload",
+    "attribute": "vpn_detected",
+    "font": 7.2,
+    "box": [
+      571,
+      197.77559055118115,
+      622.2288,
+      209.77559055118115
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "client_environment : payload",
+    "attribute": "screen_resolution",
+    "font": 7.2,
+    "box": [
+      571,
+      150.67559055118113,
+      635.8224,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "client_environment : payload",
+    "attribute": "battery_level",
+    "font": 7.2,
+    "box": [
+      635.8224,
+      150.67559055118113,
+      684.6392000000001,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "client_environment : payload",
+    "attribute": "battery_charging",
+    "font": 7.2,
+    "box": [
+      684.6392000000001,
+      150.67559055118113,
+      746.2648,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "client_environment : payload",
+    "attribute": "os_patch_level",
+    "font": 7.2,
+    "box": [
+      746.2648,
+      150.67559055118113,
+      802.2888,
+      162.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "client_environment : payload",
+    "attribute": "hardware_concurrency",
+    "font": 7.2,
+    "box": [
+      571,
+      136.67559055118113,
+      652.224,
+      148.67559055118113
+    ]
+  },
+  {
+    "diagram": "Schema",
+    "entity": "client_environment : payload",
+    "attribute": "user_agent_category",
+    "font": 7.2,
+    "box": [
+      652.224,
+      136.67559055118113,
+      727.8608,
+      148.67559055118113
+    ]
+  }
+]

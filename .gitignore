@@ -19,5 +19,9 @@ next-env.d.ts
 playwright-report/
 test-results/
 coverage/
+tmp/pdfs/
 data/local/
 docs/DBMS Level 3 Project Requirements.pdf
+
+# Python diagram renderer cache
+__pycache__/

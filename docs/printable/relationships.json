@@ -1,0 +1,262 @@
+[
+  {
+    "id": "rel1",
+    "parent": "customer",
+    "child": "account",
+    "columns": [
+      "customer_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "holds",
+    "enforced": true
+  },
+  {
+    "id": "rel2",
+    "parent": "customer",
+    "child": "address",
+    "columns": [
+      "customer_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "resides at",
+    "enforced": true
+  },
+  {
+    "id": "rel3",
+    "parent": "app_user",
+    "child": "app_session",
+    "columns": [
+      "user_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "has session",
+    "enforced": true
+  },
+  {
+    "id": "rel4",
+    "parent": "app_user",
+    "child": "app_session_cleanup",
+    "columns": [
+      "admin_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "authorizes",
+    "enforced": true
+  },
+  {
+    "id": "rel5",
+    "parent": "app_user",
+    "child": "case_command_receipt",
+    "columns": [
+      "actor_user_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "issues command",
+    "enforced": true
+  },
+  {
+    "id": "rel6",
+    "parent": "investigation_case",
+    "child": "case_command_receipt",
+    "columns": [
+      "case_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "has receipt",
+    "enforced": true
+  },
+  {
+    "id": "rel7",
+    "parent": "app_user",
+    "child": "case_event",
+    "columns": [
+      "actor_user_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "records event",
+    "enforced": true
+  },
+  {
+    "id": "rel8",
+    "parent": "investigation_case",
+    "child": "case_event",
+    "columns": [
+      "case_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "has history",
+    "enforced": true
+  },
+  {
+    "id": "rel9",
+    "parent": "app_user",
+    "child": "customer",
+    "columns": [
+      "user_id"
+    ],
+    "parentCardinality": "0..1",
+    "childCardinality": "0..1",
+    "label": "links operator",
+    "enforced": true
+  },
+  {
+    "id": "rel10",
+    "parent": "app_user",
+    "child": "investigation_case",
+    "columns": [
+      "assigned_to_user_id"
+    ],
+    "parentCardinality": "0..1",
+    "childCardinality": "0..N",
+    "label": "assigned to",
+    "enforced": true
+  },
+  {
+    "id": "rel11",
+    "parent": "transaction",
+    "child": "investigation_case",
+    "columns": [
+      "transaction_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "investigates",
+    "enforced": true
+  },
+  {
+    "id": "rel12",
+    "parent": "account",
+    "child": "payment_method",
+    "columns": [
+      "account_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "provides",
+    "enforced": true
+  },
+  {
+    "id": "rel13",
+    "parent": "risk_rule",
+    "child": "risk_signal",
+    "columns": [
+      "rule_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "fires",
+    "enforced": true
+  },
+  {
+    "id": "rel14",
+    "parent": "transaction",
+    "child": "risk_signal",
+    "columns": [
+      "transaction_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "has evidence",
+    "enforced": true
+  },
+  {
+    "id": "rel15",
+    "parent": "account",
+    "child": "transaction",
+    "columns": [
+      "account_id",
+      "currency_code"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "records",
+    "enforced": true
+  },
+  {
+    "id": "rel16",
+    "parent": "device_fingerprint",
+    "child": "transaction",
+    "columns": [
+      "device_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "originates on",
+    "enforced": true
+  },
+  {
+    "id": "rel17",
+    "parent": "merchant",
+    "child": "transaction",
+    "columns": [
+      "merchant_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "receives",
+    "enforced": true
+  },
+  {
+    "id": "rel18",
+    "parent": "payment_method",
+    "child": "transaction",
+    "columns": [
+      "method_id",
+      "account_id"
+    ],
+    "parentCardinality": "0..1",
+    "childCardinality": "0..N",
+    "label": "pays via",
+    "enforced": true
+  },
+  {
+    "id": "rel19",
+    "parent": "fraud_scenario",
+    "child": "transaction_label",
+    "columns": [
+      "scenario_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "label": "classifies",
+    "enforced": true
+  },
+  {
+    "id": "rel20",
+    "parent": "transaction",
+    "child": "transaction_label",
+    "columns": [
+      "transaction_id"
+    ],
+    "parentCardinality": "1",
+    "childCardinality": "0..1",
+    "label": "has label",
+    "enforced": true
+  },
+  {
+    "id": "mongo_device",
+    "parent": "device_fingerprint",
+    "child": "device_telemetry",
+    "label": "SQL-resolved device",
+    "parentCardinality": "1",
+    "childCardinality": "0..N",
+    "enforced": false
+  },
+  {
+    "id": "mongo_transaction",
+    "parent": "transaction",
+    "child": "device_telemetry",
+    "label": "optional context",
+    "parentCardinality": "0..1",
+    "childCardinality": "0..N",
+    "enforced": false
+  }
+]
