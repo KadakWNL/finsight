@@ -1,0 +1,306 @@
+[
+  {
+    "id": "ddl-create",
+    "sql": "CREATE TEMP TABLE academic_ddl_probe (id integer PRIMARY KEY, quantity integer CHECK (quantity > 0))",
+    "rows": []
+  },
+  {
+    "id": "ddl-alter",
+    "sql": "ALTER TABLE pg_temp.academic_ddl_probe ADD COLUMN purpose text NOT NULL DEFAULT 'disposable demonstration'",
+    "rows": []
+  },
+  {
+    "id": "ddl-insert",
+    "sql": "INSERT INTO pg_temp.academic_ddl_probe(id,quantity) VALUES (1,2) RETURNING id,quantity,purpose",
+    "rows": [
+      {
+        "id": 1,
+        "quantity": 2,
+        "purpose": "disposable demonstration"
+      }
+    ]
+  },
+  {
+    "id": "ddl-drop",
+    "sql": "DROP TABLE pg_temp.academic_ddl_probe",
+    "rows": []
+  },
+  {
+    "id": "ddl-drop-check",
+    "sql": "SELECT to_regclass('pg_temp.academic_ddl_probe') IS NULL AS removed",
+    "rows": [
+      {
+        "removed": true
+      }
+    ]
+  },
+  {
+    "id": "joins-group-having-order",
+    "sql": "SELECT m.merchant_name, count(*)::integer AS transaction_count,\n    sum(t.amount_base)::text AS total_inr, max(v.risk_score)::text AS maximum_risk\n    FROM public.transaction t JOIN public.merchant m USING(merchant_id)\n    JOIN public.v_transaction_risk v USING(transaction_id)\n    WHERE t.transaction_id IN (SELECT transaction_id FROM public.v_transaction_risk WHERE signal_count > 0)\n    GROUP BY m.merchant_id,m.merchant_name HAVING count(*) >= 2\n    ORDER BY max(v.risk_score) DESC,m.merchant_name",
+    "rows": [
+      {
+        "merchant_name": "Synthetic high merchant",
+        "transaction_count": 3,
+        "total_inr": "22500.00",
+        "maximum_risk": "65"
+      },
+      {
+        "merchant_name": "Synthetic low merchant",
+        "transaction_count": 2,
+        "total_inr": "20000.00",
+        "maximum_risk": "40"
+      }
+    ]
+  },
+  {
+    "id": "risk-view",
+    "sql": "SELECT transaction_id,risk_score::text,signal_count,risk_band\n    FROM public.v_transaction_risk ORDER BY transaction_id",
+    "rows": [
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000100",
+        "risk_score": "0",
+        "signal_count": 0,
+        "risk_band": "low"
+      },
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000101",
+        "risk_score": "0",
+        "signal_count": 0,
+        "risk_band": "low"
+      },
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000102",
+        "risk_score": "0",
+        "signal_count": 0,
+        "risk_band": "low"
+      },
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000103",
+        "risk_score": "40",
+        "signal_count": 1,
+        "risk_band": "medium"
+      },
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000104",
+        "risk_score": "25",
+        "signal_count": 1,
+        "risk_band": "low"
+      },
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000105",
+        "risk_score": "65",
+        "signal_count": 2,
+        "risk_band": "high"
+      },
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000106",
+        "risk_score": "65",
+        "signal_count": 2,
+        "risk_band": "high"
+      },
+      {
+        "transaction_id": "30000000-0000-0000-0000-000000000107",
+        "risk_score": "40",
+        "signal_count": 1,
+        "risk_band": "medium"
+      }
+    ]
+  },
+  {
+    "id": "guarded-case-insert",
+    "sql": "SELECT * FROM public.execute_case_command(\n    'create',$1,$2,repeat('a',64),NULL,NULL,$3,'high','Synthetic academic investigation',NULL,NULL,'ACADEMIC-DEMO')",
+    "rows": [
+      {
+        "operation_id": "de6e0c13-f04a-4c9e-b30f-6a261ec7c443",
+        "case_id": "886575cd-f09f-49ce-893e-d632155412b9",
+        "case_ref": "ACADEMIC-DEMO",
+        "status": "open",
+        "priority": "high",
+        "assigned_to_user_id": "a0d80a78-60bf-4e8e-9a12-f6bc2564f971",
+        "version": "1",
+        "response_status": 201,
+        "replayed": false
+      }
+    ]
+  },
+  {
+    "id": "guarded-case-update",
+    "sql": "SELECT * FROM public.execute_case_command(\n    'start_review',$1,$2,repeat('b',64),$3,$4)",
+    "rows": [
+      {
+        "operation_id": "55da0aac-da75-4502-9dc4-69c54a9b2bb3",
+        "case_id": "886575cd-f09f-49ce-893e-d632155412b9",
+        "case_ref": "ACADEMIC-DEMO",
+        "status": "in_review",
+        "priority": "high",
+        "assigned_to_user_id": "a0d80a78-60bf-4e8e-9a12-f6bc2564f971",
+        "version": "2",
+        "response_status": 200,
+        "replayed": false
+      }
+    ]
+  },
+  {
+    "id": "case-history",
+    "sql": "SELECT event_type,reason,from_state,to_state\n    FROM public.case_event WHERE case_id=$1 ORDER BY occurred_at,event_ordinal,event_id",
+    "rows": [
+      {
+        "event_type": "created",
+        "reason": "Synthetic academic investigation",
+        "from_state": null,
+        "to_state": {
+          "status": "open",
+          "case_ref": "ACADEMIC-DEMO",
+          "priority": "high",
+          "opened_at": "2026-10-30T09:02:54Z",
+          "transaction_id": "30000000-0000-0000-0000-000000000105",
+          "assigned_to_user_id": null
+        }
+      },
+      {
+        "event_type": "assigned",
+        "reason": null,
+        "from_state": {
+          "assigned_to_user_id": null
+        },
+        "to_state": {
+          "assigned_to_user_id": "a0d80a78-60bf-4e8e-9a12-f6bc2564f971"
+        }
+      },
+      {
+        "event_type": "status_change",
+        "reason": null,
+        "from_state": {
+          "status": "open"
+        },
+        "to_state": {
+          "status": "in_review"
+        }
+      }
+    ]
+  },
+  {
+    "id": "immutable-event-trigger",
+    "sql": "UPDATE public.case_event SET reason=reason WHERE case_id=$1",
+    "rejectedWith": "55000"
+  },
+  {
+    "id": "runtime-event-mutation-denied",
+    "sql": "DELETE FROM public.case_event WHERE case_id=$1",
+    "rejectedWith": "42501"
+  },
+  {
+    "id": "cleanup-preview",
+    "sql": "SELECT * FROM public.preview_app_session_cleanup($1)",
+    "rows": [
+      {
+        "operation_id": "f29541b1-263d-4b31-9169-5e6c33252a5f",
+        "candidate_count": 1,
+        "cutoff_at": "2026-10-23T09:02:54.696Z",
+        "expires_at": "2026-10-30T09:12:54.696Z",
+        "preview_at": "2026-10-30T09:02:54.696Z"
+      }
+    ]
+  },
+  {
+    "id": "runtime-direct-delete-denied",
+    "sql": "DELETE FROM public.app_session",
+    "rejectedWith": "42501"
+  },
+  {
+    "id": "analyst-cleanup-denied",
+    "sql": "SELECT * FROM public.preview_app_session_cleanup($1)",
+    "rejectedWith": "42501"
+  },
+  {
+    "id": "cleanup-inside-rolled-back-transaction",
+    "sql": "SELECT * FROM public.confirm_app_session_cleanup($1,$2,$3,repeat('c',64))",
+    "rows": [
+      {
+        "operation_id": "f29541b1-263d-4b31-9169-5e6c33252a5f",
+        "status": "completed",
+        "candidate_count": 1,
+        "deleted_count": 1,
+        "cutoff_at": "2026-10-23T09:02:54.696Z",
+        "completed_at": "2026-10-30T09:02:54.700Z",
+        "replayed": false
+      }
+    ]
+  },
+  {
+    "id": "rollback-restored-session-and-audit",
+    "sql": "SELECT (SELECT count(*)::integer FROM public.app_session) AS sessions,\n    status,deleted_count FROM public.app_session_cleanup WHERE operation_id=$1",
+    "rows": [
+      {
+        "sessions": 3,
+        "status": "previewed",
+        "deleted_count": null
+      }
+    ]
+  },
+  {
+    "id": "cleanup-committed-delete",
+    "sql": "SELECT * FROM public.confirm_app_session_cleanup($1,$2,$3,repeat('d',64))",
+    "rows": [
+      {
+        "operation_id": "f29541b1-263d-4b31-9169-5e6c33252a5f",
+        "status": "completed",
+        "candidate_count": 1,
+        "deleted_count": 1,
+        "cutoff_at": "2026-10-23T09:02:54.696Z",
+        "completed_at": "2026-10-30T09:02:54.702Z",
+        "replayed": false
+      }
+    ]
+  },
+  {
+    "id": "cleanup-replay",
+    "sql": "SELECT * FROM public.confirm_app_session_cleanup($1,$2,$3,repeat('d',64))",
+    "rows": [
+      {
+        "operation_id": "f29541b1-263d-4b31-9169-5e6c33252a5f",
+        "status": "completed",
+        "candidate_count": 1,
+        "deleted_count": 1,
+        "cutoff_at": "2026-10-23T09:02:54.696Z",
+        "completed_at": "2026-10-30T09:02:54.702Z",
+        "replayed": true
+      }
+    ]
+  },
+  {
+    "id": "cleanup-retained-active-recent-sessions",
+    "sql": "SELECT count(*)::integer AS remaining_sessions FROM public.app_session",
+    "rows": [
+      {
+        "remaining_sessions": 2
+      }
+    ]
+  },
+  {
+    "id": "protected-row-counts",
+    "before": {
+      "customer": 1,
+      "account": 2,
+      "transaction": 8,
+      "risk_rule": 2,
+      "risk_signal": 7,
+      "investigation_case": 1,
+      "case_event": 3,
+      "case_command_receipt": 2,
+      "app_user": 2
+    },
+    "after": {
+      "customer": 1,
+      "account": 2,
+      "transaction": 8,
+      "risk_rule": 2,
+      "risk_signal": 7,
+      "investigation_case": 1,
+      "case_event": 3,
+      "case_command_receipt": 2,
+      "app_user": 2
+    },
+    "unchanged": true
+  }
+]

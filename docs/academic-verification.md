@@ -2,6 +2,8 @@
 
 `npm run test:academic` runs the complete MVP acceptance gate and records additional SQL, MongoDB and contribution evidence. A passing command establishes technical evidence for review. It does not establish instructor acceptance, an independent teammate demonstration or completion of the course submission.
 
+The [2026-10-30 execution record](academic/2026-10-30-verification.md) retains a passing CI run, exact SQL results and indexed plans.
+
 The [session cleanup contract](session-cleanup-contract.md) owns the approved SQL DELETE scope. The [testing contract](development-and-testing-contract.md#6-academic-sqlnosql-scope) owns the selected advanced concepts. Vectors, Mongo notes/recovery, rule mutations and redaction remain deferred; they are not counted as delivered requirements.
 
 ## Run the verification
