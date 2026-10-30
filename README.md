@@ -159,6 +159,8 @@ The [requirements traceability](docs/requirements-traceability.md) and [testing 
 
 ## Documentation
 
+For the compulsory demonstration hard copies, use the [current ER and relational schema print masters](docs/printable/README.md), generated from the implemented schema with both team members' names.
+
 | Read this | For |
 |---|---|
 | [Development setup](docs/development-setup.md) | Environment, roles, database isolation and command reference |

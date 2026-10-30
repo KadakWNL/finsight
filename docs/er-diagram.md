@@ -1,5 +1,7 @@
 # FinSight ER design and relational mapping
 
+> For current demonstration printouts, use the [verified Chen ER and relational schema masters](printable/README.md). The Mermaid/PlantUML and figures discussed below are design/history material, including deferred entities, and are not the current implemented inventory.
+
 The [full Mermaid source](er-diagram.mmd) defines the structural inventory. This document maps it to the workflow contracts and report figures. The [financial baseline](financial-baseline.md) records the implemented migration 010 boundary; operational tables, behavior and deferred entities below remain designs.
 
 ## Authority, scope and review

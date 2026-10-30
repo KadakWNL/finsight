@@ -3,7 +3,7 @@
 ' STALE — DO NOT TRUST. This is the original 10-entity draft.
 ' It does NOT contain: SEMANTIC_DOCUMENT (pgvector), CASE_EVENT,
 ' PERSONAL_DATA_REDACTION, lat/long, or exchange_rate.
-' Authoritative sources: er-diagram.mmd / er-diagram.md
+' Current implemented printouts: printable/README.md; the older Mermaid files are design history.
 ' Regenerate or delete this file.
 ' ============================================================
 ' FinSight — UML class diagram

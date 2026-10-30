@@ -1,0 +1,2754 @@
+{
+  "title": "FinSight",
+  "members": [
+    "Shrikar Desai",
+    "Shreyas P Kulkarni"
+  ],
+  "sourceCommit": "843f0af9597439cafefe35c62dea8b9be29540bb",
+  "postgresVersion": "17.11",
+  "migrations": [
+    {
+      "filename": "010_financial_baseline.sql",
+      "checksum": "2585550ff1be78aec0c907aeba9e11df70f007ed6fc5c0d88f729c4b09d75914"
+    },
+    {
+      "filename": "020_operational_schema.sql",
+      "checksum": "1a4748725e1a2b5b2b421cb3b81a62f06aa75a6dd9fa83ec12d19ed5a88c1b77"
+    },
+    {
+      "filename": "030_financial_guards.sql",
+      "checksum": "54fa5436b59b7177d5d2acfd35d153bc0ac444e4adc5f9ff7e830729f1b7e682"
+    },
+    {
+      "filename": "040_deterministic_risk.sql",
+      "checksum": "c3a24aecbbb0c2d03a9a600914ee32d55901ef85dd5cb7bbb72f71a4791ea66a"
+    },
+    {
+      "filename": "050_case_guards.sql",
+      "checksum": "9c301374f58793fb16055b78a59e461c4e9c5e5aaae0857ff2769bd5bd795727"
+    },
+    {
+      "filename": "055_auth_session_validation.sql",
+      "checksum": "3ea8af7cf28e4b02b1569e307599d73ebfc3d64dbd75c60c18f509c834541a5b"
+    },
+    {
+      "filename": "060_session_cleanup.sql",
+      "checksum": "016f31f0d1d1611eab9386e8eccf1901bdcab85fca904d79614ac7e80e8db42e"
+    }
+  ],
+  "tables": [
+    {
+      "name": "account",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "account_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "account_number",
+          "type": "character varying(40)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "account_type",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "balance",
+          "type": "numeric(20,2)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "opened_at",
+          "type": "date",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "account_account_type_check",
+          "type": "c",
+          "definition": "CHECK (((account_type)::text = ANY ((ARRAY['savings'::character varying, 'current'::character varying, 'wallet'::character varying])::text[])))",
+          "columns": [
+            "account_type"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "account_balance_check",
+          "type": "c",
+          "definition": "CHECK (((balance >= (0)::numeric) AND (balance < 'Infinity'::numeric)))",
+          "columns": [
+            "balance"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "account_currency_code_check",
+          "type": "c",
+          "definition": "CHECK ((currency_code = ANY (ARRAY['INR'::bpchar, 'USD'::bpchar])))",
+          "columns": [
+            "currency_code"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "account_status_check",
+          "type": "c",
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'frozen'::character varying, 'closed'::character varying, 'dormant'::character varying])::text[])))",
+          "columns": [
+            "status"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "account_customer_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE RESTRICT",
+          "columns": [
+            "customer_id"
+          ],
+          "references_table": "customer",
+          "references_columns": [
+            "customer_id"
+          ]
+        },
+        {
+          "name": "account_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (account_id)",
+          "columns": [
+            "account_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "account_account_id_currency_code_key",
+          "type": "u",
+          "definition": "UNIQUE (account_id, currency_code)",
+          "columns": [
+            "account_id",
+            "currency_code"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "account_account_number_key",
+          "type": "u",
+          "definition": "UNIQUE (account_number)",
+          "columns": [
+            "account_number"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "address",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "address_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "line1",
+          "type": "character varying(250)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "city",
+          "type": "character varying(100)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "state",
+          "type": "character varying(100)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "postal_code",
+          "type": "character varying(20)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "latitude",
+          "type": "numeric",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "longitude",
+          "type": "numeric",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "is_primary",
+          "type": "boolean",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "false"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "address_coordinates",
+          "type": "c",
+          "definition": "CHECK ((((latitude IS NULL) AND (longitude IS NULL)) OR ((latitude IS NOT NULL) AND (longitude IS NOT NULL) AND ((latitude >= ('-90'::integer)::numeric) AND (latitude <= (90)::numeric)) AND ((longitude >= ('-180'::integer)::numeric) AND (longitude <= (180)::numeric)))))",
+          "columns": [
+            "latitude",
+            "longitude"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "address_customer_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (customer_id) REFERENCES customer(customer_id) ON DELETE RESTRICT",
+          "columns": [
+            "customer_id"
+          ],
+          "references_table": "customer",
+          "references_columns": [
+            "customer_id"
+          ]
+        },
+        {
+          "name": "address_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (address_id)",
+          "columns": [
+            "address_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "app_session",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "session_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        },
+        {
+          "name": "last_seen_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "idle_expires_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "absolute_expires_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "revocation_reason",
+          "type": "character varying(32)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "app_session_check",
+          "type": "c",
+          "definition": "CHECK ((isfinite(created_at) AND isfinite(last_seen_at) AND isfinite(idle_expires_at) AND isfinite(absolute_expires_at)))",
+          "columns": [
+            "created_at",
+            "last_seen_at",
+            "idle_expires_at",
+            "absolute_expires_at"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_check1",
+          "type": "c",
+          "definition": "CHECK (((created_at <= last_seen_at) AND (last_seen_at < idle_expires_at) AND (idle_expires_at <= absolute_expires_at)))",
+          "columns": [
+            "created_at",
+            "last_seen_at",
+            "idle_expires_at",
+            "absolute_expires_at"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_check2",
+          "type": "c",
+          "definition": "CHECK ((absolute_expires_at <= (created_at + '08:00:00'::interval)))",
+          "columns": [
+            "absolute_expires_at",
+            "created_at"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_check3",
+          "type": "c",
+          "definition": "CHECK ((idle_expires_at <= (last_seen_at + '00:30:00'::interval)))",
+          "columns": [
+            "idle_expires_at",
+            "last_seen_at"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_check4",
+          "type": "c",
+          "definition": "CHECK (((revoked_at IS NULL) OR (isfinite(revoked_at) AND (revoked_at >= created_at))))",
+          "columns": [
+            "revoked_at",
+            "created_at"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_check5",
+          "type": "c",
+          "definition": "CHECK ((((revoked_at IS NULL) AND (revocation_reason IS NULL)) OR ((revoked_at IS NOT NULL) AND ((revocation_reason IS NULL) OR ((revocation_reason)::text = ANY ((ARRAY['sign_out'::character varying, 'user_disabled'::character varying, 'security'::character varying])::text[]))))))",
+          "columns": [
+            "revoked_at",
+            "revocation_reason"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES app_user(user_id) ON DELETE RESTRICT",
+          "columns": [
+            "user_id"
+          ],
+          "references_table": "app_user",
+          "references_columns": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "app_session_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (session_id)",
+          "columns": [
+            "session_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "app_session_cleanup",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "operation_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "admin_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "preview_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        },
+        {
+          "name": "cutoff_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "candidate_session_ids",
+          "type": "uuid[]",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "candidate_count",
+          "type": "integer",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "'previewed'::character varying"
+        },
+        {
+          "name": "idempotency_key",
+          "type": "uuid",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "request_hash",
+          "type": "text",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "deleted_count",
+          "type": "integer",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "app_session_cleanup_candidate_count_check",
+          "type": "c",
+          "definition": "CHECK (((candidate_count >= 0) AND (candidate_count <= 100)))",
+          "columns": [
+            "candidate_count"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_cleanup_check",
+          "type": "c",
+          "definition": "CHECK (((preview_at <= expires_at) AND (cutoff_at < preview_at)))",
+          "columns": [
+            "preview_at",
+            "expires_at",
+            "cutoff_at"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_cleanup_check1",
+          "type": "c",
+          "definition": "CHECK (((((status)::text = 'previewed'::text) AND (completed_at IS NULL) AND (deleted_count IS NULL) AND (idempotency_key IS NULL) AND (request_hash IS NULL)) OR (((status)::text = 'completed'::text) AND (completed_at IS NOT NULL) AND (deleted_count IS NOT NULL) AND (deleted_count >= 0) AND (deleted_count <= candidate_count) AND (idempotency_key IS NOT NULL) AND (request_hash IS NOT NULL))))",
+          "columns": [
+            "status",
+            "completed_at",
+            "deleted_count",
+            "idempotency_key",
+            "request_hash",
+            "candidate_count"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_cleanup_request_hash_check",
+          "type": "c",
+          "definition": "CHECK (((request_hash IS NULL) OR (request_hash ~ '^[0-9a-f]{64}$'::text)))",
+          "columns": [
+            "request_hash"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_cleanup_status_check",
+          "type": "c",
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['previewed'::character varying, 'completed'::character varying])::text[])))",
+          "columns": [
+            "status"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_session_cleanup_admin_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (admin_id) REFERENCES app_user(user_id) ON DELETE RESTRICT",
+          "columns": [
+            "admin_id"
+          ],
+          "references_table": "app_user",
+          "references_columns": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "app_session_cleanup_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (operation_id)",
+          "columns": [
+            "operation_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "app_user",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "email",
+          "type": "character varying(320)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "password_hash",
+          "type": "text",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "display_name",
+          "type": "character varying(200)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "role",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "true"
+        },
+        {
+          "name": "last_login_at",
+          "type": "timestamp with time zone",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "app_user_check",
+          "type": "c",
+          "definition": "CHECK (((((role)::text = 'system'::text) AND (password_hash IS NULL)) OR (((role)::text = ANY ((ARRAY['analyst'::character varying, 'admin'::character varying])::text[])) AND (password_hash IS NOT NULL) AND (length(btrim(password_hash)) > 0))))",
+          "columns": [
+            "role",
+            "password_hash"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_user_display_name_check",
+          "type": "c",
+          "definition": "CHECK ((length(btrim((display_name)::text)) > 0))",
+          "columns": [
+            "display_name"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_user_email_check",
+          "type": "c",
+          "definition": "CHECK ((((email)::text = lower(btrim((email)::text))) AND ((email)::text <> ''::text)))",
+          "columns": [
+            "email"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_user_role_check",
+          "type": "c",
+          "definition": "CHECK (((role)::text = ANY ((ARRAY['analyst'::character varying, 'admin'::character varying, 'system'::character varying])::text[])))",
+          "columns": [
+            "role"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_user_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (user_id)",
+          "columns": [
+            "user_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "app_user_email_key",
+          "type": "u",
+          "definition": "UNIQUE (email)",
+          "columns": [
+            "email"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "case_command_receipt",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "operation_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "idempotency_key",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "command_type",
+          "type": "character varying(32)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "request_hash",
+          "type": "text",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "case_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "response_status",
+          "type": "integer",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "completed_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "case_command_receipt_command_type_check",
+          "type": "c",
+          "definition": "CHECK (((command_type)::text = ANY ((ARRAY['create'::character varying, 'start_review'::character varying, 'escalate'::character varying, 'return_to_review'::character varying, 'resolve'::character varying, 'dismiss'::character varying, 'reopen'::character varying])::text[])))",
+          "columns": [
+            "command_type"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_command_receipt_request_hash_check",
+          "type": "c",
+          "definition": "CHECK ((request_hash ~ '^[0-9a-f]{64}$'::text))",
+          "columns": [
+            "request_hash"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_command_receipt_response_status_check",
+          "type": "c",
+          "definition": "CHECK ((response_status = ANY (ARRAY[200, 201])))",
+          "columns": [
+            "response_status"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_command_receipt_actor_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (actor_user_id) REFERENCES app_user(user_id) ON DELETE RESTRICT",
+          "columns": [
+            "actor_user_id"
+          ],
+          "references_table": "app_user",
+          "references_columns": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "case_command_receipt_case_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (case_id) REFERENCES investigation_case(case_id) ON DELETE RESTRICT",
+          "columns": [
+            "case_id"
+          ],
+          "references_table": "investigation_case",
+          "references_columns": [
+            "case_id"
+          ]
+        },
+        {
+          "name": "case_command_receipt_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (operation_id)",
+          "columns": [
+            "operation_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_command_receipt_actor_user_id_idempotency_key_key",
+          "type": "u",
+          "definition": "UNIQUE (actor_user_id, idempotency_key)",
+          "columns": [
+            "actor_user_id",
+            "idempotency_key"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "case_event",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "event_id",
+          "type": "bigint",
+          "not_null": true,
+          "generated": false,
+          "identity": true,
+          "default": null
+        },
+        {
+          "name": "case_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "actor_user_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "event_type",
+          "type": "character varying(32)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "from_state",
+          "type": "jsonb",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "to_state",
+          "type": "jsonb",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "'{}'::jsonb"
+        },
+        {
+          "name": "operation_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "event_ordinal",
+          "type": "integer",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "case_event_event_ordinal_check",
+          "type": "c",
+          "definition": "CHECK ((event_ordinal > 0))",
+          "columns": [
+            "event_ordinal"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_event_event_type_check",
+          "type": "c",
+          "definition": "CHECK (((event_type)::text = ANY ((ARRAY['created'::character varying, 'assigned'::character varying, 'status_change'::character varying])::text[])))",
+          "columns": [
+            "event_type"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_event_shape",
+          "type": "c",
+          "definition": "CHECK ((valid_case_event((event_type)::text, from_state, to_state, reason, metadata) IS TRUE))",
+          "columns": [
+            "event_type",
+            "from_state",
+            "to_state",
+            "reason",
+            "metadata"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_event_actor_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (actor_user_id) REFERENCES app_user(user_id) ON DELETE RESTRICT",
+          "columns": [
+            "actor_user_id"
+          ],
+          "references_table": "app_user",
+          "references_columns": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "case_event_case_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (case_id) REFERENCES investigation_case(case_id) ON DELETE RESTRICT",
+          "columns": [
+            "case_id"
+          ],
+          "references_table": "investigation_case",
+          "references_columns": [
+            "case_id"
+          ]
+        },
+        {
+          "name": "case_event_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (event_id)",
+          "columns": [
+            "event_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "case_event_operation_id_event_ordinal_key",
+          "type": "u",
+          "definition": "UNIQUE (operation_id, event_ordinal)",
+          "columns": [
+            "operation_id",
+            "event_ordinal"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "customer",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "customer_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "full_name",
+          "type": "character varying(200)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "date_of_birth",
+          "type": "date",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "email",
+          "type": "character varying(320)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "phone",
+          "type": "character varying(32)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "kyc_verified_on",
+          "type": "date",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "customer_status_check",
+          "type": "c",
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'dormant'::character varying, 'closed'::character varying])::text[])))",
+          "columns": [
+            "status"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "customer_user_fk",
+          "type": "f",
+          "definition": "FOREIGN KEY (user_id) REFERENCES app_user(user_id) ON DELETE RESTRICT",
+          "columns": [
+            "user_id"
+          ],
+          "references_table": "app_user",
+          "references_columns": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "customer_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (customer_id)",
+          "columns": [
+            "customer_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "customer_user_id_key",
+          "type": "u",
+          "definition": "UNIQUE (user_id)",
+          "columns": [
+            "user_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "device_fingerprint",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "device_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "device_hash",
+          "type": "character(64)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "os_family",
+          "type": "character varying(40)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "first_seen_country",
+          "type": "character(2)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "first_seen_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "device_fingerprint_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (device_id)",
+          "columns": [
+            "device_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "device_fingerprint_device_hash_key",
+          "type": "u",
+          "definition": "UNIQUE (device_hash)",
+          "columns": [
+            "device_hash"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "fraud_scenario",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "scenario_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "scenario_code",
+          "type": "character varying(64)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "scenario_name",
+          "type": "character varying(200)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "fraud_scenario_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (scenario_id)",
+          "columns": [
+            "scenario_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "fraud_scenario_scenario_code_key",
+          "type": "u",
+          "definition": "UNIQUE (scenario_code)",
+          "columns": [
+            "scenario_code"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "investigation_case",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "case_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "case_ref",
+          "type": "character varying(64)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "transaction_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "assigned_to_user_id",
+          "type": "uuid",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "'open'::character varying"
+        },
+        {
+          "name": "priority",
+          "type": "character varying(8)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "resolution_code",
+          "type": "character varying(32)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "resolution_notes",
+          "type": "text",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "opened_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        },
+        {
+          "name": "due_at",
+          "type": "timestamp with time zone",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "closed_at",
+          "type": "timestamp with time zone",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        },
+        {
+          "name": "version",
+          "type": "bigint",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "1"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "case_outcome",
+          "type": "c",
+          "definition": "CHECK ((((((status)::text = ANY ((ARRAY['open'::character varying, 'in_review'::character varying, 'escalated'::character varying])::text[])) AND (resolution_code IS NULL) AND (resolution_notes IS NULL) AND (closed_at IS NULL)) OR (((status)::text = ANY ((ARRAY['closed'::character varying, 'dismissed'::character varying])::text[])) AND (resolution_code IS NOT NULL) AND ((((status)::text = 'closed'::text) AND ((resolution_code)::text = 'confirmed_suspicious'::text)) OR (((status)::text = 'dismissed'::text) AND ((resolution_code)::text = ANY ((ARRAY['false_positive'::character varying, 'insufficient_evidence'::character varying])::text[])))) AND (resolution_notes IS NOT NULL) AND (resolution_notes = btrim(resolution_notes)) AND ((length(resolution_notes) >= 1) AND (length(resolution_notes) <= 5000)) AND (closed_at IS NOT NULL))) IS TRUE))",
+          "columns": [
+            "status",
+            "resolution_code",
+            "resolution_notes",
+            "closed_at"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "investigation_case_case_ref_check",
+          "type": "c",
+          "definition": "CHECK ((((case_ref)::text = btrim((case_ref)::text)) AND ((case_ref)::text <> ''::text)))",
+          "columns": [
+            "case_ref"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "investigation_case_priority_check",
+          "type": "c",
+          "definition": "CHECK (((priority)::text = ANY ((ARRAY['low'::character varying, 'medium'::character varying, 'high'::character varying])::text[])))",
+          "columns": [
+            "priority"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "investigation_case_status_check",
+          "type": "c",
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['open'::character varying, 'in_review'::character varying, 'escalated'::character varying, 'closed'::character varying, 'dismissed'::character varying])::text[])))",
+          "columns": [
+            "status"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "investigation_case_version_check",
+          "type": "c",
+          "definition": "CHECK ((version > 0))",
+          "columns": [
+            "version"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "investigation_case_assigned_to_user_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (assigned_to_user_id) REFERENCES app_user(user_id) ON DELETE RESTRICT",
+          "columns": [
+            "assigned_to_user_id"
+          ],
+          "references_table": "app_user",
+          "references_columns": [
+            "user_id"
+          ]
+        },
+        {
+          "name": "investigation_case_transaction_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id) ON DELETE RESTRICT",
+          "columns": [
+            "transaction_id"
+          ],
+          "references_table": "transaction",
+          "references_columns": [
+            "transaction_id"
+          ]
+        },
+        {
+          "name": "investigation_case_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (case_id)",
+          "columns": [
+            "case_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "investigation_case_case_ref_key",
+          "type": "u",
+          "definition": "UNIQUE (case_ref)",
+          "columns": [
+            "case_ref"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "merchant",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "merchant_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "merchant_name",
+          "type": "character varying(200)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "category_code",
+          "type": "character varying(4)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "country_code",
+          "type": "character(2)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "city",
+          "type": "character varying(100)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "latitude",
+          "type": "numeric",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "longitude",
+          "type": "numeric",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "risk_tier",
+          "type": "character varying(8)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "is_watchlisted",
+          "type": "boolean",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "false"
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "merchant_coordinates",
+          "type": "c",
+          "definition": "CHECK ((((latitude IS NULL) AND (longitude IS NULL)) OR ((latitude IS NOT NULL) AND (longitude IS NOT NULL) AND ((latitude >= ('-90'::integer)::numeric) AND (latitude <= (90)::numeric)) AND ((longitude >= ('-180'::integer)::numeric) AND (longitude <= (180)::numeric)))))",
+          "columns": [
+            "latitude",
+            "longitude"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "merchant_risk_tier_check",
+          "type": "c",
+          "definition": "CHECK (((risk_tier)::text = ANY ((ARRAY['low'::character varying, 'medium'::character varying, 'high'::character varying])::text[])))",
+          "columns": [
+            "risk_tier"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "merchant_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (merchant_id)",
+          "columns": [
+            "merchant_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "payment_method",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "method_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "account_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "method_type",
+          "type": "character varying(20)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "token",
+          "type": "character varying(200)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "last4",
+          "type": "character(4)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "expiry_date",
+          "type": "date",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "payment_method_method_type_check",
+          "type": "c",
+          "definition": "CHECK (((method_type)::text = ANY ((ARRAY['card'::character varying, 'bank_transfer'::character varying, 'wallet'::character varying, 'upi'::character varying])::text[])))",
+          "columns": [
+            "method_type"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "payment_method_status_check",
+          "type": "c",
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['active'::character varying, 'expired'::character varying, 'blocked'::character varying])::text[])))",
+          "columns": [
+            "status"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "payment_method_account_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (account_id) REFERENCES account(account_id) ON DELETE RESTRICT",
+          "columns": [
+            "account_id"
+          ],
+          "references_table": "account",
+          "references_columns": [
+            "account_id"
+          ]
+        },
+        {
+          "name": "payment_method_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (method_id)",
+          "columns": [
+            "method_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "payment_method_method_id_account_id_key",
+          "type": "u",
+          "definition": "UNIQUE (method_id, account_id)",
+          "columns": [
+            "method_id",
+            "account_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "risk_rule",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "rule_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "rule_code",
+          "type": "character varying(64)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "rule_name",
+          "type": "character varying(200)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "dimension",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "weight",
+          "type": "numeric",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "threshold_value",
+          "type": "numeric",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "is_active",
+          "type": "boolean",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "true"
+        },
+        {
+          "name": "version",
+          "type": "integer",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "1"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "risk_rule_dimension_check",
+          "type": "c",
+          "definition": "CHECK (((dimension)::text = ANY ((ARRAY['amount'::character varying, 'location'::character varying, 'device'::character varying, 'time'::character varying, 'frequency'::character varying, 'merchant'::character varying])::text[])))",
+          "columns": [
+            "dimension"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_rule_threshold_value_check",
+          "type": "c",
+          "definition": "CHECK (((threshold_value >= (0)::numeric) AND (threshold_value < 'Infinity'::numeric)))",
+          "columns": [
+            "threshold_value"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_rule_version_check",
+          "type": "c",
+          "definition": "CHECK ((version > 0))",
+          "columns": [
+            "version"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_rule_weight_check",
+          "type": "c",
+          "definition": "CHECK (((weight >= (0)::numeric) AND (weight <= (100)::numeric) AND (weight = trunc(weight))))",
+          "columns": [
+            "weight"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_rule_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (rule_id)",
+          "columns": [
+            "rule_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_rule_rule_code_key",
+          "type": "u",
+          "definition": "UNIQUE (rule_code)",
+          "columns": [
+            "rule_code"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "risk_signal",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "signal_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "transaction_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "rule_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "observed_value",
+          "type": "numeric",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "score_contribution",
+          "type": "numeric",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "evidence",
+          "type": "text",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "triggered_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "risk_signal_evidence_check",
+          "type": "c",
+          "definition": "CHECK ((length(btrim(evidence)) > 0))",
+          "columns": [
+            "evidence"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_signal_observed_value_check",
+          "type": "c",
+          "definition": "CHECK (((observed_value >= (0)::numeric) AND (observed_value < 'Infinity'::numeric)))",
+          "columns": [
+            "observed_value"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_signal_score_contribution_check",
+          "type": "c",
+          "definition": "CHECK (((score_contribution >= (0)::numeric) AND (score_contribution <= (100)::numeric) AND (score_contribution = trunc(score_contribution))))",
+          "columns": [
+            "score_contribution"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_signal_rule_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (rule_id) REFERENCES risk_rule(rule_id) ON DELETE RESTRICT",
+          "columns": [
+            "rule_id"
+          ],
+          "references_table": "risk_rule",
+          "references_columns": [
+            "rule_id"
+          ]
+        },
+        {
+          "name": "risk_signal_transaction_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id) ON DELETE RESTRICT",
+          "columns": [
+            "transaction_id"
+          ],
+          "references_table": "transaction",
+          "references_columns": [
+            "transaction_id"
+          ]
+        },
+        {
+          "name": "risk_signal_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (signal_id)",
+          "columns": [
+            "signal_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "risk_signal_transaction_id_rule_id_key",
+          "type": "u",
+          "definition": "UNIQUE (transaction_id, rule_id)",
+          "columns": [
+            "transaction_id",
+            "rule_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "schema_migrations",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "version",
+          "type": "text",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "filename",
+          "type": "text",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "checksum",
+          "type": "text",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "applied_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": "clock_timestamp()"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "schema_migrations_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (version)",
+          "columns": [
+            "version"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "transaction",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "transaction_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "account_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "method_id",
+          "type": "uuid",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "merchant_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "device_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "amount",
+          "type": "numeric(20,2)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "currency_code",
+          "type": "character(3)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "exchange_rate",
+          "type": "numeric(20,8)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "amount_base",
+          "type": "numeric(20,2)",
+          "not_null": false,
+          "generated": true,
+          "identity": false,
+          "default": "round((amount * exchange_rate), 2)"
+        },
+        {
+          "name": "direction",
+          "type": "character varying(8)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "txn_type",
+          "type": "character varying(20)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "status",
+          "type": "character varying(16)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "occurred_at",
+          "type": "timestamp with time zone",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "merchant_country_code",
+          "type": "character(2)",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "merchant_city",
+          "type": "character varying(100)",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "latitude",
+          "type": "numeric",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "longitude",
+          "type": "numeric",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "search_vector",
+          "type": "tsvector",
+          "not_null": false,
+          "generated": true,
+          "identity": false,
+          "default": "to_tsvector('english'::regconfig, description)"
+        }
+      ],
+      "constraints": [
+        {
+          "name": "transaction_amount_check",
+          "type": "c",
+          "definition": "CHECK (((amount > (0)::numeric) AND (amount < 'Infinity'::numeric)))",
+          "columns": [
+            "amount"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_check",
+          "type": "c",
+          "definition": "CHECK (((currency_code <> 'INR'::bpchar) OR (exchange_rate = (1)::numeric)))",
+          "columns": [
+            "currency_code",
+            "exchange_rate"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_coordinates",
+          "type": "c",
+          "definition": "CHECK ((((latitude IS NULL) AND (longitude IS NULL)) OR ((latitude IS NOT NULL) AND (longitude IS NOT NULL) AND ((latitude >= ('-90'::integer)::numeric) AND (latitude <= (90)::numeric)) AND ((longitude >= ('-180'::integer)::numeric) AND (longitude <= (180)::numeric)))))",
+          "columns": [
+            "latitude",
+            "longitude"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_currency_code_check",
+          "type": "c",
+          "definition": "CHECK ((currency_code = ANY (ARRAY['INR'::bpchar, 'USD'::bpchar])))",
+          "columns": [
+            "currency_code"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_direction_check",
+          "type": "c",
+          "definition": "CHECK (((direction)::text = ANY ((ARRAY['debit'::character varying, 'credit'::character varying])::text[])))",
+          "columns": [
+            "direction"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_exchange_rate_check",
+          "type": "c",
+          "definition": "CHECK (((exchange_rate > (0)::numeric) AND (exchange_rate < 'Infinity'::numeric)))",
+          "columns": [
+            "exchange_rate"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_status_check",
+          "type": "c",
+          "definition": "CHECK (((status)::text = ANY ((ARRAY['posted'::character varying, 'pending'::character varying, 'reversed'::character varying, 'blocked'::character varying])::text[])))",
+          "columns": [
+            "status"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_txn_type_check",
+          "type": "c",
+          "definition": "CHECK (((txn_type)::text = 'card_payment'::text))",
+          "columns": [
+            "txn_type"
+          ],
+          "references_table": null,
+          "references_columns": null
+        },
+        {
+          "name": "transaction_account_id_currency_code_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (account_id, currency_code) REFERENCES account(account_id, currency_code) ON DELETE RESTRICT",
+          "columns": [
+            "account_id",
+            "currency_code"
+          ],
+          "references_table": "account",
+          "references_columns": [
+            "account_id",
+            "currency_code"
+          ]
+        },
+        {
+          "name": "transaction_device_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (device_id) REFERENCES device_fingerprint(device_id) ON DELETE RESTRICT",
+          "columns": [
+            "device_id"
+          ],
+          "references_table": "device_fingerprint",
+          "references_columns": [
+            "device_id"
+          ]
+        },
+        {
+          "name": "transaction_merchant_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (merchant_id) REFERENCES merchant(merchant_id) ON DELETE RESTRICT",
+          "columns": [
+            "merchant_id"
+          ],
+          "references_table": "merchant",
+          "references_columns": [
+            "merchant_id"
+          ]
+        },
+        {
+          "name": "transaction_method_id_account_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (method_id, account_id) REFERENCES payment_method(method_id, account_id) ON DELETE RESTRICT",
+          "columns": [
+            "method_id",
+            "account_id"
+          ],
+          "references_table": "payment_method",
+          "references_columns": [
+            "method_id",
+            "account_id"
+          ]
+        },
+        {
+          "name": "transaction_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (transaction_id)",
+          "columns": [
+            "transaction_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "transaction_label",
+      "kind": "r",
+      "columns": [
+        {
+          "name": "transaction_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "scenario_id",
+          "type": "uuid",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "is_suspicious",
+          "type": "boolean",
+          "not_null": true,
+          "generated": false,
+          "identity": false,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "transaction_label_scenario_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (scenario_id) REFERENCES fraud_scenario(scenario_id) ON DELETE RESTRICT",
+          "columns": [
+            "scenario_id"
+          ],
+          "references_table": "fraud_scenario",
+          "references_columns": [
+            "scenario_id"
+          ]
+        },
+        {
+          "name": "transaction_label_transaction_id_fkey",
+          "type": "f",
+          "definition": "FOREIGN KEY (transaction_id) REFERENCES transaction(transaction_id) ON DELETE RESTRICT",
+          "columns": [
+            "transaction_id"
+          ],
+          "references_table": "transaction",
+          "references_columns": [
+            "transaction_id"
+          ]
+        },
+        {
+          "name": "transaction_label_pkey",
+          "type": "p",
+          "definition": "PRIMARY KEY (transaction_id)",
+          "columns": [
+            "transaction_id"
+          ],
+          "references_table": null,
+          "references_columns": null
+        }
+      ]
+    },
+    {
+      "name": "v_transaction_risk",
+      "kind": "v",
+      "columns": [
+        {
+          "name": "transaction_id",
+          "type": "uuid",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "risk_score",
+          "type": "numeric",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "signal_count",
+          "type": "integer",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        },
+        {
+          "name": "risk_band",
+          "type": "text",
+          "not_null": false,
+          "generated": false,
+          "identity": false,
+          "default": null
+        }
+      ],
+      "constraints": []
+    }
+  ],
+  "mongo": {
+    "collection": "device_telemetry",
+    "validator": {
+      "$jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "device_id",
+          "captured_at",
+          "schema_version",
+          "shape_type",
+          "retention_eligible",
+          "payload"
+        ],
+        "additionalProperties": false,
+        "oneOf": [
+          {
+            "properties": {
+              "shape_type": {
+                "enum": [
+                  "connection_telemetry"
+                ]
+              },
+              "payload": {
+                "bsonType": "object",
+                "additionalProperties": false,
+                "required": [
+                  "ip_routing_hash",
+                  "connection_type",
+                  "latency_ms",
+                  "tls_cipher",
+                  "vpn_detected"
+                ],
+                "properties": {
+                  "ip_routing_hash": {
+                    "bsonType": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  "connection_type": {
+                    "enum": [
+                      "cellular",
+                      "broadband",
+                      "vpn",
+                      "dialup"
+                    ]
+                  },
+                  "latency_ms": {
+                    "bsonType": "int",
+                    "minimum": 0,
+                    "maximum": 10000
+                  },
+                  "tls_cipher": {
+                    "bsonType": "string",
+                    "minLength": 1,
+                    "maxLength": 100
+                  },
+                  "vpn_detected": {
+                    "bsonType": "bool"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "properties": {
+              "shape_type": {
+                "enum": [
+                  "client_environment"
+                ]
+              },
+              "payload": {
+                "bsonType": "object",
+                "additionalProperties": false,
+                "required": [
+                  "screen_resolution",
+                  "battery_level",
+                  "battery_charging",
+                  "os_patch_level",
+                  "hardware_concurrency",
+                  "user_agent_category"
+                ],
+                "properties": {
+                  "screen_resolution": {
+                    "bsonType": "string",
+                    "pattern": "^\\d{3,5}x\\d{3,5}$"
+                  },
+                  "battery_level": {
+                    "bsonType": "int",
+                    "minimum": 0,
+                    "maximum": 100
+                  },
+                  "battery_charging": {
+                    "bsonType": "bool"
+                  },
+                  "os_patch_level": {
+                    "bsonType": "string",
+                    "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+                  },
+                  "hardware_concurrency": {
+                    "bsonType": "int",
+                    "minimum": 1,
+                    "maximum": 256
+                  },
+                  "user_agent_category": {
+                    "enum": [
+                      "mobile_browser",
+                      "desktop_browser",
+                      "native_app"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "description": "Primary identifier, must be a UUID string"
+          },
+          "device_id": {
+            "bsonType": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "description": "PostgreSQL device_fingerprint reference UUID"
+          },
+          "transaction_id": {
+            "bsonType": [
+              "string",
+              "null"
+            ],
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            "description": "Optional PostgreSQL transaction reference UUID"
+          },
+          "captured_at": {
+            "bsonType": "date",
+            "description": "Observation timestamp"
+          },
+          "schema_version": {
+            "bsonType": "int",
+            "minimum": 1,
+            "maximum": 1,
+            "description": "Schema version integer, currently 1"
+          },
+          "shape_type": {
+            "enum": [
+              "connection_telemetry",
+              "client_environment"
+            ],
+            "description": "Discriminator for heterogeneous payload shapes"
+          },
+          "retention_eligible": {
+            "bsonType": "bool",
+            "description": "Flag indicating eligibility for retention cleanup"
+          },
+          "payload": {
+            "bsonType": "object",
+            "description": "Shape-specific telemetry payload"
+          }
+        }
+      }
+    },
+    "indexes": [
+      {
+        "key": {
+          "device_id": 1,
+          "captured_at": -1
+        },
+        "name": "idx_device_captured_at"
+      },
+      {
+        "key": {
+          "transaction_id": 1
+        },
+        "name": "idx_transaction_id",
+        "sparse": true
+      },
+      {
+        "key": {
+          "retention_eligible": 1,
+          "captured_at": 1
+        },
+        "name": "idx_retention_eligibility"
+      }
+    ]
+  }
+}

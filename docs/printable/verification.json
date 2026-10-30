@@ -1,0 +1,33 @@
+{
+  "title": "FinSight",
+  "members": [
+    "Shrikar Desai",
+    "Shreyas P Kulkarni"
+  ],
+  "sourceCommit": "843f0af9597439cafefe35c62dea8b9be29540bb",
+  "applicationTables": 17,
+  "toolingTables": 1,
+  "views": 1,
+  "sqlAttributes": 161,
+  "declaredSqlForeignKeys": 20,
+  "mongoCollection": "device_telemetry",
+  "migrationChecksumsMatch": true,
+  "catalogAttributeCoverage": "passed",
+  "deferredEntitiesExcluded": true,
+  "files": [
+    {
+      "file": "output/pdf/FinSight-ER-Diagram.pdf",
+      "sha256": "f279a83f59ca6cb5832a1de1f27fa8f9c353ff7b8c33dbf322c79359cbbdd9d5",
+      "pages": 1,
+      "widthPoints": 3370.393798828125,
+      "heightPoints": 2383.93701171875
+    },
+    {
+      "file": "output/pdf/FinSight-Schema-Diagram.pdf",
+      "sha256": "c78358407cf1e15aaf1631058680a1c424c48f84c4f89b930748c8ff0c85c2e8",
+      "pages": 1,
+      "widthPoints": 2383.93701171875,
+      "heightPoints": 1683.780029296875
+    }
+  ]
+}
