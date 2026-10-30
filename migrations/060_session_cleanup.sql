@@ -53,7 +53,7 @@ RETURNS TABLE (
     expires_at timestamptz,
     preview_at timestamptz
 )
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public AS $$
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog AS $$
 #variable_conflict use_column
 DECLARE
     v_admin record;
@@ -64,7 +64,7 @@ DECLARE
     v_candidates uuid[];
     v_count integer;
 BEGIN
-    SELECT role, is_active INTO v_admin FROM public.app_user WHERE user_id = p_admin_user_id;
+    SELECT role, is_active INTO v_admin FROM public.app_user WHERE user_id = p_admin_user_id FOR SHARE;
     IF v_admin.role IS NULL OR v_admin.role <> 'admin' OR v_admin.is_active IS NOT TRUE THEN
         RAISE EXCEPTION 'Caller is not an active administrator' USING ERRCODE = '42501';
     END IF;
@@ -113,7 +113,7 @@ RETURNS TABLE (
     completed_at timestamptz,
     replayed boolean
 )
-LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, public AS $$
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog AS $$
 #variable_conflict use_column
 DECLARE
     v_admin record;
@@ -121,7 +121,7 @@ DECLARE
     v_now timestamptz;
     v_deleted_count integer;
 BEGIN
-    SELECT role, is_active INTO v_admin FROM public.app_user WHERE user_id = p_admin_user_id;
+    SELECT role, is_active INTO v_admin FROM public.app_user WHERE user_id = p_admin_user_id FOR SHARE;
     IF v_admin.role IS NULL OR v_admin.role <> 'admin' OR v_admin.is_active IS NOT TRUE THEN
         RAISE EXCEPTION 'Caller is not an active administrator' USING ERRCODE = '42501';
     END IF;
@@ -177,6 +177,12 @@ BEGIN
     WHERE s.session_id = ANY(v_op.candidate_session_ids)
     ORDER BY s.session_id ASC
     FOR UPDATE;
+
+    -- A candidate lock may have waited past the preview validity window.
+    v_now := clock_timestamp();
+    IF v_now >= v_op.expires_at THEN
+        RAISE EXCEPTION 'Cleanup preview has expired' USING ERRCODE = '22000';
+    END IF;
 
     WITH eligible_candidates AS (
         SELECT s.session_id

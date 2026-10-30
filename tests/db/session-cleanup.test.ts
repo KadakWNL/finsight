@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import pg from 'pg';
 import { randomUUID } from 'node:crypto';
+import { setTimeout as delay } from 'node:timers/promises';
 import { requireTestDatabase } from '../../scripts/database-safety.mjs';
 import { applyMigrations } from '../../scripts/migration-runner.mjs';
 
@@ -14,6 +15,7 @@ import {
 describe('FinSight Issue #23: Audited Admin Session Cleanup Integration Tests', () => {
   let client: pg.Client;
   let concurrentClient: pg.Client;
+  let observerClient: pg.Client;
 
   const adminAlice = '60000000-0000-0000-0000-000000000001';
   const adminBob = '60000000-0000-0000-0000-000000000002';
@@ -27,6 +29,8 @@ describe('FinSight Issue #23: Audited Admin Session Cleanup Integration Tests', 
     concurrentClient = new pg.Client({ connectionString: requireTestDatabase() });
     await client.connect();
     await concurrentClient.connect();
+    observerClient = new pg.Client({ connectionString: requireTestDatabase() });
+    await observerClient.connect();
 
     // Verify non-superuser and PostgreSQL 17
     const v = await client.query('SHOW server_version_num');
@@ -65,6 +69,69 @@ describe('FinSight Issue #23: Audited Admin Session Cleanup Integration Tests', 
     } finally {
       await client.end();
       await concurrentClient.end();
+      await observerClient.end();
+    }
+  });
+
+  async function waitForLock(pid: number) {
+    for (let attempt = 0; attempt < 100; attempt++) {
+      const row = (await observerClient.query('SELECT wait_event_type FROM pg_stat_activity WHERE pid=$1', [pid])).rows[0];
+      if (row?.wait_event_type === 'Lock') return;
+      await delay(10);
+    }
+    throw new Error('Cleanup did not wait for the contended lock');
+  }
+
+  it.each(['preview', 'confirm'])('rejects %s when an administrator is demoted during the authority check', async action => {
+    const preview = await previewSessionCleanup(client, adminAlice);
+    const pid = (await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+    let pending: Promise<unknown> | undefined;
+    try {
+      await concurrentClient.query('BEGIN');
+      await concurrentClient.query("UPDATE public.app_user SET role='analyst' WHERE user_id=$1", [adminAlice]);
+      pending = (action === 'preview'
+        ? previewSessionCleanup(client, adminAlice)
+        : confirmSessionCleanup(client, { operationId: preview.operationId, adminUserId: adminAlice, idempotencyKey: randomUUID() })
+      ).then(value => ({ value }), error => ({ error }));
+      await waitForLock(pid);
+      await concurrentClient.query('COMMIT');
+      expect(await pending).toMatchObject({ error: { code: '42501' } });
+      const audit = (await client.query('SELECT status FROM public.app_session_cleanup WHERE operation_id=$1', [preview.operationId])).rows[0];
+      expect(audit.status).toBe('previewed');
+    } finally {
+      await concurrentClient.query('ROLLBACK');
+      await pending;
+      await client.query("UPDATE public.app_user SET role='admin' WHERE user_id=$1", [adminAlice]);
+    }
+  });
+
+  it('rejects a preview that expires while confirmation waits for a candidate session lock', async () => {
+    await client.query('DELETE FROM public.app_session');
+    const sessionId = randomUUID();
+    await client.query(`
+      INSERT INTO public.app_session (session_id, user_id, created_at, last_seen_at, idle_expires_at, absolute_expires_at)
+      VALUES ($1, $2, clock_timestamp()-interval '8 days', clock_timestamp()-interval '8 days',
+              clock_timestamp()-interval '8 days'+interval '20 minutes', clock_timestamp()-interval '8 days'+interval '4 hours')
+    `, [sessionId, adminAlice]);
+    const preview = await previewSessionCleanup(client, adminAlice);
+    await client.query("UPDATE public.app_session_cleanup SET expires_at=clock_timestamp()+interval '500 milliseconds' WHERE operation_id=$1", [preview.operationId]);
+    const pid = (await client.query('SELECT pg_backend_pid() AS pid')).rows[0].pid;
+    let pending: Promise<unknown> | undefined;
+    try {
+      await concurrentClient.query('BEGIN');
+      await concurrentClient.query('SELECT 1 FROM public.app_session WHERE session_id=$1 FOR UPDATE', [sessionId]);
+      pending = confirmSessionCleanup(client, {
+        operationId: preview.operationId, adminUserId: adminAlice, idempotencyKey: randomUUID(),
+      }).then(value => ({ value }), error => ({ error }));
+      await waitForLock(pid);
+      await observerClient.query('SELECT pg_sleep(GREATEST(0, EXTRACT(EPOCH FROM (expires_at-clock_timestamp())))+0.05) FROM public.app_session_cleanup WHERE operation_id=$1', [preview.operationId]);
+      await concurrentClient.query('COMMIT');
+      expect(await pending).toMatchObject({ error: { code: '22000' } });
+      expect((await client.query('SELECT 1 FROM public.app_session WHERE session_id=$1', [sessionId])).rowCount).toBe(1);
+      expect((await client.query('SELECT status FROM public.app_session_cleanup WHERE operation_id=$1', [preview.operationId])).rows[0].status).toBe('previewed');
+    } finally {
+      await concurrentClient.query('ROLLBACK');
+      await pending;
     }
   });
 
@@ -149,6 +216,29 @@ describe('FinSight Issue #23: Audited Admin Session Cleanup Integration Tests', 
     expect(remaining).toContain(sActive);
     expect(remaining).toContain(sRecentExpired);
     expect(remaining).toContain(sExactCutoff);
+  });
+
+  it('preserves a previewed candidate whose rechecked expiry equals the captured cutoff exactly', async () => {
+    await client.query('DELETE FROM public.app_session');
+    const sessionId = randomUUID();
+    await client.query(`
+      INSERT INTO public.app_session (session_id, user_id, created_at, last_seen_at, idle_expires_at, absolute_expires_at)
+      VALUES ($1, $2, clock_timestamp()-interval '8 days', clock_timestamp()-interval '8 days',
+              clock_timestamp()-interval '8 days'+interval '20 minutes', clock_timestamp()-interval '8 days'+interval '4 hours')
+    `, [sessionId, adminAlice]);
+    const preview = await previewSessionCleanup(client, adminAlice);
+    expect(preview.candidateCount).toBe(1);
+    await client.query(`
+      UPDATE public.app_session s SET created_at=c.cutoff_at-interval '4 hours',
+        last_seen_at=c.cutoff_at-interval '20 minutes', idle_expires_at=c.cutoff_at,
+        absolute_expires_at=c.cutoff_at+interval '4 hours'
+      FROM public.app_session_cleanup c WHERE s.session_id=$1 AND c.operation_id=$2
+    `, [sessionId, preview.operationId]);
+    const result = await confirmSessionCleanup(client, {
+      operationId: preview.operationId, adminUserId: adminAlice, idempotencyKey: randomUUID(),
+    });
+    expect(result.deletedCount).toBe(0);
+    expect((await client.query('SELECT 1 FROM public.app_session WHERE session_id=$1', [sessionId])).rowCount).toBe(1);
   });
 
   it('9: preview is capped at 100 and deterministic when > 100 candidates exist', async () => {
