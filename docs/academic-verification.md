@@ -1,6 +1,6 @@
 # Academic verification
 
-`npm run test:academic` runs the complete MVP acceptance gate and records additional SQL, MongoDB and contribution evidence. A passing command establishes technical evidence for review. It does not establish instructor acceptance, an independent teammate demonstration or completion of the course submission.
+`npm run test:academic` runs the complete MVP acceptance gate and records additional SQL, MongoDB and contribution evidence. A passing command establishes technical evidence for review. Independent teammate demonstration/review and completion of the course submission remain separate.
 
 The [2026-10-30 execution record](academic/2026-10-30-verification.md) retains a passing CI run, exact SQL results and indexed plans.
 
@@ -77,6 +77,6 @@ Shrikar's independent review should run the command from a fresh checkout/databa
 
 ## Missing items and defect triage
 
-Instructor acceptance of the expired-session DELETE workload is not confirmed. The project owner considers the workload sufficient and approved its scope, but that is recorded separately from instructor approval. Shrikar's independent case-function demonstration and review of the financial evidence are also pending. The generated report always keeps these human gates separate from its technical result.
+The SQL DELETE requirement is satisfied by the retained application cleanup evidence. The [project-owner decision](academic/delete-scope-decision.md) removes a separate instructor-approval gate for that workload. Shrikar's independent case-function demonstration and review of the financial evidence remain pending. The generated report keeps these teammate gates separate from its technical result.
 
 Any failed/missing required technical check blocks the command. A report is evidence only for its pinned source and environment. Retain failures as defects with commands and responsible workstreams; do not weaken ownership denials, constraints or required tests to obtain a pass. Final documentation, timed demonstration, title/team confirmation and submission evidence remain under [#19](https://github.com/KadakWNL/finsight/issues/19) and course review. [#18](https://github.com/KadakWNL/finsight/issues/18) remains open until its required human gates are recorded.

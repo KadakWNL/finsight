@@ -20,9 +20,9 @@ const runId = `${Date.now()}_${randomBytes(6).toString('hex')}`;
 const output = path.resolve('test-results/academic', runId);
 await mkdir(output, { recursive: true });
 const report = { startedAt: new Date().toISOString(), technicalStatus: 'blocking', academicComplete: false,
-  humanGates: { instructorDeleteAcceptance: 'pending', independentShrikarDemonstration: 'pending', teammateReview: 'pending' },
+  humanGates: { independentShrikarDemonstration: 'pending', teammateReview: 'pending' },
   checks: [], defects: [], limitations: [
-    'The project owner approved the SQL DELETE scope; instructor acceptance has not been confirmed.',
+    'The project owner approved the SQL DELETE scope; retained execution evidence establishes the DELETE requirement.',
     'Merged implementation and automated tests do not prove an independent teammate demonstration or academic originality.',
     'The timed final report/demo and independent clean-machine setup remain separate under #19.',
     'Vector retrieval, Mongo notes/recovery, rule edits and redaction are deferred and are not counted as delivered.',

@@ -226,7 +226,7 @@ Embedding selection, Mongo notes/recovery, and general administrative mutations 
 
 ## Academic coverage
 
-References below point to the inspected local [DBMS brief](<DBMS Level 3 Project Requirements.pdf>), which is not redistributed. The executable [academic verification matrix](academic-verification.md#commands-and-result-matrix) and its pinned run artifacts establish current implementation evidence. This table retains the original brief mapping; design plans elsewhere in this document do not establish delivered behavior. Instructor acceptance and independent teammate demonstration remain separate gates.
+References below point to the inspected local [DBMS brief](<DBMS Level 3 Project Requirements.pdf>), which is not redistributed. The executable [academic verification matrix](academic-verification.md#commands-and-result-matrix) and its pinned run artifacts establish current implementation evidence. This table retains the original brief mapping; design plans elsewhere in this document do not establish delivered behavior. Independent teammate demonstration and review remain separate gates. The [DELETE scope decision](academic/delete-scope-decision.md) records that separate instructor approval is not required for the demonstrated workload.
 
 | Brief item / page | Runtime/source evidence | Remaining gate |
 |---|---|---|
@@ -235,7 +235,7 @@ References below point to the inspected local [DBMS brief](<DBMS Level 3 Project
 | 3, SQL + second paradigm; p1 | PostgreSQL migrations and Mongo telemetry validation/aggregation; `npm run test:academic` | Technical run and cross-review; vectors not required for the selected SQL + NoSQL scope |
 | 4, relational/nonrelational models; p1-2 | Executable migrations, ER/dictionaries, two validated Mongo shapes and indexes | Final documentation/demo under #19 |
 | 5, DDL; p2 | `ddl-create`, `ddl-alter`, `ddl-drop` on a disposable temporary table; ordered application migrations | Retain actual execution results |
-| 6, DML/queries; p2 | Guarded case INSERT/UPDATE, session cleanup DELETE, SELECT/JOIN/GROUP BY/HAVING/ORDER BY/aggregates/subquery in the [command matrix](academic-verification.md#commands-and-result-matrix) | Instructor acceptance of the approved DELETE workload is not confirmed |
+| 6, DML/queries; p2 | Guarded case INSERT/UPDATE, session cleanup DELETE, SELECT/JOIN/GROUP BY/HAVING/ORDER BY/aggregates/subquery in the [command matrix](academic-verification.md#commands-and-result-matrix) | DELETE execution and retained-row checks passed; teammate review remains |
 | 7, advanced features; p2-3 | Transactions/rollback, aggregate view, protected functions, immutable triggers, indexed plans/FTS, Mongo aggregation | Reproducible run and independent review |
 | 8, optional vector; p3 | Deferred; no embedding, similarity or retrieval result claimed | Optional scope, excluded from completion evidence |
 | 9, Next.js; p3 | Integrated discovery/case/admin screens and production browser tests | Final timed demonstration |

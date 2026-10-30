@@ -1,5 +1,7 @@
 # Academic verification execution, 2026-10-30
 
+> Gate-state correction: the [project-owner decision](delete-scope-decision.md) removes the instructor DELETE approval gate recorded below. This execution record and its raw artifacts retain the state captured during the run; Shrikar's demonstration/review remains required.
+
 All automated academic checks passed in [CI run 41030351130](https://github.com/KadakWNL/finsight/actions/runs/41030351130). Instructor acceptance of the SQL DELETE workload and Shrikar's independent case-function demonstration/financial-evidence review remain pending. This record does not close #18 or claim final course completion.
 
 The command was `npm run test:academic`. It ran from 09:02:00.512 to 09:02:55.404 UTC on October 30, 2026, using Node.js 24.22.1, PostgreSQL 17 and MongoDB 7.0.45 on Linux. The owner was a non-superuser; the application used the separate nonowner `finsight_runtime` login with no owner membership. Fresh PostgreSQL and run-specific Mongo fixtures were used.
