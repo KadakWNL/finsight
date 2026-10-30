@@ -17,16 +17,16 @@
   "paper": "A4 landscape",
   "files": [
     {
-      "file": "output/pdf/FinSight-ER-Diagram-A4.pdf",
-      "sha256": "dfd6878322546dfd5e8ceca894dd96b66d9c1c198518b1793fa50fc6b2e8329d",
+      "file": "output/pdf/FinSight-ER-A4-Revised.pdf",
+      "sha256": "a83c922deb1c821580f5bbd82ebb572172c40aab21a24c5db853bb8876eca66f",
       "pages": 1,
       "paper": "A4 landscape",
       "widthPoints": 841.8897705078125,
       "heightPoints": 595.2755737304688
     },
     {
-      "file": "output/pdf/FinSight-Schema-Diagram-A4.pdf",
-      "sha256": "ef3e3c6f1823a60eacf27770403a867a355b4a33a4721518c43628e3fffc7054",
+      "file": "output/pdf/FinSight-Schema-A4-Revised.pdf",
+      "sha256": "4ce84b2da7ba2151b0b215509673d545c49ce561804e502caec151080f831244",
       "pages": 1,
       "paper": "A4 landscape",
       "widthPoints": 841.8897705078125,

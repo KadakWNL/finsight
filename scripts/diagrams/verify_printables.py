@@ -19,7 +19,7 @@ for table in catalog['tables']:
         assert len(actual)==len(table['columns']),(diagram,table['name'])
 
 files=[]
-for filename in ['FinSight-ER-Diagram-A4.pdf','FinSight-Schema-Diagram-A4.pdf']:
+for filename in ['FinSight-ER-A4-Revised.pdf','FinSight-Schema-A4-Revised.pdf']:
     path=root/'output/pdf'/filename
     document=pymupdf.open(path)
     assert len(document)==1

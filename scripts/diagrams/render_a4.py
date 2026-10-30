@@ -1,6 +1,5 @@
 """Two single-sheet A4 masters, using the verified implemented schema inventory."""
 import hashlib
-import heapq
 import json
 import math
 from pathlib import Path
@@ -64,32 +63,9 @@ def mongo_fields():
     return base,shapes
 
 
-class Router:
-    def __init__(self,xs,ys,blocked=None):self.xs=xs;self.ys=ys;self.usage={};self.blocked=blocked or set()
-    def route(self,start,end):
-        q=[(0,start)];distance={start:0};prev={}
-        while q:
-            cost,node=heapq.heappop(q)
-            if node==end:break
-            if cost!=distance[node]:continue
-            i,j=node
-            for nxt in [(i-1,j),(i+1,j),(i,j-1),(i,j+1)]:
-                if not (0<=nxt[0]<len(self.xs) and 0<=nxt[1]<len(self.ys)):continue
-                edge=tuple(sorted([node,nxt]))
-                if edge in self.blocked:continue
-                nc=cost+1+self.usage.get(edge,0)*.35
-                if nc<distance.get(nxt,1e9):distance[nxt]=nc;prev[nxt]=node;heapq.heappush(q,(nc,nxt))
-        path=[end]
-        while path[-1]!=start:path.append(prev[path[-1]])
-        path.reverse()
-        for a,b in zip(path,path[1:]):
-            edge=tuple(sorted([a,b]));self.usage[edge]=self.usage.get(edge,0)+1
-        return path
-    def points(self,path,offset=0):return [(self.xs[i]+offset,self.ys[j]) for i,j in path]
-
 
 def er():
-    c=canvas.Canvas(str(OUT/'FinSight-ER-Diagram-A4.pdf'),pagesize=(W,H),pageCompression=1)
+    c=canvas.Canvas(str(OUT/'FinSight-ER-A4-Revised.pdf'),pagesize=(W,H),pageCompression=1)
     heading(c,'ER Diagram (Chen notation)')
     # Four columns, six rows. Wide relations receive two cells rather than tiny lettering.
     positions={
@@ -97,33 +73,8 @@ def er():
       'app_session':(0,1,1),'address':(1,1,1),'merchant':(2,1,1),'device_fingerprint':(3,1,1),
       'app_session_cleanup':(0,2,1),'transaction':(1,2,2),'fraud_scenario':(3,2,1),
       'investigation_case':(0,3,1),'risk_rule':(1,3,1),'risk_signal':(2,3,1),'transaction_label':(3,3,1),
-      'case_event':(0,4,1),'case_command_receipt':(1,4,1),'device_telemetry':(2,4,2),
-      'schema_migrations':(0,5,1),'v_transaction_risk':(1,5,1)}
-    xs=[12,215,418,621,824];ys=[H-51-i*81.5 for i in range(7)]
-    blocked={tuple(sorted([(k,r),(k,r+1)])) for col,r,span in positions.values() for k in range(col+1,col+span)}
-    router=Router(xs,ys,blocked);slots=set();routes=[]
-    for index,rel in enumerate(REL):
-        pc,pr,ps=positions[rel['parent']];cc,cr,cs=positions[rel['child']]
-        # Relationship diamonds occupy gutter space, never attribute space.
-        choices=[(abs(k-(pc+ps))+abs(k-(cc+cs))+abs(r-pr)+abs(r-cr),k,r)
-                 for k in range(5) for r in range(6) if (k,r) not in slots and tuple(sorted([(k,r),(k,r+1)])) not in blocked]
-        _,k,r=min(choices);slots.add((k,r))
-        start=(pc+ps,pr);end=(cc+cs,cr)
-        before=router.points(router.route(start,(k,r)),offset=8+(index%4)*.7)
-        after=router.points(router.route((k,r+1),end),offset=8+(index%4)*.7)
-        sx=(xs[pc]+xs[pc+ps])/2;tx=(xs[cc]+xs[cc+cs])/2
-        cy=(ys[r]+ys[r+1])/2;dx=xs[k];dy=cy
-        color=HexColor('#8a6530') if not rel['enforced'] else HexColor('#4d5863')
-        points=[(sx,ys[pr]-7),(sx,ys[pr]),*before,(before[-1][0],dy+9),(dx,dy+7)]
-        line(c,points,color,.35,not rel['enforced'])
-        line(c,[(dx,dy-7),(after[0][0],dy-9),*after,(tx,ys[cr]),(tx,ys[cr]-7)],color,.35,not rel['enforced'])
-        routes.append((index,dx,dy,rel))
-    for index,x,y,rel in routes:
-        c.setStrokeColor(HexColor('#7885aa'));c.setFillColor(BLUE);c.setLineWidth(.4)
-        p=c.beginPath();p.moveTo(x,y+7);p.lineTo(x+7,y);p.lineTo(x,y-7);p.lineTo(x-7,y);p.close();c.drawPath(p,fill=1,stroke=1)
-        label(c,x,y-1.7,f'{index+1:02}',5.4,True,True)
-        label(c,x,y+9,rel['parentCardinality'],4.8,center=True)
-        label(c,x,y-13.5,rel['childCardinality'],4.8,center=True)
+      'case_event':(0,4,1),'case_command_receipt':(1,4,1),'device_telemetry':(2,4,2)}
+    xs=[12,215,418,621,824];ys=[H-51-i*78 for i in range(7)]
     base,shapes=mongo_fields()
     for name,(col,row,span) in positions.items():
         x=xs[col]+13;right=xs[col+span]-12;top=ys[row]-5;cw=right-x;center=(x+right)/2
@@ -149,14 +100,38 @@ def er():
             if field in pk:
                 tw=stringWidth(field,'Helvetica',size);line(c,[(ax-tw/2,ay-size*.55),(ax+tw/2,ay-size*.55)],width=.35)
             audit.append({'diagram':'ER','entity':name,'attribute':field,'font':size,'box':[ax-rx,ay-ry,ax+rx,ay+ry]})
-    # Relationship names and explicit endpoint cardinalities in the two remaining cells.
-    lx=xs[2]+15;ly=ys[5]-11
-    label(c,lx,ly,'RELATIONSHIPS  (parent -> child; counts at the two ends)',6.7,True)
+    # Each relationship is drawn separately: no shared route, crossing or implicit bus.
+    ly=ys[5]-2
+    label(c,20,ly,'RELATIONSHIPS - repeated entity names refer to the attribute definitions above',6.7,True)
     for index,rel in enumerate(REL):
-        column=index//11;rr=index%11
-        s=f'{index+1:02} {rel["label"]}: {rel["parent"]}/{rel["child"]} [{rel["parentCardinality"]}:{rel["childCardinality"]}]'
-        label(c,lx+column*194,ly-10-rr*5.7,s,min(5.75,185/stringWidth(s,'Helvetica',1)))
-    footer(c,'Underline = PK; dashed oval = generated. Diamonds are numbered in the relationship key. Brown dashed links = validated Mongo references, not SQL FKs.')
+        col=index//8;rr=index%8;x=20+col*268;y=ly-9-rr*11.8
+        parent_width=78;child_width=78;diamond_width=64;gap=16;rh=9.0
+        left=x;diamond_x=x+parent_width+gap+diamond_width/2;child_x=x+parent_width+gap+diamond_width+gap
+        color=HexColor('#8a6530') if not rel['enforced'] else HexColor('#475462')
+        for xx,name in [(left,rel['parent']),(child_x,rel['child'])]:
+            c.setFillColor(GREEN if name!='device_telemetry' else HexColor('#fff0d8'))
+            c.setStrokeColor(HexColor('#82947b'));c.setLineWidth(.35)
+            c.rect(xx,y-rh/2,78,rh,fill=1,stroke=1)
+            label(c,xx+39,y-1.8,name,min(6,(73/stringWidth(name,'Helvetica',1))),center=True)
+        c.setFillColor(BLUE);c.setStrokeColor(HexColor('#7885aa'))
+        pp=c.beginPath();pp.moveTo(diamond_x,y+5.4);pp.lineTo(diamond_x+32,y);pp.lineTo(diamond_x,y-5.4);pp.lineTo(diamond_x-32,y);pp.close();c.drawPath(pp,stroke=1,fill=1)
+        verb={'SQL-resolved device':'device context','optional context':'context'}.get(rel['label'],rel['label'])
+        label(c,diamond_x,y-1.6,verb,min(5.2,54/stringWidth(verb,'Helvetica',1)),center=True)
+        for ax,bx,count in [(left+78,diamond_x-32,rel['parentCardinality']), (diamond_x+32,child_x,rel['childCardinality'])]:
+            line(c,[(ax,y),(bx,y)],color,.4,not rel['enforced'])
+            tw=stringWidth(count,'Helvetica',4.7)
+            c.setFillColor(white);c.rect((ax+bx-tw)/2-1,y-2.6,tw+2,5.5,fill=1,stroke=0)
+            label(c,(ax+bx)/2,y-1.55,count,4.7,center=True)
+    # Non-domain SQL objects are small explicit attribute strips, not extra business entities.
+    for name,x,width in [('schema_migrations',20,365),('v_transaction_risk',420,400)]:
+        label(c,x,41.5,name+':',6.0,True)
+        xx=x+stringWidth(name+':','Helvetica-Bold',6.0)+5
+        for attr in TABLES[name]['columns']:
+            field=attr['name'];ww=stringWidth(field,'Helvetica',5.9)+8
+            label(c,xx+ww/2,41.5,field,5.9,center=True)
+            audit.append({'diagram':'ER','entity':name,'attribute':field,'font':5.9,'box':[xx,38,xx+ww,46]})
+            xx+=ww
+    footer(c,'Underline = PK; dashed oval = generated. Each local diamond is a separate relationship; brown dashed connectors are Mongo references, not SQL FKs.')
     c.showPage();c.save()
 
 
@@ -169,8 +144,22 @@ def pack_fields(fields,width,font=7.2):
     return bands
 
 
+def fk_continuation(c,x,y,refs,width=239):
+    # Short, isolated arrows name their endpoints; there is no route shared with another table.
+    parsed=[tuple(ref.split(' -> ',1)) for ref in refs]
+    unit=stringWidth('FK ','Helvetica',1)+sum(stringWidth(a+b,'Helvetica',1) for a,b in parsed)
+    gaps=16*len(parsed)+7*max(0,len(parsed)-1)
+    size=min(6.0,(width-gaps)/unit)
+    label(c,x,y,'FK ',size,True);xx=x+stringWidth('FK ','Helvetica-Bold',size)
+    for i,(source,target) in enumerate(parsed):
+        if i:xx+=7
+        label(c,xx,y,source,size);xx+=stringWidth(source,'Helvetica',size)+2
+        line(c,[(xx,y+size*.3),(xx+9,y+size*.3)],width=.45,arrow=True);xx+=13
+        label(c,xx,y,target,size);xx+=stringWidth(target,'Helvetica',size)
+
+
 def schema():
-    c=canvas.Canvas(str(OUT/'FinSight-Schema-Diagram-A4.pdf'),pagesize=(W,H),pageCompression=1)
+    c=canvas.Canvas(str(OUT/'FinSight-Schema-A4-Revised.pdf'),pagesize=(W,H),pageCompression=1)
     heading(c,'Relational Schema Diagram')
     positions={
       'app_user':(0,0,1),'customer':(0,1,1),'address':(0,2,1),'account':(0,3,1),
@@ -187,17 +176,6 @@ def schema():
             xx=x;y=top-22-bi*14
             for field,ww in band:boxes[name][field]=(xx,y,ww,12);xx+=ww
         assert 22+len(bands)*14 <=61.1*span+6,name
-    blocked={tuple(sorted([(col,r),(col+1,r)])) for col,row,span in positions.values() for r in range(row+1,row+span)}
-    router=Router(xs,ys,blocked)
-    for i,(table,fk) in enumerate((t,k) for t in CAT['tables'] for k in t['constraints'] if k['type']=='f'):
-        parent=fk['references_table'].replace('public.','');sc,sr,_=positions[table['name']];tc,tr,_=positions[parent]
-        route=router.points(router.route((sc,sr),(tc,tr)),offset=3+(i%4)*.7)
-        for source,target in zip(fk['columns'],fk['references_columns']):
-            sx,sy,sw,_=boxes[table['name']][source];tx,ty,tw,_=boxes[parent][target]
-            sx+=sw/2;tx+=tw/2
-            startx=xs[sc]+3+(i%4)*.7;endx=xs[tc]+3+(i%4)*.7
-            pts=[(sx,sy),(sx,sy-1),(startx,sy-1),(startx,ys[sr]),*route,(endx,ty-1),(tx,ty-1),(tx,ty)]
-            line(c,pts,HexColor('#5b626b'),.3,arrow=True)
     red=HexColor('#b72b2b')
     for name,(col,row,span) in positions.items():
         table=TABLES[name];x=xs[col]+17;top=ys[row]-5
@@ -223,10 +201,20 @@ def schema():
                     line(c,[(xx+ww/2,yy+12),(xx+ww/2,top-8.5),(x-3,top-8.5)],red,.35)
                 if field in fks:line(c,[(xx+ww/2-tw/2,yy+1.2),(xx+ww/2+tw/2,yy+1.2)],width=.35,dash=True)
                 audit.append({'diagram':'Schema','entity':name,'attribute':field,'font':7.2,'box':[xx,yy,xx+ww,yy+hh]})
-        if name=='transaction':
-            label(c,x,top-88,'Cream = stored generated fields.',6.3)
-            label(c,x,top-98,'Composite FKs retain the exact account/currency',6.1)
-            label(c,x,top-106,'and payment-method/account column pairings.',6.1)
+        refs=[]
+        for fk in table['constraints']:
+            if fk['type']!='f':continue
+            parent=fk['references_table'].replace('public.','')
+            if len(fk['columns'])>1:
+                refs.append('('+','.join(fk['columns'])+') -> '+parent+'('+','.join(fk['references_columns'])+')')
+            else:
+                refs.append(fk['columns'][0]+' -> '+parent+'.'+fk['references_columns'][0])
+        if refs:
+            last_bottom=min(cell[1] for cell in boxes[name].values())
+            if name=='transaction':
+                for i,ref in enumerate(refs):fk_continuation(c,x,last_bottom-8-i*7,[ref])
+            else:
+                fk_continuation(c,x,last_bottom-8,refs)
     base,shapes=mongo_fields()
     supplements=[('device_telemetry [Mongo]',base),*[(kind+' : payload',fields) for kind,fields in shapes]]
     for row,(name,fields) in enumerate(supplements,4):
@@ -240,16 +228,16 @@ def schema():
                 audit.append({'diagram':'Schema','entity':name,'attribute':field,'font':7.2,'box':[xx,yy,xx+ww,yy+12]})
                 xx+=ww
     x=xs[2]+17;top=ys[7]-5
-    for i,s in enumerate(['KEY: solid underline PK; dotted underline FK.', 'Red arrows: PK dependencies; black arrows: FKs.',
-                          'Attribute strips wrap within the same relation.', 'Mongo references are not SQL FKs.',
+    for i,s in enumerate(['KEY: solid underline PK; dotted underline FK.', 'Red arrows stay inside their own relation.',
+                          'FK source -> target is written below each relation.', 'Mongo references are not SQL FKs.',
                           'Bookkeeping/view are implementation supplements.']):label(c,x,top-8-i*8,s,6.5,i==0)
-    footer(c,'All attributes retained. View has no declared PK; candidate_session_ids is an audit array, not an FK. Deferred design entities are excluded.')
+    footer(c,'All attributes retained. FK continuations explicitly name both source and target. No cross-page lines or shared buses. Cream cells are generated.')
     c.showPage();c.save()
 
 
 def finish():
     files=[]
-    for name,kind in [('FinSight-ER-Diagram-A4.pdf','ER'),('FinSight-Schema-Diagram-A4.pdf','Schema')]:
+    for name,kind in [('FinSight-ER-A4-Revised.pdf','ER'),('FinSight-Schema-A4-Revised.pdf','Schema')]:
         p=OUT/name;d=fitz.open(p);assert len(d)==1
         assert abs(d[0].rect.width-W)<.1 and abs(d[0].rect.height-H)<.1
         content=d[0].get_text()
@@ -268,8 +256,8 @@ def finish():
               'toolingTables':1,'views':1,'sqlAttributes':161,'declaredSqlForeignKeys':20,'paper':'A4 landscape',
               'catalogAttributeCoverage':'passed','files':files}
     (ROOT/'docs/printable/verification.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
-    with ZipFile(OUT/'FinSight-A4-Diagrams.zip','w',ZIP_DEFLATED) as z:
-        for name in ['FinSight-ER-Diagram-A4.pdf','FinSight-Schema-Diagram-A4.pdf']:z.write(OUT/name,name)
+    with ZipFile(OUT/'FinSight-A4-Revised.zip','w',ZIP_DEFLATED) as z:
+        for name in ['FinSight-ER-A4-Revised.pdf','FinSight-Schema-A4-Revised.pdf']:z.write(OUT/name,name)
         for name in ['finsight-er-preview.png','finsight-schema-preview.png','schema-catalog.json','verification.json']:
             z.write(ROOT/'docs/printable'/name,'reference/'+name)
         z.writestr('README.txt','FinSight\nShrikar Desai | Shreyas P Kulkarni\n\nBoth diagrams are ONE A4 landscape page each. Print at 100% on A4; no poster scaling is needed. All current attributes are retained.\n')
