@@ -20,7 +20,7 @@ Before setting up FinSight, ensure your local environment satisfies:
 
 | Component | Required Version | Verification Command | Notes |
 | :--- | :--- | :--- | :--- |
-| **Node.js** | `v24.x` | `node -v` | Pinned by `.nvmrc` (`24`). Recommended: `v24.22.x` |
+| **Node.js** | `24.x` | `node -v` | Pinned by `.nvmrc` (`24`). Use the committed Node major |
 | **npm** | `10.x` or higher | `npm -v` | Use with committed lockfile (`npm ci`) |
 | **PostgreSQL** | `17.x` | `psql --version` | Native local installation or Docker service on port 5432 |
 | **MongoDB** | `7.x` or `8.x` | `mongosh --version` | Local standalone instance on port 27017 |
@@ -32,7 +32,7 @@ Before setting up FinSight, ensure your local environment satisfies:
 
 ---
 
-## 2. Workflow A — Application Demonstration Setup
+## 2. Workflow A - Application Demonstration Setup
 
 Follow this workflow to set up the complete interactive FinSight application with synthetic financial data and demo credentials.
 
@@ -75,7 +75,7 @@ MIGRATOR_DATABASE_URL=postgresql://finsight_test:local-owner-password@localhost:
 DATABASE_URL=postgresql://finsight_runtime:local-runtime-password@localhost:5432/finsight_demo
 ALLOW_SYNTHETIC_SEED=true
 
-# NextAuth / Auth.js Configuration
+# Authentication configuration
 NEXTAUTH_URL=http://localhost:3014
 AUTH_SECRET=<generate-random-secret-at-least-32-chars>
 
@@ -97,14 +97,15 @@ Apply all ordered migrations through `060_session_cleanup.sql`:
 npm run db:migrate
 ```
 
-The migration runner reads `migrations/`, acquires an advisory lock, executes each unapplied migration in an individual transaction, and updates `public.schema_migrations`. Migrations include:
-- `010_financial_baseline.sql`: Core users, accounts, payment methods, merchants, transactions.
-- `020_operational_schema.sql`: Audit logs, cases, case events, evidence items, SARs.
-- `030_financial_guards.sql`: Check constraints, currency rules, financial retention triggers.
-- `040_deterministic_risk.sql`: Rules, rule executions, rule parameters, and view `v_transaction_risk`.
-- `050_case_guards.sql`: Guarded stored function `execute_case_command`, versioning, and immutable event trigger.
-- `055_auth_session_validation.sql`: Sessions (`app_session`), login rate limiting, and password hashing.
-- `060_session_cleanup.sql`: Audited 7-day expired session cleanup functions and audit ledger.
+The runner applies the seven migration files in order and records checksums in `schema_migrations`. Migration 010 creates financial tables, 020 creates users/sessions/cases/events/receipts, 030 adds financial guards, 040 implements deterministic scoring and its view, 050 guards case commands, 055 adds protected session validation, and 060 adds audited session cleanup. Existing `finsight_runtime` receives grants from migrations 050, 055 and 060. It must not inherit the owner role.
+
+Seed the eight canonical financial scenarios before telemetry and the live demonstration:
+
+```powershell
+npm run db:seed
+```
+
+This creates the canonical `30000000-...` transaction/device IDs. Re-running verifies existing synthetic facts rather than overwriting them.
 
 ### Step 5: Provision Demo Identities
 
@@ -127,13 +128,13 @@ Provisioned accounts:
 Initialize the collection with strict schema validation and compound indexes, then seed demonstration telemetry:
 
 ```powershell
-npm run mongo:setup
-npm run mongo:seed
+npm run telemetry:setup
+npm run telemetry:seed
 ```
 
-### Step 7: Import Synthetic Demonstration Dataset & FX Reference
+### Step 7: Optional Larger Dataset and Historical FX Reference
 
-Fetch historical European Central Bank daily exchange rates and import the bounded synthetic dataset:
+For a larger explorer table, fetch historical European Central Bank daily exchange rates and import a separate bounded dataset. Network access is required. These generated UUIDs differ from the canonical fixtures; keep the canonical seed for the scripted risk and telemetry demonstration:
 
 ```powershell
 npm run demo:fx -- --out=data/local/fx-2026-q1.json
@@ -150,9 +151,9 @@ Open your browser to: **[http://localhost:3014/sign-in](http://localhost:3014/si
 
 ---
 
-## 3. Workflow B — Academic Verification Setup
+## 3. Workflow B - Academic Verification Setup
 
-The academic verification suite (`npm run test:academic`) executes the complete MVP acceptance suite (VS01–VS16), verifies all SQL demonstrations, validates MongoDB heterogeneous schema validation and aggregation pipelines, and checks merge contribution provenance.
+The academic verification suite (`npm run test:academic`) executes the complete MVP acceptance suite (VS01-VS16), verifies all SQL demonstrations, validates MongoDB heterogeneous schema validation and aggregation pipelines, and checks merge contribution provenance.
 
 > [!WARNING]
 > **Destructive Test Safety Boundary:** `npm run test:academic` requires a **fresh, empty** isolated database whose name strictly ends in `_test`. Once connected, the runner completely resets and controls the test schema. **Never** point `TEST_DATABASE_URL` at `finsight_demo`, a production database, or any database containing valuable records. Each academic test run requires a fresh or newly emptied test database.
@@ -192,7 +193,7 @@ The runner will automatically generate an isolated, run-specific MongoDB databas
 npx playwright install chromium
 ```
 
-Ensure port `3100` is free, as Playwright launches its own isolated Next.js server instance on port 3100.
+Stop any demo server for this checkout before testing because the harness rebuilds `.next`. Ensure port `3100` is free, as Playwright launches its own isolated Next.js server instance on port 3100.
 
 ### Step 4: Execute Academic Verification
 
@@ -202,7 +203,7 @@ npm run test:academic
 
 Expected output:
 - `fresh-postgres-and-role-isolation passed.`
-- `mvp-and-full-regression passed.` (All 16 VS acceptance scenarios, 88 API tests, 24 DB tests, 17 browser tests).
+- `mvp-and-full-regression passed.` (VS01 through VS16 and the required unit, API, database and browser suites).
 - `ddl-dml-queries-and-protected-delete passed.` (Disposable DDL, relational queries, risk view, guarded case commands, immutable triggers, rolled-back and committed session cleanup).
 - `indexes-and-full-text-search passed.` (5 planner-selected indexes).
 - `merged-contribution-provenance passed.` (Git ancestry and committed file existence checked across all PR merge commits).
@@ -248,3 +249,23 @@ Results and execution artifacts are written to `test-results/academic/<run_id>/`
 | `python scripts/diagrams/verify_printables.py` | Diagrams | Verifies single-page A4 dimensions, titles, and 100% attribute coverage. |
 | `npm run build` | Build | Compiles Next.js production bundle. |
 | `npm start` | Production | Serves production build on port 3000. |
+
+## 6. Prepare the live SQL DELETE demonstration
+
+Fresh sign-ins are ineligible for cleanup. In the dedicated local `finsight_demo` database only, connect as the migration owner and create one unusable synthetic session. This never modifies a real login session. Prepare another row before repeating the demonstration:
+
+```sql
+INSERT INTO public.app_session
+  (session_id, user_id, created_at, last_seen_at, idle_expires_at, absolute_expires_at)
+SELECT gen_random_uuid(), user_id,
+       statement_timestamp() - interval '9 days',
+       statement_timestamp() - interval '9 days',
+       statement_timestamp() - interval '9 days' + interval '20 minutes',
+       statement_timestamp() - interval '9 days' + interval '8 hours'
+FROM public.app_user
+WHERE email = 'admin@finsight.local';
+```
+
+Expect `INSERT 0 1`. As admin, open `/admin`, preview eligible sessions, then confirm the captured candidates within ten minutes. On a fresh demo database, the prepared row is the only eligible row and the deleted count is one. On a reused demo database, inspect the preview count before proceeding. Active/recent sessions remain untouched. Candidate session IDs remain in the SQL audit record and are not exposed by the UI.
+
+The [timed demonstration](academic/timed-demonstration.md) uses this setup. Run the independent academic suite only against its separate fresh `_test` database.

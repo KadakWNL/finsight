@@ -165,8 +165,8 @@ For the compulsory demonstration hard copies, use the [current ER and relational
 
 | Read this | For |
 |---|---|
-| [Academic submission report](docs/academic/submission-report.md) | Comprehensive academic report covering course item 13, system architecture, SQL/NoSQL concepts, measured results, and contributions |
-| [Timed demonstration script](docs/academic/timed-demonstration.md) | Practical 14-stage presenter guide (14–16 min) for live evaluators and peer review |
+| [Academic submission report](docs/academic/submission-report.md) | Academic report covering implemented architecture, SQL/NoSQL evidence, measured results, and contributions |
+| [Timed demonstration script](docs/academic/timed-demonstration.md) | Source-backed presenter guide (approximately 18 min) for live evaluators and peer review |
 | [Printable A4 diagrams](docs/printable/README.md) | Single-page A4 landscape Chen ER and Relational Schema print masters with team member names |
 | [Development setup](docs/development-setup.md) | Clean setup sequence, demo/test role isolation, and verification commands |
 | [Discovery workspace](docs/discovery-ui.md) / [design system](DESIGN.md) | Routes, themed shell, interaction boundaries and visual tokens |
