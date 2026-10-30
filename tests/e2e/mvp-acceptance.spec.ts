@@ -178,7 +178,7 @@ test('VS16: admin mutation gates reject direct HTTP requests without data change
     '/api/v1/users', '/api/v1/users/' + analyst, '/api/v1/operators/' + analyst,
     '/api/v1/rules', '/api/v1/rules/' + syntheticId(50), '/api/v1/risk-rules/' + syntheticId(50),
     '/api/v1/redactions', '/api/v1/redaction-requests', '/api/v1/cleanup', '/api/v1/session-cleanup',
-    '/api/v1/telemetry-cleanups', '/api/v1/session-cleanups/preview', '/api/v1/session-cleanups/' + privateCase + '/confirm',
+    '/api/v1/telemetry-cleanups',
     '/api/v1/cases/' + privateCase + '/notes',
   ];
   for (const endpoint of paths) {

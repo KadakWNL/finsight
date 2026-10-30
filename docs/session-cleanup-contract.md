@@ -1,6 +1,6 @@
 # Admin cleanup of expired sessions
 
-The project owner approved expired-session cleanup as the application SQL `DELETE` workload. This is an academic-completion feature after MVP acceptance, with no implemented table, endpoint or UI yet. Instructor acceptance and actual execution evidence remain part of final academic verification.
+The project owner approved expired-session cleanup as the application SQL `DELETE` workload. The database writer, API and admin UI implement this academic-completion feature after MVP acceptance. Instructor acceptance and actual execution evidence remain part of final academic verification.
 
 This contract owns the cleanup policy. The [authentication contract](case-auth-contracts.md#2-session-design) owns session validation and the proposed `APP_SESSION` fields. Cleanup requires that foundation, current-role authorization and isolated database tests before implementation.
 
@@ -39,3 +39,46 @@ Reserve migration `060_session_cleanup.sql`, owned by ShrikarDesai07 and reviewe
 | Protected-table counts before/after | User, financial, risk, case, event and receipt records unchanged |
 
 Retain real SQL results, API denial/idempotency results and browser evidence for academic verification. The preview and successful cleanup demonstrate a meaningful application DELETE; naming this feature or writing its contract does not complete that requirement. Mongo telemetry reads/aggregation remain the separate NoSQL workload. Telemetry deletion, general admin mutations, rule editing and redaction remain deferred.
+
+## Implemented Objects and Verification Evidence (Issue #23)
+
+### Delivered Schema and Migration
+- **Migration:** `migrations/060_session_cleanup.sql` (forward-only numbering following `055_auth_session_validation.sql`).
+- **Audit Table:** `public.app_session_cleanup`
+  - Columns: `operation_id` (UUID PK), `admin_id` (UUID FK to `app_user`), `preview_at` (timestamptz), `cutoff_at` (timestamptz), `expires_at` (timestamptz), `candidate_session_ids` (UUID array), `candidate_count` (integer), `status` (text: `'previewed'` or `'completed'`), `idempotency_key` (UUID nullable), `request_hash` (text nullable), `completed_at` (timestamptz nullable), `deleted_count` (integer nullable).
+  - Integrity Constraints:
+    - Status lifecycle constraints: `status = 'previewed'` requires null completion fields; `status = 'completed'` requires all completion fields non-null with `deleted_count <= candidate_count`.
+    - Unique `(admin_id, idempotency_key)` index for committed operations.
+    - Runtime privileges deny direct INSERT/UPDATE/DELETE. Triggers reject audit DELETE/TRUNCATE and updates to completed records; the owner can update uncompleted previews for isolated tests.
+- **Database Functions & Procedures:**
+  - `preview_app_session_cleanup(p_admin_user_id uuid)`:
+    - Locks the administrator row while verifying current role and activity; the lock prevents concurrent demotion or deactivation until the transaction ends.
+    - Evaluates 7-day unusable cutoff: `LEAST(idle_expires_at, absolute_expires_at, revoked_at) < clock_timestamp() - interval '7 days'`.
+    - Captures deterministic preview of up to 100 candidate session IDs ordered by `LEAST(...) ASC, session_id ASC`.
+    - Records preview audit row with 10-minute expiry (`clock_timestamp() + interval '10 minutes'`).
+    - Returns bounded candidate summary without exposing session secrets or sensitive identifiers.
+  - `confirm_app_session_cleanup(p_operation_id uuid, p_admin_user_id uuid, p_idempotency_key uuid, p_request_hash text)`:
+    - Atomically locks the preview operation record and validates admin ownership and active status.
+    - Validates the 10-minute preview window (`clock_timestamp() < expires_at`) after locking the operation and again after waiting for candidate session locks.
+    - Handles idempotency replay: returns committed result if `(admin_id, idempotency_key)` matches; raises 409 conflict if payload hash differs.
+    - Locks candidate sessions in ascending order (`session_id ASC`), rechecks eligibility under lock against the original captured `cutoff_at`.
+    - Executes atomic `DELETE FROM public.app_session ... RETURNING session_id` and records the exact deleted count.
+    - Updates audit record to status `'completed'` within the same transaction.
+  - `grant_cleanup_privileges(regrole)`:
+    - Procedure granting `EXECUTE` privileges on `preview_app_session_cleanup` and `confirm_app_session_cleanup` to the specified runtime role.
+    - Direct `DELETE` on `public.app_session` is withheld from the runtime role; the grant procedure adds only audit SELECT and protected function execution.
+
+### API Routes & Components
+- `POST /api/v1/session-cleanups/preview`: Authenticated, active-admin-only Route Handler with CSRF protection, returning bounded preview metadata.
+- `POST /api/v1/session-cleanups/[id]/confirm`: Authenticated confirmation Route Handler with cryptographic idempotency key support and strict payload validation (rejects client-supplied candidate IDs or cutoff overrides).
+- `SessionCleanupPanel` (`src/components/workspace/session-cleanup.tsx`): Administrative maintenance panel mounted in `/admin` with preview counts, an expiry timestamp, confirmation, retries using the same idempotency key, and no session credentials in responses.
+
+### Verification coverage
+
+The regression suites exercise real PostgreSQL functions and route handlers:
+
+- [Database tests](../tests/db/session-cleanup.test.ts): eligibility, captured candidate limits, expiry, role denials, ownership, replay, concurrent confirmation, refresh behavior, injected audit failure, restrictive foreign keys and protected row counts. Contended-lock tests cover concurrent administrator demotion and expiry during session-lock waits.
+- [API tests](../tests/api/session-cleanup.test.ts): authentication, same-origin enforcement, bounded responses, parameter validation, operation ownership, expiry and replay.
+- [Browser test](../tests/e2e/session-cleanup.spec.ts): analyst exclusion and administrator preview/confirmation with session identifiers absent from page content.
+
+Run `npm run test:db`, `npm run test:api` and `npm run test:e2e` against the isolated databases described in the [test contract](development-and-testing-contract.md). The PR checks retain their execution results. Final academic evidence and instructor acceptance remain tracked separately.
