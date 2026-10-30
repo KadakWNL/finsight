@@ -1,65 +1,271 @@
-# Development setup
+# Development and Environment Setup Guide
 
-The application in `src/app` serves a landing page, `GET /api/health`, [authentication APIs](authentication.md), [transaction read APIs](transaction-api.md) and the [discovery workspace](discovery-ui.md). Health reports process availability only. The [case lifecycle APIs](case-api.md) are implemented; case screens remain pending. Migrations through 055 implement storage, financial guards/risk SQL, case commands and protected session validation. These checks do not establish VS01-VS16 acceptance.
+FinSight is built with **Next.js 16 (App Router)**, **TypeScript**, **PostgreSQL 17**, and **MongoDB 7**.
 
-## Start the application
+The application serves:
+- Public landing page and process health check (`GET /api/health`).
+- [Authentication and session management](authentication.md) with Argon2id passwords and encrypted cookies.
+- [Transaction discovery workspace](discovery-ui.md) with risk scoring, filtering, and stable signed cursor paging.
+- [Transaction detail](transaction-api.md) with explainable signal breakdowns, masked context, and [scoped MongoDB device telemetry](mongo-telemetry.md).
+- [Guarded case investigation workspace](case-ui.md) with queue management, lifecycle transitions, optimistic concurrency, and immutable audit history.
+- [Administrative session maintenance](session-cleanup-contract.md) with audited 7-day expired session deletion.
 
-Use Node.js 24, pinned by `.nvmrc`, and npm with the committed lockfile. Run these commands from the repository root:
+For hard-copy academic evaluation, use the verified [current ER and relational schema print masters](printable/README.md).
+
+---
+
+## 1. Prerequisites and System Requirements
+
+Before setting up FinSight, ensure your local environment satisfies:
+
+| Component | Required Version | Verification Command | Notes |
+| :--- | :--- | :--- | :--- |
+| **Node.js** | `24.x` | `node -v` | Pinned by `.nvmrc` (`24`). Use the committed Node major |
+| **npm** | `10.x` or higher | `npm -v` | Use with committed lockfile (`npm ci`) |
+| **PostgreSQL** | `17.x` | `psql --version` | Native local installation or Docker service on port 5432 |
+| **MongoDB** | `7.x` or `8.x` | `mongosh --version` | Local standalone instance on port 27017 |
+| **psql CLI** | 17.x | `Get-Command psql` | Must be available on system `PATH` |
+| **Playwright** | Chromium | `npx playwright --version` | Installed via `npx playwright install chromium` |
+
+> [!CAUTION]
+> **Secret Hygiene:** Never put passwords, connection strings, session secrets, or tokens in documentation, tracked files, or Git commits. Use environment variables and `.env.local` (which is excluded by `.gitignore`).
+
+---
+
+## 2. Workflow A - Application Demonstration Setup
+
+Follow this workflow to set up the complete interactive FinSight application with synthetic financial data and demo credentials.
+
+### Step 1: Clone and Install Dependencies
 
 ```powershell
+git clone https://github.com/KadakWNL/finsight.git
+cd finsight
 npm ci
 Copy-Item .env.example .env.local
+```
+
+### Step 2: Configure Local PostgreSQL Roles and Demo Database
+
+Using PostgreSQL superuser (`postgres`), create the dedicated non-superuser migration owner (`finsight_test`), the restricted nonowner runtime role (`finsight_runtime`), the probe role (`finsight_auth_probe`), and the dedicated demo database (`finsight_demo`):
+
+```sql
+-- Connect via psql as superuser:
+-- psql -U postgres
+
+CREATE ROLE finsight_auth_probe NOLOGIN;
+CREATE ROLE finsight_runtime WITH LOGIN PASSWORD 'local-runtime-password';
+CREATE ROLE finsight_test WITH LOGIN CREATEROLE PASSWORD 'local-owner-password';
+
+-- Grant membership so owner can administer runtime grants:
+GRANT finsight_runtime TO finsight_test;
+GRANT finsight_auth_probe TO finsight_test;
+
+-- Create dedicated demonstration database:
+CREATE DATABASE finsight_demo OWNER finsight_test;
+```
+
+### Step 3: Configure `.env.local`
+
+Edit `.env.local` with your local values. Do not commit this file:
+
+```ini
+# PostgreSQL Connections for Demonstration
+MIGRATOR_DATABASE_URL=postgresql://finsight_test:local-owner-password@localhost:5432/finsight_demo
+DATABASE_URL=postgresql://finsight_runtime:local-runtime-password@localhost:5432/finsight_demo
+ALLOW_SYNTHETIC_SEED=true
+
+# Authentication configuration
+NEXTAUTH_URL=http://localhost:3014
+AUTH_SECRET=<generate-random-secret-at-least-32-chars>
+
+# MongoDB Device Telemetry
+MONGODB_URI=mongodb://127.0.0.1:27017
+MONGODB_DB_NAME=finsight_demo
+```
+
+Generate a secure random secret for `AUTH_SECRET`:
+```powershell
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+### Step 4: Apply Schema Migrations
+
+Apply all ordered migrations through `060_session_cleanup.sql`:
+
+```powershell
+npm run db:migrate
+```
+
+The runner applies the seven migration files in order and records checksums in `schema_migrations`. Migration 010 creates financial tables, 020 creates users/sessions/cases/events/receipts, 030 adds financial guards, 040 implements deterministic scoring and its view, 050 guards case commands, 055 adds protected session validation, and 060 adds audited session cleanup. Existing `finsight_runtime` receives grants from migrations 050, 055 and 060. It must not inherit the owner role.
+
+Seed the eight canonical financial scenarios before telemetry and the live demonstration:
+
+```powershell
+npm run db:seed
+```
+
+This creates the canonical `30000000-...` transaction/device IDs. Re-running verifies existing synthetic facts rather than overwriting them.
+
+### Step 5: Provision Demo Identities
+
+Provision local demo analyst and administrator accounts with explicit local passwords:
+
+```powershell
+$env:DEMO_ANALYST_PASSWORD="YourLocalAnalystPassword123!"
+$env:DEMO_ADMIN_PASSWORD="YourLocalAdminPassword123!"
+npm run auth:provision -- --demo
+```
+
+Provisioned accounts:
+- **Analyst:** `analyst_a@finsight.local`
+- **Administrator:** `admin@finsight.local`
+
+*(Alternatively, use `npm run auth:provision -- --bootstrap-admin` with `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` to create a custom administrative user).*
+
+### Step 6: Initialize MongoDB Telemetry Collection
+
+Initialize the collection with strict schema validation and compound indexes, then seed demonstration telemetry:
+
+```powershell
+npm run telemetry:setup
+npm run telemetry:seed
+```
+
+### Step 7: Optional Larger Dataset and Historical FX Reference
+
+For a larger explorer table, fetch historical European Central Bank daily exchange rates and import a separate bounded dataset. Network access is required. These generated UUIDs differ from the canonical fixtures; keep the canonical seed for the scripted risk and telemetry demonstration:
+
+```powershell
+npm run demo:fx -- --out=data/local/fx-2026-q1.json
+npm run demo:import -- --snapshot=data/local/fx-2026-q1.json --manifest=data/local/demo-2026-q1.manifest.json
+```
+
+### Step 8: Start the Application
+
+```powershell
 npm run dev -- --port 3014
 ```
 
-Open `http://localhost:3014`. The landing page requires no database. Set local values in `.env.local` before running database tooling; the committed example contains placeholders. Never prefix database credentials with `NEXT_PUBLIC_` or commit local environment files.
+Open your browser to: **[http://localhost:3014/sign-in](http://localhost:3014/sign-in)**.
 
-The local visual system is recorded in [DESIGN.md](../DESIGN.md) and records the accepted visual direction. `src/app/globals.css` defines light/dark semantic colors, violet accents, bordered surfaces, visible keyboard focus and square sidebar selection. `src/app/layout.tsx` loads local IBM Plex Sans and initializes the theme from a stored choice or system preference. Shared primitives live in `src/components/ui`; `components.json` defines shadcn-compatible paths and Tailwind configuration. Workspace components live in `src/components/workspace`. Open `/sign-in` after configuring the database and [provisioning identities](authentication.md).
+---
 
-## Environment and database tooling
+## 3. Workflow B - Academic Verification Setup
 
-The [development contract](development-and-testing-contract.md#2-sql-migration-contract) owns role privileges and migration ownership. Use PostgreSQL 17 and separate non-superuser connections. A local database administrator provisions databases and roles; this scaffold never provisions shared roles or grants feature privileges.
+The academic verification suite (`npm run test:academic`) executes the complete MVP acceptance suite (VS01-VS16), verifies all SQL demonstrations, validates MongoDB heterogeneous schema validation and aggregation pipelines, and checks merge contribution provenance.
 
-| Variable | Default | Usage |
-|---|---|---|
-| `DATABASE_URL` | None | Server-only nonowner runtime application connection |
-| `SERVICE_DATABASE_URL` | None | Reserved server-only synthetic ingestion connection |
-| `MIGRATOR_DATABASE_URL` | None | Dedicated DDL connection for `db:migrate` |
-| `TEST_DATABASE_URL` | None | Disposable local database owned by a non-superuser test role, name ending in `_test` |
-| `ALLOW_TEST_DATABASE` | False unless exactly `true` | Explicit permission to run integration tooling against that isolated database |
-| `ALLOW_SYNTHETIC_SEED` | False unless exactly `true` | Explicit permission for synthetic seed work via a local migrator database ending in `_demo` or `_test` |
-| `AUTH_SECRET` | None | Random secret of at least 32 characters for encrypted Auth.js cookies; `NEXTAUTH_SECRET` is accepted when absent |
-| `NEXTAUTH_URL` | Request origin for custom origin checks | Canonical browser origin for authentication, required behind a reverse proxy |
-| `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD` | None | Local credential input to protected initial-admin provisioning |
-| `BOOTSTRAP_ADMIN_NAME` | Primary Administrator | Display name for the initial admin |
-| `DEMO_ANALYST_PASSWORD`, `DEMO_ADMIN_PASSWORD` | None | Explicit passwords for isolated demo provisioning |
+> [!WARNING]
+> **Destructive Test Safety Boundary:** `npm run test:academic` requires a **fresh, empty** isolated database whose name strictly ends in `_test`. Once connected, the runner completely resets and controls the test schema. **Never** point `TEST_DATABASE_URL` at `finsight_demo`, a production database, or any database containing valuable records. Each academic test run requires a fresh or newly emptied test database.
 
-`npm run db:migrate` reads `.env.local`, discovers `NNN_lowercase_name.sql` in `migrations`, takes an advisory lock and applies each file with its ledger row in one transaction. It rejects duplicate versions, changed/missing applied files and out-of-order additions. Errors omit connection details. The runner never falls back to application credentials. Migrations 010-040 supply financial/operational storage and risk SQL; 050 adds guarded case commands; 055 adds protected session validation. A native local PostgreSQL 17 installation works; Docker Desktop is optional.
+### Step 1: Create a Fresh Isolated Test Database
 
-For local database checks, an administrator creates a disposable database such as `finsight_test`, owned by a separate login with `NOSUPERUSER NOCREATEDB NOCREATEROLE`. Set `TEST_DATABASE_URL` to that local connection and `ALLOW_TEST_DATABASE=true`. URL options, remote hosts and names without the `_test` suffix are refused. Do not point this role at a shared database. No database reset helper is provided.
+In PostgreSQL, create a fresh empty test database:
 
-The migration harness requires a database without `public.schema_migrations`; it creates and removes only its own probe table and ledger. It verifies transactional DDL rollback, ledger rollback, retry behavior and checksum rejection using actual PostgreSQL. `db:migrate:test` applies repository migrations through the test connection and therefore should use a different disposable database from the runner harness.
+```sql
+-- As superuser:
+DROP DATABASE IF EXISTS finsight_academic_test;
+CREATE DATABASE finsight_academic_test OWNER finsight_test;
+```
 
-## Verification commands
+Verify the database is completely empty (zero public objects):
+```sql
+SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public';
+-- Expected: 0
+```
 
-| Command | Usage |
-|---|---|
-| `npm run lint` | ESLint and TypeScript ESLint checks |
-| `npm run typecheck` | Generate Next route types and run TypeScript without emitting |
-| `npm run test:unit` | Test database-target guards, password hashing and authorization/security helpers |
-| `npm run test:api` | Exercise auth/session and transaction handlers with PostgreSQL fixtures, masks, signed cursors and provisioning CLIs |
-| `npm run test:db` | Run the PostgreSQL 17 migration harness using the isolated test role |
-| `npm run test:discovery` | List Vitest and Playwright tests without running database/browser checks |
-| `npm run test:e2e` | Launch a local Next server on port 3100 against the isolated test database; verify discovery UI, case creation/recovery, mobile/keyboard behavior and authentication/transaction HTTP behavior |
-| `npm run build` | Create the production build |
-| `npm start` | Serve the production build on port 3000 |
-| `npm run db:migrate` | Apply/verify ordered migrations with the dedicated migrator connection |
-| `npm run db:migrate:test` | Apply/verify migrations in an explicitly permitted isolated test database |
-| `npm run db:seed` | Verify eight deterministic synthetic scenarios and once-only signals in an explicitly permitted local demo/test database; see [risk SQL](deterministic-risk.md) |
-| `npm run demo:fx -- --out=data/local/fx.json` | Save daily historical FX reference observations for the [reproducible demo](demo-dataset.md) |
-| `npm run demo:import -- --snapshot=data/local/fx.json --manifest=data/local/demo.json` | Add a bounded synthetic dataset using the saved rate snapshot and an isolated demo/test database |
-| `npm run auth:provision -- --bootstrap-admin` | Provision the first admin through migrator credentials and local credential input |
-| `npm run auth:provision -- --demo` | Provision explicit-password demo identities in an opted-in local isolated database |
-| `npm run test:acceptance` | Run the [MVP acceptance matrix](mvp-acceptance.md) against a fresh isolated database and separate runtime login; retain evidence for human cross-review |
+### Step 2: Configure Environment for Academic Testing
 
-Run `npx playwright install chromium` once before browser checks. Port 3100 must be free; Playwright starts its own server and does not reuse an unrelated process. Desktop/mobile captures and failure traces appear under ignored `test-results`. `.github/workflows/checks.yml` runs these scaffold checks with Node 24 and a disposable PostgreSQL 17 service using a non-superuser test role.
+Set these parameters in `.env.local` or directly in your PowerShell session:
+
+```powershell
+$env:TEST_DATABASE_URL = "postgresql://finsight_test:local-owner-password@localhost:5432/finsight_academic_test"
+$env:ACCEPTANCE_RUNTIME_DATABASE_URL = "postgresql://finsight_runtime:local-runtime-password@localhost:5432/finsight_academic_test"
+$env:ALLOW_TEST_DATABASE = "true"
+$env:MONGODB_URI = "mongodb://127.0.0.1:27017"
+```
+
+The runner will automatically generate an isolated, run-specific MongoDB database (`finsight_academic_<timestamp>_<random>_test`), verify its isolation, and drop it upon test completion.
+
+### Step 3: Install Playwright Chromium
+
+```powershell
+npx playwright install chromium
+```
+
+Stop any demo server for this checkout before testing because the harness rebuilds `.next`. Ensure port `3100` is free, as Playwright launches its own isolated Next.js server instance on port 3100.
+
+### Step 4: Execute Academic Verification
+
+```powershell
+npm run test:academic
+```
+
+Expected output:
+- `fresh-postgres-and-role-isolation passed.`
+- `mvp-and-full-regression passed.` (VS01 through VS16 and the required unit, API, database and browser suites).
+- `ddl-dml-queries-and-protected-delete passed.` (Disposable DDL, relational queries, risk view, guarded case commands, immutable triggers, rolled-back and committed session cleanup).
+- `indexes-and-full-text-search passed.` (5 planner-selected indexes).
+- `merged-contribution-provenance passed.` (Git ancestry and committed file existence checked across all PR merge commits).
+- `mongo-heterogeneous-validator-and-aggregation passed.` (Multi-facet aggregation pipeline and validator rejection code 121).
+
+Results and execution artifacts are written to `test-results/academic/<run_id>/`.
+
+---
+
+## 4. Environment Variables Reference
+
+| Variable | Required In | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `DATABASE_URL` | Demo / Runtime | *None* | Nonowner application runtime PostgreSQL connection string. |
+| `MIGRATOR_DATABASE_URL` | Demo / Migration | *None* | Dedicated DDL owner connection for running `npm run db:migrate`. |
+| `TEST_DATABASE_URL` | Testing | *None* | Dedicated test owner connection; database name **must** end in `_test`. |
+| `ACCEPTANCE_RUNTIME_DATABASE_URL` | Testing | *None* | Nonowner `finsight_runtime` connection to the test database. |
+| `ALLOW_TEST_DATABASE` | Testing | `false` | Must be explicitly `'true'` to permit integration tooling on the test database. |
+| `ALLOW_SYNTHETIC_SEED` | Demo | `false` | Must be explicitly `'true'` to permit synthetic dataset seeding in demo database. |
+| `AUTH_SECRET` | All | *None* | Secret key of at least 32 characters for Auth.js cookie encryption. |
+| `NEXTAUTH_URL` | All | Request origin | Canonical browser origin (e.g. `http://localhost:3014`). |
+| `MONGODB_URI` | All | *None* | Local MongoDB connection URI (`mongodb://127.0.0.1:27017`). |
+| `MONGODB_DB_NAME` | Demo | `finsight` | Database name for application MongoDB telemetry storage. |
+| `DEMO_ANALYST_PASSWORD` | Demo Provisioning| *None* | Plaintext password to hash for `analyst_a@finsight.local`. |
+| `DEMO_ADMIN_PASSWORD` | Demo Provisioning| *None* | Plaintext password to hash for `admin@finsight.local`. |
+| `BOOTSTRAP_ADMIN_EMAIL` | Custom Provision | *None* | Email address for initial bootstrap administrator. |
+| `BOOTSTRAP_ADMIN_PASSWORD`| Custom Provision | *None* | Plaintext password for initial bootstrap administrator. |
+
+---
+
+## 5. Verification Commands Summary
+
+| Command | Category | Purpose / Description |
+| :--- | :--- | :--- |
+| `npm run lint` | Code Quality | ESLint and TypeScript ESLint verification. |
+| `npm run typecheck` | Typing | Next.js type generation and `tsc --noEmit` validation. |
+| `npm run test:unit` | Fast Tests | Vitest unit tests for authorization, risk parameters, and guards. |
+| `npm run test:api` | Integration | API route tests with PostgreSQL fixtures and masks. |
+| `npm run test:db` | Database | Migration runner transactional DDL and rollback tests. |
+| `npm run test:e2e` | End-to-End | Playwright browser tests covering workspace, queues, and dialogs. |
+| `npm run test:acceptance` | Acceptance | Full MVP acceptance suite across scenarios VS01 through VS16. |
+| `npm run test:academic` | Academic Gate | Complete academic evidence suite (acceptance + SQL + NoSQL + git ancestry). |
+| `python scripts/diagrams/verify_printables.py` | Diagrams | Verifies single-page A4 dimensions, titles, and 100% attribute coverage. |
+| `npm run build` | Build | Compiles Next.js production bundle. |
+| `npm start` | Production | Serves production build on port 3000. |
+
+## 6. Prepare the live SQL DELETE demonstration
+
+Fresh sign-ins are ineligible for cleanup. In the dedicated local `finsight_demo` database only, connect as the migration owner and create one unusable synthetic session. This never modifies a real login session. Prepare another row before repeating the demonstration:
+
+```sql
+INSERT INTO public.app_session
+  (session_id, user_id, created_at, last_seen_at, idle_expires_at, absolute_expires_at)
+SELECT gen_random_uuid(), user_id,
+       statement_timestamp() - interval '9 days',
+       statement_timestamp() - interval '9 days',
+       statement_timestamp() - interval '9 days' + interval '20 minutes',
+       statement_timestamp() - interval '9 days' + interval '8 hours'
+FROM public.app_user
+WHERE email = 'admin@finsight.local';
+```
+
+Expect `INSERT 0 1`. As admin, open `/admin`, preview eligible sessions, then confirm the captured candidates within ten minutes. On a fresh demo database, the prepared row is the only eligible row and the deleted count is one. On a reused demo database, inspect the preview count before proceeding. Active/recent sessions remain untouched. Candidate session IDs remain in the SQL audit record and are not exposed by the UI.
+
+The [timed demonstration](academic/timed-demonstration.md) uses this setup. Run the independent academic suite only against its separate fresh `_test` database.
