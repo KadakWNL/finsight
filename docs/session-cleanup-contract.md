@@ -1,5 +1,7 @@
 # Admin cleanup of expired sessions
 
+> Current DELETE acceptance gate: the [2026-10-30 project-owner decision](academic/delete-scope-decision.md) supersedes earlier instructor-confirmation references in this contract. Real execution/retention evidence and teammate review remain required.
+
 The project owner approved expired-session cleanup as the application SQL `DELETE` workload. The database writer, API and admin UI implement this academic-completion feature after MVP acceptance. Instructor acceptance and actual execution evidence remain part of final academic verification.
 
 This contract owns the cleanup policy. The [authentication contract](case-auth-contracts.md#2-session-design) owns session validation and the proposed `APP_SESSION` fields. Cleanup requires that foundation, current-role authorization and isolated database tests before implementation.

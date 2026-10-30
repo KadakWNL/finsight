@@ -1,4 +1,4 @@
-name: MVP acceptance
+name: Academic and MVP acceptance
 on:
   pull_request:
   push:
@@ -33,6 +33,8 @@ jobs:
       MONGODB_DB_NAME: finsight_acceptance_telemetry_test
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
@@ -47,7 +49,7 @@ jobs:
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE ROLE finsight_auth_probe NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE; GRANT finsight_runtime, finsight_auth_probe TO finsight_test;"
           psql -h localhost -U postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE finsight_acceptance_test OWNER finsight_test;"
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:acceptance
+      - run: npm run test:academic
       - name: Retain sanitized results, SQL plans and synthetic demonstration recordings
         if: always()
         uses: actions/upload-artifact@v4
@@ -62,3 +64,16 @@ jobs:
             test-results/acceptance/*/query-plans.json
             test-results/acceptance/*/browser/**/*.webm
             test-results/acceptance/*/browser/**/investigation-journey.png
+      - name: Retain academic SQL and Mongo evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: academic-verification-evidence
+          if-no-files-found: warn
+          retention-days: 14
+          path: |
+            test-results/academic/latest.json
+            test-results/academic/*/report.json
+            test-results/academic/*/report.md
+            test-results/academic/*/sql-results.json
+            test-results/academic/*/query-plans.json

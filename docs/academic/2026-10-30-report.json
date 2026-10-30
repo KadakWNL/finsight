@@ -1,0 +1,1006 @@
+{
+  "startedAt": "2026-10-30T09:02:00.512Z",
+  "technicalStatus": "passed",
+  "academicComplete": false,
+  "humanGates": {
+    "instructorDeleteAcceptance": "pending",
+    "independentShrikarDemonstration": "pending",
+    "teammateReview": "pending"
+  },
+  "checks": [
+    {
+      "id": "fresh-postgres-and-role-isolation",
+      "status": "passed",
+      "evidence": {
+        "postgresVersion": 170011,
+        "ownerRole": "finsight_test",
+        "runtimeRole": "finsight_runtime",
+        "runtimeIsNonowner": true
+      }
+    },
+    {
+      "id": "mvp-and-full-regression",
+      "status": "passed",
+      "evidence": {
+        "command": "npm run test:acceptance",
+        "directory": "test-results/acceptance/20261030090200635-a1591c",
+        "scenarios": [
+          {
+            "id": "VS01",
+            "status": "passed"
+          },
+          {
+            "id": "VS02",
+            "status": "passed"
+          },
+          {
+            "id": "VS03",
+            "status": "passed"
+          },
+          {
+            "id": "VS04",
+            "status": "passed"
+          },
+          {
+            "id": "VS05",
+            "status": "passed"
+          },
+          {
+            "id": "VS06",
+            "status": "passed"
+          },
+          {
+            "id": "VS07",
+            "status": "passed"
+          },
+          {
+            "id": "VS08",
+            "status": "passed"
+          },
+          {
+            "id": "VS09",
+            "status": "passed"
+          },
+          {
+            "id": "VS10",
+            "status": "passed"
+          },
+          {
+            "id": "VS11",
+            "status": "passed"
+          },
+          {
+            "id": "VS12",
+            "status": "passed"
+          },
+          {
+            "id": "VS13",
+            "status": "passed"
+          },
+          {
+            "id": "VS14",
+            "status": "passed"
+          },
+          {
+            "id": "VS15",
+            "status": "passed"
+          },
+          {
+            "id": "VS16",
+            "status": "passed"
+          }
+        ],
+        "counts": {
+          "api": 88,
+          "database": 24,
+          "browser": 17
+        },
+        "requiredTests": [
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/preview returns 200 with bounded preview metadata for active administrator",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/preview denies unauthenticated requests with 401",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/preview denies analyst callers with 403",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/preview denies inactive administrators with 401 or 403",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/preview denies cross-origin requests with 403",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/preview rejects client attempt to supply authoritative cutoff or session IDs with 400",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm successfully confirms cleanup for active admin and returns deleted count",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm denies unauthenticated confirmation with 401",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm denies analyst confirmation with 403",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm denies cross-origin confirmation with 403",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm validates invalid UUID and payload parameters with 400",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm returns 404 for unknown operation ID",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm enforces operation ownership: Admin Bob cannot confirm Admin Alice preview (403)",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm returns 410 Gone for expired preview",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/session-cleanup.test.ts",
+            "title": "API Integration Tests: Admin Session Cleanup (Issue #23) POST /api/v1/session-cleanups/[id]/confirm handles idempotent retries and detects changed payload conflict (409)",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests VS-TELEMETRY-01: returns available bounded telemetry summary for canonical transaction and respects time bounding",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests VS-TELEMETRY-02: returns truthful no_data state for transaction device without telemetry",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests VS-TELEMETRY-03: rejects unknown or invalid transactions before MongoDB read",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests VS-TELEMETRY-04: enforces authentication and role-based permissions",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests VS-TELEMETRY-05: preserves masked projections and excludes raw sensitive metadata",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests VS-TELEMETRY-06: gracefully degrades to unavailable when MongoDB is offline without breaking PostgreSQL",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests excludes telemetry with unknown transaction references or a mismatched SQL device",
+            "status": "passed"
+          },
+          {
+            "stage": "api",
+            "file": "/home/runner/work/finsight/finsight/tests/api/telemetry.test.ts",
+            "title": "Issue #17: MongoDB Telemetry Integration and API Tests VS-TELEMETRY-07: verifies strict MongoDB schema validator and collection indexes",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests rejects preview when an administrator is demoted during the authority check",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests rejects confirm when an administrator is demoted during the authority check",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests rejects a preview that expires while confirmation waits for a candidate session lock",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 1-8: correctly discriminates eligibility across active, idle, absolute, revoked, cutoff and null revocation sessions",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests preserves a previewed candidate whose rechecked expiry equals the captured cutoff exactly",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 9: preview is capped at 100 and deterministic when > 100 candidates exist",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 10-11: does not delete newly eligible sessions after preview, and missing candidate is not replaced",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 12: expired preview fails without deletion",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 13: direct DELETE on public.app_session is denied to nonowner/runtime callers",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 14-16: denies analyst, service, inactive admin, demoted admin, and mismatched operation ownership",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 17-19: idempotency replay returns committed result once; changed payload conflicts; completed op cannot delete again",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 20: concurrent confirmations yield only one committed cleanup result without errors",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 21: concurrent session validation/refresh cannot revive expired sessions or delete active sessions",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 22: injected audit-completion failure rolls the deletion back",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 23: restrictive foreign-key failure rolls back safely",
+            "status": "passed"
+          },
+          {
+            "stage": "db",
+            "file": "/home/runner/work/finsight/finsight/tests/db/session-cleanup.test.ts",
+            "title": "FinSight Issue #23: Audited Admin Session Cleanup Integration Tests 24-25: user, financial, case, event, and receipt tables remain intact; deleted count strictly matches persisted completion",
+            "status": "passed"
+          },
+          {
+            "stage": "browser",
+            "file": "/home/runner/work/finsight/finsight/tests/e2e/session-cleanup.spec.ts",
+            "title": "session-cleanup.spec.ts administrator can preview and confirm session cleanup, while analyst has no access",
+            "status": "passed"
+          }
+        ]
+      }
+    },
+    {
+      "id": "ddl-dml-queries-and-protected-delete",
+      "status": "passed",
+      "evidence": {
+        "file": "sql-results.json",
+        "demonstrations": [
+          "ddl-create",
+          "ddl-alter",
+          "ddl-insert",
+          "ddl-drop",
+          "ddl-drop-check",
+          "joins-group-having-order",
+          "risk-view",
+          "guarded-case-insert",
+          "guarded-case-update",
+          "case-history",
+          "immutable-event-trigger",
+          "runtime-event-mutation-denied",
+          "cleanup-preview",
+          "runtime-direct-delete-denied",
+          "analyst-cleanup-denied",
+          "cleanup-inside-rolled-back-transaction",
+          "rollback-restored-session-and-audit",
+          "cleanup-committed-delete",
+          "cleanup-replay",
+          "cleanup-retained-active-recent-sessions",
+          "protected-row-counts"
+        ]
+      }
+    },
+    {
+      "id": "indexes-and-full-text-search",
+      "status": "passed",
+      "evidence": [
+        {
+          "name": "cursor",
+          "expectedIndex": "transaction_cursor"
+        },
+        {
+          "name": "account activity",
+          "expectedIndex": "transaction_account_activity"
+        },
+        {
+          "name": "merchant activity",
+          "expectedIndex": "transaction_merchant_activity"
+        },
+        {
+          "name": "device activity",
+          "expectedIndex": "transaction_device_activity"
+        },
+        {
+          "name": "description FTS",
+          "expectedIndex": "transaction_description_search"
+        }
+      ]
+    },
+    {
+      "id": "merged-contribution-provenance",
+      "status": "passed",
+      "evidence": {
+        "ledger": "docs/academic/contributions.json",
+        "sha256": "b032917cf50766d141bf79b6cfd4abd41b0c521f7db23677123c3cd39ade0580",
+        "records": [
+          {
+            "pullRequest": 27,
+            "title": "Implement financial baseline migration and SQL integrity checks",
+            "author": "KadakWNL",
+            "mergeCommit": "1228889556f78779f551fd9a2511b8fba09e05f5",
+            "mergedAt": "2026-10-21T10:49:00Z",
+            "files": [
+              ".gitattributes",
+              ".github/workflows/financial-baseline.yml",
+              "README.md",
+              "docs/development-setup.md",
+              "docs/er-diagram.md",
+              "docs/financial-baseline.md",
+              "migrations/010_financial_baseline.sql",
+              "tests/sql/financial_baseline.sql"
+            ],
+            "databaseIssue": 6
+          },
+          {
+            "pullRequest": 29,
+            "title": "Enforce retained financial facts and indexed access",
+            "author": "KadakWNL",
+            "mergeCommit": "0adb26c19a9da61b808de56f2e0f68e53682df1c",
+            "mergedAt": "2026-10-26T07:07:10Z",
+            "files": [
+              ".github/workflows/financial-guards.yml",
+              "README.md",
+              "docs/development-setup.md",
+              "docs/financial-guards.md",
+              "migrations/030_financial_guards.sql",
+              "tests/financial-verification.mjs",
+              "tests/sql/financial_fixture.sql",
+              "tests/sql/financial_guards.sql",
+              "tests/sql/operational_schema.sql"
+            ],
+            "databaseIssue": 7
+          },
+          {
+            "pullRequest": 30,
+            "title": "Add deterministic financial seeds and explainable risk SQL",
+            "author": "KadakWNL",
+            "mergeCommit": "4163ce537f64ddab8f4f50c4beccc5bf9debe8f2",
+            "mergedAt": "2026-10-26T07:25:43Z",
+            "files": [
+              ".env.example",
+              ".github/workflows/deterministic-risk.yml",
+              "README.md",
+              "docs/deterministic-risk.md",
+              "docs/development-setup.md",
+              "migrations/040_deterministic_risk.sql",
+              "package.json",
+              "scripts/database-safety.mjs",
+              "scripts/financial-seed.mjs",
+              "scripts/seed.mjs",
+              "src/server/financial-queries.ts",
+              "tests/risk-verification.mjs",
+              "tests/unit/synthetic-database-safety.test.ts"
+            ],
+            "databaseIssue": 10
+          },
+          {
+            "pullRequest": 31,
+            "title": "feat: guard case writes, immutable history and optimistic concurrency (#9)",
+            "author": "ShrikarDesai07",
+            "mergeCommit": "0817f712189f2cff40a87dbba618e05e7d5e6ce7",
+            "mergedAt": "2026-10-26T16:25:56Z",
+            "files": [
+              "migrations/050_case_guards.sql",
+              "src/server/case-commands.ts",
+              "tests/db/case-guards.test.ts",
+              "tests/sql/case_guards.sql",
+              "vitest.config.ts"
+            ],
+            "databaseIssue": 9
+          },
+          {
+            "pullRequest": 32,
+            "title": "feat: credentials authentication, session lifecycle and role authorization (#11)",
+            "author": "ShrikarDesai07",
+            "mergeCommit": "4f017273c146ac87013aac319cbc0428b35ab9ca",
+            "mergedAt": "2026-10-26T17:12:30Z",
+            "files": [
+              ".env.example",
+              ".github/workflows/checks.yml",
+              "README.md",
+              "docs/authentication.md",
+              "docs/development-setup.md",
+              "migrations/055_auth_session_validation.sql",
+              "package-lock.json",
+              "package.json",
+              "playwright.config.ts",
+              "scripts/provision-identities.mjs",
+              "src/app/api/auth/[...nextauth]/route.ts",
+              "src/app/api/auth/login/route.ts",
+              "src/app/api/auth/logout/route.ts",
+              "src/app/api/auth/session/route.ts",
+              "src/server/auth-config.ts",
+              "src/server/auth-security.ts",
+              "src/server/auth.ts",
+              "src/server/authentication.ts",
+              "src/server/authorization.ts",
+              "src/server/db.ts",
+              "src/server/login-limit.ts",
+              "src/server/session.ts",
+              "tests/api/auth.test.ts",
+              "tests/api/provision.test.ts",
+              "tests/db/case-guards.test.ts",
+              "tests/e2e/auth.spec.ts",
+              "tests/unit/auth-security.test.ts",
+              "tests/unit/auth.test.ts",
+              "vitest.config.ts"
+            ]
+          },
+          {
+            "pullRequest": 34,
+            "title": "feat: implement atomic case lifecycle commands and scoped history APIs (#13)",
+            "author": "ShrikarDesai07",
+            "mergeCommit": "22d096f289b02a040f92f2ebc1c79ee03a102e84",
+            "mergedAt": "2026-10-26T18:43:51Z",
+            "files": [
+              "README.md",
+              "docs/api/cases.openapi.yaml",
+              "docs/case-api.md",
+              "src/app/api/cases/[id]/commands/route.ts",
+              "src/app/api/cases/[id]/events/route.ts",
+              "src/app/api/cases/[id]/route.ts",
+              "src/app/api/cases/route.ts",
+              "src/app/api/v1/cases/[id]/commands/route.ts",
+              "src/app/api/v1/cases/[id]/events/route.ts",
+              "src/app/api/v1/cases/[id]/route.ts",
+              "src/app/api/v1/cases/route.ts",
+              "src/server/case-api.ts",
+              "src/server/case-parameters.ts",
+              "src/server/case-queries.ts",
+              "tests/api/cases.test.ts",
+              "tests/unit/case-parameters.test.ts"
+            ]
+          },
+          {
+            "pullRequest": 35,
+            "title": "feat: integrate themed transaction discovery workspace (#14)",
+            "author": "KadakWNL",
+            "mergeCommit": "3bda24d04d791fdde168e85269e87c5601e2ee4e",
+            "mergedAt": "2026-10-27T13:27:26Z",
+            "files": [
+              ".impeccable/design.json",
+              "DESIGN.md",
+              "PRODUCT.md",
+              "README.md",
+              "docs/development-setup.md",
+              "docs/discovery-ui.md",
+              "src/app/(workspace)/access-denied/page.tsx",
+              "src/app/(workspace)/admin/page.tsx",
+              "src/app/(workspace)/layout.tsx",
+              "src/app/(workspace)/overview/page.tsx",
+              "src/app/(workspace)/transactions/[id]/page.tsx",
+              "src/app/(workspace)/transactions/page.tsx",
+              "src/app/actions/create-subject-case.ts",
+              "src/app/api/v1/overview/route.ts",
+              "src/app/error.tsx",
+              "src/app/fonts/IBMPlexSans.ttf",
+              "src/app/fonts/OFL.txt",
+              "src/app/globals.css",
+              "src/app/layout.tsx",
+              "src/app/login/page.tsx",
+              "src/app/page.tsx",
+              "src/app/sign-in/page.tsx",
+              "src/components/ui/button.tsx",
+              "src/components/workspace/app-shell.tsx",
+              "src/components/workspace/create-case-dialog.tsx",
+              "src/components/workspace/explorer.tsx",
+              "src/components/workspace/overview-screen.tsx",
+              "src/components/workspace/record-identifier.tsx",
+              "src/components/workspace/sign-in-form.tsx",
+              "src/components/workspace/theme-switch.tsx",
+              "src/components/workspace/transaction-detail.tsx",
+              "src/components/workspace/transaction-table.tsx",
+              "src/components/workspace/ui.tsx",
+              "src/components/workspace/use-api.ts",
+              "src/lib/transaction-types.ts",
+              "src/lib/workspace.ts",
+              "src/server/auth-config.ts",
+              "src/server/overview.ts",
+              "src/server/page-auth.ts",
+              "src/server/subject-case.ts",
+              "tests/api/transactions.test.ts",
+              "tests/e2e/auth.spec.ts",
+              "tests/unit/workspace.test.ts"
+            ]
+          },
+          {
+            "pullRequest": 37,
+            "title": "feat: integrate investigation queue, lifecycle dialogs and event history (#15)",
+            "author": "ShrikarDesai07",
+            "mergeCommit": "f7fe4e64452a92396cd7cc9d0da55c1001c7e8a4",
+            "mergedAt": "2026-10-27T14:10:17Z",
+            "files": [
+              "docs/api/cases.openapi.yaml",
+              "docs/case-api.md",
+              "docs/case-ui.md",
+              "playwright.config.ts",
+              "src/app/(workspace)/cases/[id]/page.tsx",
+              "src/app/(workspace)/cases/page.tsx",
+              "src/app/globals.css",
+              "src/components/workspace/app-shell.tsx",
+              "src/components/workspace/case-detail.tsx",
+              "src/components/workspace/case-dialogs.tsx",
+              "src/components/workspace/case-queue.tsx",
+              "src/components/workspace/overview-screen.tsx",
+              "src/components/workspace/transaction-detail.tsx",
+              "src/components/workspace/ui.tsx",
+              "src/lib/case-types.ts",
+              "src/lib/workspace.ts",
+              "src/server/case-parameters.ts",
+              "src/server/case-queries.ts",
+              "tests/api/cases.test.ts",
+              "tests/e2e/auth.spec.ts",
+              "tests/e2e/case-ui.spec.ts",
+              "tests/unit/case-parameters.test.ts",
+              "tests/unit/workspace.test.ts"
+            ]
+          },
+          {
+            "pullRequest": 40,
+            "title": "feat: demonstrate scoped Mongo telemetry reads and aggregation (#17)",
+            "author": "ShrikarDesai07",
+            "mergeCommit": "098fb43a1e018f667b72c301616896db500bd43e",
+            "mergedAt": "2026-10-29T15:32:52Z",
+            "files": [
+              ".env.example",
+              ".github/workflows/acceptance.yml",
+              ".github/workflows/checks.yml",
+              "README.md",
+              "docs/mongo-telemetry.md",
+              "package-lock.json",
+              "package.json",
+              "scripts/mongo-telemetry-seed.mjs",
+              "scripts/mongo-telemetry-setup.mjs",
+              "scripts/telemetry-schema.mjs",
+              "src/components/workspace/transaction-detail.tsx",
+              "src/lib/mongo.ts",
+              "src/lib/telemetry-schema.ts",
+              "src/lib/transaction-types.ts",
+              "src/server/telemetry.ts",
+              "src/server/transaction-api.ts",
+              "tests/api/telemetry.test.ts",
+              "tests/unit/mongo-telemetry.test.ts"
+            ],
+            "databaseIssue": 17
+          },
+          {
+            "pullRequest": 41,
+            "title": "feat: implement audited admin cleanup of expired SQL sessions (#23)",
+            "author": "ShrikarDesai07",
+            "mergeCommit": "f5fdf76bb50c5054167cbd1477b1e8536dd039f6",
+            "mergedAt": "2026-10-30T08:44:33Z",
+            "files": [
+              "docs/requirements-traceability.md",
+              "docs/session-cleanup-contract.md",
+              "migrations/060_session_cleanup.sql",
+              "src/app/(workspace)/admin/page.tsx",
+              "src/app/api/v1/session-cleanups/[id]/confirm/route.ts",
+              "src/app/api/v1/session-cleanups/preview/route.ts",
+              "src/components/workspace/session-cleanup.tsx",
+              "src/server/session-cleanup-parameters.ts",
+              "src/server/session-cleanup.ts",
+              "tests/api/session-cleanup.test.ts",
+              "tests/db/case-guards.test.ts",
+              "tests/db/session-cleanup.test.ts",
+              "tests/e2e/mvp-acceptance.spec.ts",
+              "tests/e2e/session-cleanup.spec.ts"
+            ],
+            "databaseIssue": 23
+          },
+          {
+            "pullRequest": 39,
+            "title": "Verify MVP acceptance across VS01-VS16",
+            "author": "KadakWNL",
+            "mergeCommit": "56d6127adfc2e77e5fd70eaab501ccfd4507ddd0",
+            "mergedAt": "2026-10-28T12:26:05Z",
+            "files": [
+              ".env.example",
+              ".github/workflows/acceptance.yml",
+              "README.md",
+              "docs/acceptance/2026-10-27-artifacts.json",
+              "docs/acceptance/2026-10-27-mvp-report.json",
+              "docs/acceptance/2026-10-27-mvp.md",
+              "docs/acceptance/2026-10-27-query-plans.json",
+              "docs/case-ui.md",
+              "docs/development-setup.md",
+              "docs/mvp-acceptance.md",
+              "package.json",
+              "playwright.acceptance.config.ts",
+              "scripts/acceptance-matrix.mjs",
+              "scripts/acceptance-safety.mjs",
+              "scripts/acceptance.mjs",
+              "src/components/workspace/case-detail.tsx",
+              "src/components/workspace/case-dialogs.tsx",
+              "tests/api/acceptance-gaps.test.ts",
+              "tests/api/acceptance-safety.test.ts",
+              "tests/e2e/mvp-acceptance.spec.ts",
+              "tests/financial-verification.mjs",
+              "tests/unit/acceptance.test.ts",
+              "vitest.config.ts"
+            ]
+          }
+        ],
+        "limitation": "PR authorship and committed changes establish source provenance; independent demonstration and originality assessment remain human gates."
+      }
+    },
+    {
+      "id": "mongo-heterogeneous-validator-and-aggregation",
+      "status": "passed",
+      "evidence": {
+        "pipeline": [
+          {
+            "$match": {
+              "device_id": "30000000-0000-0000-0000-000000000040",
+              "captured_at": {
+                "$lte": "2026-01-01T00:05:00.000Z"
+              }
+            }
+          },
+          {
+            "$sort": {
+              "captured_at": -1
+            }
+          },
+          {
+            "$limit": 100
+          },
+          {
+            "$group": {
+              "_id": "$shape_type",
+              "observations": {
+                "$sum": 1
+              },
+              "earliest": {
+                "$min": "$captured_at"
+              },
+              "latest": {
+                "$max": "$captured_at"
+              }
+            }
+          },
+          {
+            "$sort": {
+              "_id": 1
+            }
+          }
+        ],
+        "rows": [
+          {
+            "_id": "client_environment",
+            "observations": 6,
+            "earliest": "2025-12-28T14:22:15.000Z",
+            "latest": "2026-01-01T00:05:00.000Z"
+          },
+          {
+            "_id": "connection_telemetry",
+            "observations": 6,
+            "earliest": "2025-12-28T14:22:10.000Z",
+            "latest": "2026-01-01T00:04:15.000Z"
+          }
+        ],
+        "indexes": [
+          {
+            "name": "_id_",
+            "key": {
+              "_id": 1
+            }
+          },
+          {
+            "name": "idx_device_captured_at",
+            "key": {
+              "device_id": 1,
+              "captured_at": -1
+            }
+          },
+          {
+            "name": "idx_transaction_id",
+            "key": {
+              "transaction_id": 1
+            }
+          },
+          {
+            "name": "idx_retention_eligibility",
+            "key": {
+              "retention_eligible": 1,
+              "captured_at": 1
+            }
+          }
+        ],
+        "invalidPayloadRejectedWith": 121,
+        "appIntegrationEvidence": "tests/api/telemetry.test.ts: SQL authority, reference checks, masking, time bound and outage fallback"
+      }
+    }
+  ],
+  "defects": [],
+  "limitations": [
+    "The project owner approved the SQL DELETE scope; instructor acceptance has not been confirmed.",
+    "Merged implementation and automated tests do not prove an independent teammate demonstration or academic originality.",
+    "The timed final report/demo and independent clean-machine setup remain separate under #19.",
+    "Vector retrieval, Mongo notes/recovery, rule edits and redaction are deferred and are not counted as delivered."
+  ],
+  "environment": {
+    "postgresVersion": 170011,
+    "ownerRole": "finsight_test",
+    "runtimeRole": "finsight_runtime",
+    "runtimeIsNonowner": true
+  },
+  "runtime": {
+    "node": "v24.22.1",
+    "platform": "linux",
+    "mongoVersion": "7.0.45"
+  },
+  "source": {
+    "commit": "281c538e2c614529988153aad27eb35ed0ea2003",
+    "dirty": false,
+    "hashes": {
+      "scripts/academic-safety.mjs": "f0639c8a25dd3f8096b6e2bdea15d52c177dde1ddacdadda7a7e4697eb5477f4",
+      "scripts/academic-sql.mjs": "b428e35d36931a1c54757141e5b4d60342ec56042fd4f67eb262ec4ad4b63cdb",
+      "scripts/academic.mjs": "0403f4ab807f8ee05c0fcc56aad74ec9f8473f2c80b57fcae777ca958195998d",
+      "scripts/acceptance-matrix.mjs": "aab50a4802f637b30335290c79b22f5f00736479b482b069b1026a12b1b678f5",
+      "scripts/acceptance-safety.mjs": "e371b4bc8c1299b999339fba6320ef16db658cd198f0f27b975bcf3cd01401b1",
+      "scripts/acceptance.mjs": "01c8a2c7fa30e7bae32999bd05ffc33f40cea39edd388900ce99cf9b4b46d257",
+      "scripts/database-safety.mjs": "8a36417c4964e3149ce1dc81ea929e9e1388faa88f11e75d94f1a54a6b13d242",
+      "scripts/demo-cli.mjs": "420e950ea63480c54f3d2235b39b1d8fb4c094c96ee729469b8031dfd48e1766",
+      "scripts/demo-dataset.mjs": "1af35c0b3fa03ea54d11d2ea548c654b53fa17add6454465f0d4fb841c6fee01",
+      "scripts/demo-fx.mjs": "d0624ba3cd1f003d5dab17a06e1d4ab7e3259f0ef59912219ffaa91dd70a0670",
+      "scripts/demo-import.mjs": "24ef6762a273ef0f40ee784140c3e3828d184a3a7403af16b0aad57b1e514ba5",
+      "scripts/financial-seed.mjs": "8ca38f18870ba832b168ef6869c54fbe4088a34e3fdf478f8ed07e9e5c40efd9",
+      "scripts/migrate.mjs": "7c8c1c4789ecce88e7727a53987602dd27293d40c9a8019762c70a0a7eadfe66",
+      "scripts/migration-runner.mjs": "20220100f5b5dad54fa075b30a967ca63d7f23629843b3ebc4217e5d94593a7a",
+      "scripts/mongo-telemetry-seed.mjs": "f977a551b774e5ed92bd56f9525e310ba193d337a572dc30691c20a709a29844",
+      "scripts/mongo-telemetry-setup.mjs": "4ea7548a5f40a031bc0d1a145108bd5bfc2f6f0e94a58d359037292a52545c3a",
+      "scripts/pending.mjs": "8fd2b2f4eaa7be5510aadbe4bdea94f2462df2fc7babbc80f86ce3d01966d00c",
+      "scripts/provision-identities.mjs": "b9b22b1ca232a323406a764fda857674534c6fe9f2aec9cd9e5901f93565a739",
+      "scripts/seed.mjs": "d0054637ee1bf67752eff054aa08c70f9b9d7eba90e236c4f82b78288ad7bf5b",
+      "scripts/telemetry-schema.mjs": "6e5c318b4ee33206f670f2d0ec386f9f0069069450a996e7a625823dce51edfd",
+      "src/app/(workspace)/access-denied/page.tsx": "cfd4375d1cb79fb8c2ad002ca1875c9c8856150863c0ec569ccc19e6dca87bd3",
+      "src/app/(workspace)/admin/page.tsx": "1120dc94a2235db486ce6bb722b2daaf71bfc098012c6743b8b574a581228eed",
+      "src/app/(workspace)/cases/[id]/page.tsx": "9e2affabe7f04b41b809e9de1f075145933ece9556751656bce870f4ab94beae",
+      "src/app/(workspace)/cases/page.tsx": "1c6a06def3059748996c34555bd96f378412b39e0ea579e0566cd1acf8fe80e0",
+      "src/app/(workspace)/layout.tsx": "bc1004c4a4152a4576dddcce9840d599006eaecd5d25055f6be98c7e7df54ea1",
+      "src/app/(workspace)/overview/page.tsx": "619858578f1571ef79188ef19b423ef992401aec5f872089a6a9048a939c79a7",
+      "src/app/(workspace)/settings/page.tsx": "82b14cc252e8c5421bc16c5d1a6149af097317e45f6d573445a8132576260c96",
+      "src/app/(workspace)/transactions/[id]/page.tsx": "d95d182b41ad62ef46ffa55aa605481c7bf35c35e0b293811729fcd6f5c3b1ab",
+      "src/app/(workspace)/transactions/page.tsx": "1e9386fee36b583333d470b14c0ff8b2cc82d3277c57eff72399f730946309c9",
+      "src/app/actions/create-subject-case.ts": "2a03510b0a5b18cf44eb37950fed433dacf085b510fafab9f1cdc349e90073fe",
+      "src/app/api/auth/[...nextauth]/route.ts": "769e383903bdd6a62746ef87200bebb06340cb4305ef611ba914b8b33ec72f9a",
+      "src/app/api/auth/login/route.ts": "7ca8806f9cf86eef82ceb7ddb6f90360afb2933d557278d5c53012eed578e753",
+      "src/app/api/auth/logout/route.ts": "c2cfa2f4fa2802bd1545406c7056f28a9363b1d92af034878d0d1c9c1409085f",
+      "src/app/api/auth/session/route.ts": "66230a219075736211874b5a78b34afec687c3443a1384c0d33b86732553dafb",
+      "src/app/api/cases/[id]/commands/route.ts": "248a6fb16e1489c34cb49c9008cb6f3c9bd3b08ecee2222a09b0d5ff2560f9c7",
+      "src/app/api/cases/[id]/events/route.ts": "7ae39f753067501786dd21df16d0f680bf715dbe4fb5dbfe3fe1eade49ba1639",
+      "src/app/api/cases/[id]/route.ts": "0ed2b5fae68bd35d8fb391ffdafb7e06e5030e22608bf76478a9b9bd91df63b4",
+      "src/app/api/cases/route.ts": "70cdd4113c6799d309093703b6e8c377356612eb222aa9c071ad54c3b3a24636",
+      "src/app/api/health/route.ts": "d6ce9e8b1e2e413a5657b6464453449a21cdff50c358de9bc07eca031a5d762a",
+      "src/app/api/v1/cases/[id]/commands/route.ts": "248a6fb16e1489c34cb49c9008cb6f3c9bd3b08ecee2222a09b0d5ff2560f9c7",
+      "src/app/api/v1/cases/[id]/events/route.ts": "7ae39f753067501786dd21df16d0f680bf715dbe4fb5dbfe3fe1eade49ba1639",
+      "src/app/api/v1/cases/[id]/route.ts": "0ed2b5fae68bd35d8fb391ffdafb7e06e5030e22608bf76478a9b9bd91df63b4",
+      "src/app/api/v1/cases/route.ts": "70cdd4113c6799d309093703b6e8c377356612eb222aa9c071ad54c3b3a24636",
+      "src/app/api/v1/overview/route.ts": "18f048f41feecfaf8f9d36629eab0893eb2d7be45986af5803d285e8fee4acb2",
+      "src/app/api/v1/session-cleanups/[id]/confirm/route.ts": "47bfa1e26c3cb6abf5b1830230f933c17d48b4237ddc589a8aa8d4f5f7a9ae33",
+      "src/app/api/v1/session-cleanups/preview/route.ts": "819fbcdc5fd962bee94e309ebaf775466a7433279fb6fc37d6fe24b841c27dca",
+      "src/app/api/v1/transactions/[id]/route.ts": "9d508f36ed506540c4a97d1e659ecacb6161eee92d7cb5869680b507917bde77",
+      "src/app/api/v1/transactions/route.ts": "5e9e4cc9ff91a3564507ffa8560e26135b4794bf2db1b51a0b4321124671b7f1",
+      "src/app/error.tsx": "9d55be8d54442bfd912bb0f2074ab0f8acf6d56ef254fda0f9df002ddd072e4f",
+      "src/app/layout.tsx": "700789a6eabc8b990a8203eb5f12ba79df47ce77b0357bdeae4714c22145fac9",
+      "src/app/login/page.tsx": "d45c6e14c1557e5920d2100a243db65b2b2f018b46dcbfcd262344e3866a1e99",
+      "src/app/page.tsx": "a5214b205c701dc0282cb41cc37df1a08e26b1bddceb4ef9e8d6a94cea6cf92c",
+      "src/app/sign-in/page.tsx": "dee5416e94a419a8bd6a054c8baf72dfd3b39555d39614d32a4e5e4bd22c8100",
+      "src/components/ui/button.tsx": "529e074979027718dbdb850decaad2b022706678b503d544b47591b84c44c1d4",
+      "src/components/ui/settings-icon.tsx": "fd28d83712d4f9870fa3a696dd79724aaf2cc53b120e10dfdab071f1e28b8a34",
+      "src/components/workspace/app-shell.tsx": "3c5011cd8bb8cad387c26f5b612559bd7989763fe1d88a17d20efb9ba6ac14f9",
+      "src/components/workspace/case-detail.tsx": "3b7d8908d4f500acd67fc492510f9aa32c80f7dc7ca96cd95c91f7cfa32a4f3d",
+      "src/components/workspace/case-dialogs.tsx": "03d437a8088c566d98542581e0f0df5bf564a69918c9ff9039ece3f066950c88",
+      "src/components/workspace/case-queue.tsx": "7ce7056a6475226111870ff6b327a77a90e5eb01fa10cab28535489f129cbd12",
+      "src/components/workspace/create-case-dialog.tsx": "a84c1b08321230103ccf538395d7a888fce971e33d7fd565dd19f4a8079767e1",
+      "src/components/workspace/display-preferences.tsx": "a94b61f018893c119ab561c65c53ce109ef3461dfbe7db1ddb13b8b92c7c1b30",
+      "src/components/workspace/explorer.tsx": "427305b9e52a90c617627a3e4a591db56690f778163c454e5a42ddb7918c2fdf",
+      "src/components/workspace/overview-screen.tsx": "38890d604ae3a507769ff7a423ba4a1fb4a1dffc57b78a495e07057a3ddbe8f2",
+      "src/components/workspace/record-identifier.tsx": "e901f17e13d1761c891268f4f106885bd28fc0d8af57f67f95ffe4a8aefed49d",
+      "src/components/workspace/session-cleanup.tsx": "0ce0d5fe0ed19241078aa60c8b8be5095b489d458763595740abed7790c32e85",
+      "src/components/workspace/sign-in-form.tsx": "e587f798410a32ab0162ee1c22561d47be4165a9ecda064979cff9d5cb1eb070",
+      "src/components/workspace/theme-switch.tsx": "49bd987222723ecfbb5be8ab0931186a6774a5ce89113610a5c2115c080dd23e",
+      "src/components/workspace/transaction-detail.tsx": "bda9341cb4404b797a9dd8fb4952098e8c963770999a150a9cb06b869d7f7a59",
+      "src/components/workspace/transaction-table.tsx": "4f0c7dc77e2ba4cb87cfc3e03fd0a20e06c3d7906f50d225d70e551bd6e86aa2",
+      "src/components/workspace/ui.tsx": "f5c624cf1d1c090140ea90aec6509d2f3b3445e4c290b28b89d3ea65b483b8a6",
+      "src/components/workspace/use-api.ts": "705c5c3d9fc9d2ef0d3676e1c672c2669844d50a5ccdadb56914fe8dda28291a",
+      "src/lib/case-types.ts": "16107512e2ca2a71756888fb6f0dec2659a799c7af81875c7b4d697633167f6d",
+      "src/lib/display-preferences.ts": "21021df10e7a95daf312f8f270debe0c0ad39907557a83a127c74ceb89811264",
+      "src/lib/mongo.ts": "fbd33dcc026e722ec1a0022ade1e8fdadf4e7ffe474558a323514fe9f0c82dcd",
+      "src/lib/telemetry-schema.ts": "114d0abb0aede4ed135a03ba95b941c0331391131049a49d9b505c138ad46b4c",
+      "src/lib/transaction-types.ts": "060f0ee0ef5cb556ee4b9b864b0450d37fbc74778b147eb37674fd003cf2b088",
+      "src/lib/utils.ts": "9304a861c8673bee09e0f12de31773abbde503b02e59dfd74763ddec2e37cf05",
+      "src/lib/workspace.ts": "bc9d9db7bac0a0de6a5e6a26a0abeb51d62c9741513d21fafef34568badebf80",
+      "src/server/auth-config.ts": "e548e9137bdf7522fc5da4eb11f3f2af9d600eab2c5ea0f2fdd073fa8eb92f0c",
+      "src/server/auth-security.ts": "f701314f5fabff79d877c3a48872329e75cf838729df72dd64f2ee713174d8e3",
+      "src/server/auth.ts": "2555d174cb51d80e777f4222c1dfbc25b59a170310261f0edcacc44fda6b1f90",
+      "src/server/authentication.ts": "1b422f1e041d3edc598b7c9f12959aebe28f809e2b19ea5424f6acbc944fb7eb",
+      "src/server/authorization.ts": "429e21a3a384e72c7a48c7c4d4b6173585e922c97d678c16ba025522d5532b04",
+      "src/server/case-api.ts": "6b40ddc91a98682285409308c2e766408e53f6b6bba0cab6671d2c6b49cd044c",
+      "src/server/case-commands.ts": "b4e61e46e01678863147f25130b725a64c4c7a0fee25488c2702a5632612c3c5",
+      "src/server/case-parameters.ts": "a234900116c1da641abafa3ec73ac1e4b75455a2b0dae65111bd8c0b083dbd61",
+      "src/server/case-queries.ts": "4ec1fd64a5a92908134d05b68f0f880bda80c3813ecc0dfc9570dbb3e124091f",
+      "src/server/db.ts": "0f20cb8fc9d6671397ac557de9f55bbbe838b5689dd18111087d1eb6ddd5cff1",
+      "src/server/financial-queries.ts": "f4a8784401e1f98f84429e9dba507871735e93a2071e8ddd585a1f9f99bdce2a",
+      "src/server/login-limit.ts": "a303893386cda86d2e607675e7d18296107ef95128eae0892d9fb13ffe9680f8",
+      "src/server/overview.ts": "49d6541434a19deb9802579cf256e071e2a2b8666ab4e65971abe4466c503776",
+      "src/server/page-auth.ts": "91137436306f3672a1dc39fd501767d6879f84c23413a902060d9f8d5c06fc2c",
+      "src/server/session-cleanup-parameters.ts": "2a6466740c0de91ab03d46f903ba024e9487536f6a40d579ef5b04655722845e",
+      "src/server/session-cleanup.ts": "7979c63f4dcec2e965096db89910ff1c554a21d8c5c1c0dc1a7e99b561857f02",
+      "src/server/session.ts": "94856ad576f0b335f0adb016faa6f448c4705f29f5f5792040cb34001d55fff9",
+      "src/server/subject-case.ts": "67d5d75847cba20b74513973d0c2749e535ab5ef94737ba9ffb573bf8f8d7f09",
+      "src/server/telemetry.ts": "01e869e193c16153cd8bb1990748bc1c82682a5c5f0deecf8d161501739d8392",
+      "src/server/transaction-api.ts": "18ce45daad3e641436b6d641b1c37908a4a7249beffd2486e3188969e1c4bca2",
+      "src/server/transaction-parameters.ts": "7e3abdcf500e48aa7bcee168f9561965f19dbf46f9d0216ecd40a3a9daa52ff9",
+      "tests/api/acceptance-gaps.test.ts": "185678c7f8b9df3d221814d8171f13186e0454510dd7893bc962b4f9bcecb9b6",
+      "tests/api/acceptance-safety.test.ts": "16165a0b4e1c7c9c0fd26b9f8eb14f913dcdcddef8d1b46648d459b75afd103e",
+      "tests/api/auth.test.ts": "46ecd8e2863269ed1d63bccebdf90ea5f532ac2ed4eb210a55c40035ba44bc37",
+      "tests/api/cases.test.ts": "6aca2ae50e648d639ec2403967ecad482161561b513d803972ec0ec9aa1c5124",
+      "tests/api/demo-import.test.ts": "acd48d0d4ad3d4e8c3d1a10b43b03e720b59416143568d321d933af7831ea2e7",
+      "tests/api/health.test.ts": "8ddc292e5e39a9ca3d7dac52da83475a907224a6cf35d511033a2b814502c517",
+      "tests/api/provision.test.ts": "53defa7dcf1b8a8179c47d1c5c0399d29eefea7b6e40369fc5f87a74269bf79e",
+      "tests/api/session-cleanup.test.ts": "7d0a8c12be1ffe28c9e135d635653738753024bbfb90067594b97d5386a14646",
+      "tests/api/telemetry.test.ts": "7756e59eab0ea2d85b5b2c598173586c4fa472504b63dd3a04ed428fa98960c9",
+      "tests/api/transactions.test.ts": "c6385569f05bd0279bd8a197fb210e7b0a2ca0e3a2008da13b3f62a60bfb2096",
+      "tests/db/case-guards.test.ts": "3787b2a493f17835f868bb0f603baa7cddc0786ff69cd2179bf001d36928f1cd",
+      "tests/db/migrations.test.ts": "0dc0e415382759f6690e5d365b7a3094f6c1cd438c8323453da43fa401fae648",
+      "tests/db/session-cleanup.test.ts": "bfe2d5189127d9b92da82fe7a58c73608b4f7828b25507efb6701fb8ded71a31",
+      "tests/e2e/auth.spec.ts": "bb6cf168e9d12d4f3e50a57ee88353135a4f55bc5145a7fb03424e6062e3ac71",
+      "tests/e2e/case-ui.spec.ts": "5557dbffe523e450a09c423ccaecca57e6db4fbe8d58ee0af80603893aa7b330",
+      "tests/e2e/mvp-acceptance.spec.ts": "34eee401734d2e9d14eee66080fec5546ad54ffa7acddbd976f924ac4a6df710",
+      "tests/e2e/session-cleanup.spec.ts": "1a57db529c0c7c6128da8275661593e3d7fe2ee57c4926dbacaa0408fc6364a5",
+      "tests/e2e/shell.spec.ts": "0c4a459bc43e2d8086aef9ad88b49ef63a90e09c05a90a12a0b07b0f48ef1d80",
+      "tests/financial-verification.mjs": "175454b8386905370c60c2f56345fcde1bdc334230fbd7510f54ec5e161ad2fc",
+      "tests/risk-verification.mjs": "c3755e0e0d9b21157e5e2485f7bbcd93c50deacdc6753e6cbfd78f3a5cf793fe",
+      "tests/sql/case_guards.sql": "8c9e95391b4915b2ce8cb6a9e78d04ba834402a2ebc1429e217bfb098dd9abb6",
+      "tests/sql/financial_baseline.sql": "0827023cba579c3e4ea3cb60d10b6454e135d984b88363329b6f49dc7a4cac5d",
+      "tests/sql/financial_fixture.sql": "500bc11b800ab8dbe6415ee4001bf2a70e559f77203351dd15473e24a325b451",
+      "tests/sql/financial_guards.sql": "6689232b05ab8489117de2bb3fee020b6d89a3af6174f8a54081feedd7c8d459",
+      "tests/sql/operational_schema.sql": "19010ca49358688ed105fe74c73c54c7ad407cff03e42c2a034c1efde36d7a74",
+      "tests/unit/academic-safety.test.ts": "b80190d99eebde2aea82fcf2c3cc7dfab98f92eb6fab4b4333e354f52a447429",
+      "tests/unit/acceptance.test.ts": "c2eb3ccf9096e8bcfc4046b77ef38983c55f2a2136832047ac57472c7d18d3dc",
+      "tests/unit/auth-security.test.ts": "22afba22aeab87a8cf2a1ecd28253ad5663b1599571c70e15e29cf6aa17d5895",
+      "tests/unit/auth.test.ts": "7d25f70181fd4745c43d9d6860b3b234e2057a31bc5304a4c8aa41d81266f10b",
+      "tests/unit/case-parameters.test.ts": "220a56236a732504cdb23c482cbfad1739d22fb304465d5f5c58455cce835c12",
+      "tests/unit/database-safety.test.ts": "eee770f249e89b83d2a4b6648d43592ad03c7b400754136bcf4f3bd1817e8b61",
+      "tests/unit/demo-dataset.test.ts": "a1ad33fe832c1057f2fd464b8643e01dff90c718a4d967870c8071be323058ab",
+      "tests/unit/display-preferences.test.ts": "0cd501ba4462c2ee51516f7d09fae942814b5b0303ea819ba53e6d0858337722",
+      "tests/unit/mongo-telemetry.test.ts": "c3a0a013bbdc377b56131d2713509d131a64217b1be7faf549c9bdf4d139ae73",
+      "tests/unit/synthetic-database-safety.test.ts": "b8213d5240355336e089590381ac25c3db53e657821680d5e34b83ad5bdd93ec",
+      "tests/unit/transaction-parameters.test.ts": "52b46acbe052dcb007bb7004a62975156283d451287fdd5dc0527bd20bc941ab",
+      "tests/unit/workspace.test.ts": "80640392333f1727d8337a4e1e48773cad564c169e813656255686a536ff0d0b",
+      "migrations/010_financial_baseline.sql": "2585550ff1be78aec0c907aeba9e11df70f007ed6fc5c0d88f729c4b09d75914",
+      "migrations/020_operational_schema.sql": "1a4748725e1a2b5b2b421cb3b81a62f06aa75a6dd9fa83ec12d19ed5a88c1b77",
+      "migrations/030_financial_guards.sql": "54fa5436b59b7177d5d2acfd35d153bc0ac444e4adc5f9ff7e830729f1b7e682",
+      "migrations/040_deterministic_risk.sql": "c3a24aecbbb0c2d03a9a600914ee32d55901ef85dd5cb7bbb72f71a4791ea66a",
+      "migrations/050_case_guards.sql": "9c301374f58793fb16055b78a59e461c4e9c5e5aaae0857ff2769bd5bd795727",
+      "migrations/055_auth_session_validation.sql": "3ea8af7cf28e4b02b1569e307599d73ebfc3d64dbd75c60c18f509c834541a5b",
+      "migrations/060_session_cleanup.sql": "016f31f0d1d1611eab9386e8eccf1901bdcab85fca904d79614ac7e80e8db42e",
+      "package-lock.json": "3d831f8ac5be25cb7e5aea489962d0a11a61143b4e389053bbc3bc49c43df77d",
+      "playwright.config.ts": "4d6b54b305549e11f3f5d983d5669a0077b080ac2b7e3f87417f63e66b70ee35",
+      "playwright.acceptance.config.ts": "d9af0b73f5761c27b1f35388f826b732aaa86e7074e7ccaee6f04f24be5c0720",
+      "vitest.config.ts": "417c40101bb60eeb17c3bb6c7e5857469a06fe7631781aa427bfdffedcde3d36",
+      "next.config.ts": "7a471f27744c04aad0cf3cc9a3c3de461b1d3e2b692c7bbcb76ac1ef5b59771f"
+    }
+  },
+  "migrations": [
+    {
+      "filename": "010_financial_baseline.sql",
+      "checksum": "2585550ff1be78aec0c907aeba9e11df70f007ed6fc5c0d88f729c4b09d75914"
+    },
+    {
+      "filename": "020_operational_schema.sql",
+      "checksum": "1a4748725e1a2b5b2b421cb3b81a62f06aa75a6dd9fa83ec12d19ed5a88c1b77"
+    },
+    {
+      "filename": "030_financial_guards.sql",
+      "checksum": "54fa5436b59b7177d5d2acfd35d153bc0ac444e4adc5f9ff7e830729f1b7e682"
+    },
+    {
+      "filename": "040_deterministic_risk.sql",
+      "checksum": "c3a24aecbbb0c2d03a9a600914ee32d55901ef85dd5cb7bbb72f71a4791ea66a"
+    },
+    {
+      "filename": "050_case_guards.sql",
+      "checksum": "9c301374f58793fb16055b78a59e461c4e9c5e5aaae0857ff2769bd5bd795727"
+    },
+    {
+      "filename": "055_auth_session_validation.sql",
+      "checksum": "3ea8af7cf28e4b02b1569e307599d73ebfc3d64dbd75c60c18f509c834541a5b"
+    },
+    {
+      "filename": "060_session_cleanup.sql",
+      "checksum": "016f31f0d1d1611eab9386e8eccf1901bdcab85fca904d79614ac7e80e8db42e"
+    }
+  ],
+  "completedAt": "2026-10-30T09:02:55.404Z"
+}

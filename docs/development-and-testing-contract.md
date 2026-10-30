@@ -1,5 +1,7 @@
 # Development, Migration, Testing, and Academic-Scope Contract
 
+> Current DELETE acceptance gate: the [2026-10-30 project-owner decision](academic/delete-scope-decision.md) supersedes earlier instructor-confirmation references in this contract. Real execution/retention evidence and teammate review remain required.
+
 - **Status:** Proposed for cross-review — not approved and not implemented.
 - **Related work:** [Issue #4](https://github.com/KadakWNL/finsight/issues/4)
 - **Decision owner:** ShrikarDesai07 · **Cross-review:** KadakWNL

@@ -25,7 +25,8 @@
     "demo:import": "node --env-file-if-exists=.env.local scripts/demo-cli.mjs import",
     "auth:provision": "node --env-file-if-exists=.env.local scripts/provision-identities.mjs",
     "telemetry:setup": "node --env-file-if-exists=.env.local scripts/mongo-telemetry-setup.mjs",
-    "telemetry:seed": "node --env-file-if-exists=.env.local scripts/mongo-telemetry-seed.mjs"
+    "telemetry:seed": "node --env-file-if-exists=.env.local scripts/mongo-telemetry-seed.mjs",
+    "test:academic": "node scripts/academic.mjs"
   },
   "dependencies": {
     "argon2": "^0.45.1",
