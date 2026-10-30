@@ -14,20 +14,23 @@
   "migrationChecksumsMatch": true,
   "catalogAttributeCoverage": "passed",
   "deferredEntitiesExcluded": true,
+  "paper": "A4 landscape",
   "files": [
     {
-      "file": "output/pdf/FinSight-ER-Diagram.pdf",
-      "sha256": "f279a83f59ca6cb5832a1de1f27fa8f9c353ff7b8c33dbf322c79359cbbdd9d5",
+      "file": "output/pdf/FinSight-ER-Diagram-A4.pdf",
+      "sha256": "dfd6878322546dfd5e8ceca894dd96b66d9c1c198518b1793fa50fc6b2e8329d",
       "pages": 1,
-      "widthPoints": 3370.393798828125,
-      "heightPoints": 2383.93701171875
+      "paper": "A4 landscape",
+      "widthPoints": 841.8897705078125,
+      "heightPoints": 595.2755737304688
     },
     {
-      "file": "output/pdf/FinSight-Schema-Diagram.pdf",
-      "sha256": "c78358407cf1e15aaf1631058680a1c424c48f84c4f89b930748c8ff0c85c2e8",
+      "file": "output/pdf/FinSight-Schema-Diagram-A4.pdf",
+      "sha256": "ef3e3c6f1823a60eacf27770403a867a355b4a33a4721518c43628e3fffc7054",
       "pages": 1,
-      "widthPoints": 2383.93701171875,
-      "heightPoints": 1683.780029296875
+      "paper": "A4 landscape",
+      "widthPoints": 841.8897705078125,
+      "heightPoints": 595.2755737304688
     }
   ]
 }

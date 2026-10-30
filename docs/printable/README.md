@@ -2,10 +2,10 @@
 
 Use these two print masters for the demonstration:
 
-- [ER diagram](../../output/pdf/FinSight-ER-Diagram.pdf): Chen notation with entity rectangles, attribute ellipses, relationship diamonds, cardinalities and underlined primary keys. The master is A0 landscape.
-- [Schema diagram](../../output/pdf/FinSight-Schema-Diagram.pdf): attribute strips, solid PK underlines, dotted FK underlines, red primary-key dependencies and black declared-FK arrows. The master is A1 landscape.
+- [ER diagram](../../output/pdf/FinSight-ER-Diagram-A4.pdf): Chen notation with entity rectangles, attribute ellipses, relationship diamonds, cardinalities and underlined primary keys. The master is one A4 landscape page.
+- [Schema diagram](../../output/pdf/FinSight-Schema-Diagram-A4.pdf): attribute strips, solid PK underlines, dotted FK underlines, red primary-key dependencies and black declared-FK arrows. The master is one A4 landscape page.
 
-Both print **FinSight**, **Shrikar Desai**, and **Shreyas P Kulkarni**. They are vector PDFs: zoom for inspection, or ask a print shop to print at the stated native size. Shrinking the whole poster to A4 makes the attributes too small. [ER preview](finsight-er-preview.png) and [schema preview](finsight-schema-preview.png) are screen previews, not the print masters.
+Both print **FinSight**, **Shrikar Desai**, and **Shreyas P Kulkarni**. Both are designed for standard A4 paper. Print in landscape at 100% size; no poster scaling or oversized paper is required. The ER uses compact attribute clusters with a numbered relationship key; long schema strips wrap within their own relation. [ER preview](finsight-er-preview.png) and [schema preview](finsight-schema-preview.png) are screen previews, not the print masters.
 
 ## Verified scope
 
@@ -25,11 +25,10 @@ Export only against an explicitly opted-in local test database. `export-catalog.
 node --env-file-if-exists=.env.local scripts/diagrams/export-catalog.mjs
 ```
 
-Install `@viz-js/viz@3.31.0` in a temporary directory, outside application dependencies. Supply that directory to the layout command. Python needs `reportlab` and `pymupdf`:
+Python needs `reportlab` and `pymupdf`. The layout uses fixed A4 coordinates and does not need Graphviz or a Node layout dependency:
 
 ```powershell
-node scripts/diagrams/layout-er.mjs C:/path/to/temporary-viz-install
 python scripts/diagrams/render_printables.py
 ```
 
-The layout command generates Graphviz layout data under ignored `tmp/pdfs/`; the renderer produces the SVG, preview PNGs and both PDF masters. It checks that every catalog table/column, every Mongo property and both names appear in the PDF text. Visual QA additionally checks the full pages and close-ups for clipping or overlaps. Re-export and regenerate if a migration or Mongo schema changes before the demonstration. Make the same migrations and application revision available on both teammates' systems.
+The renderer produces the SVG, preview PNGs, A4 layout audit, review ZIP and both PDF masters. It checks that every catalog table/column, every Mongo property and both names appear in the PDF text, each PDF has exactly one A4 landscape page, and all attribute boxes stay inside the page. Visual QA additionally checks the full pages and close-ups for clipping or overlaps. Re-export and regenerate if a migration or Mongo schema changes before the demonstration. Make the same migrations and application revision available on both teammates' systems.

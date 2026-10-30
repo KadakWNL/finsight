@@ -2,7 +2,6 @@
 import hashlib
 import json
 from pathlib import Path
-import xml.etree.ElementTree as ET
 import pymupdf
 
 root=Path(__file__).resolve().parents[2]
@@ -12,20 +11,19 @@ assert [p.name for p in migration_files]==[m['filename'] for m in catalog['migra
 for source,migration in zip(migration_files,catalog['migrations']):
     assert hashlib.sha256(source.read_bytes()).hexdigest()==migration['checksum'],source.name
 
-svg=ET.parse(root/'docs/printable/finsight-er-diagram.svg')
-ns={'s':'http://www.w3.org/2000/svg'}
+layout=json.loads((root/'docs/printable/a4-layout.json').read_text(encoding='utf-8'))
 for table in catalog['tables']:
-    group=svg.find(f".//s:g[@id='entity-{table['name']}']",ns)
-    assert group is not None,table['name']
-    labels={node.text for node in group.findall('s:text',ns)}
-    assert {column['name'] for column in table['columns']} <= labels,table['name']
-    assert len(group.findall('s:ellipse',ns))==len(table['columns']),table['name']
+    for diagram in ['ER','Schema']:
+        actual=[row['attribute'] for row in layout if row['diagram']==diagram and row['entity']==table['name']]
+        assert set(actual)=={column['name'] for column in table['columns']},(diagram,table['name'])
+        assert len(actual)==len(table['columns']),(diagram,table['name'])
 
 files=[]
-for filename in ['FinSight-ER-Diagram.pdf','FinSight-Schema-Diagram.pdf']:
+for filename in ['FinSight-ER-Diagram-A4.pdf','FinSight-Schema-Diagram-A4.pdf']:
     path=root/'output/pdf'/filename
     document=pymupdf.open(path)
     assert len(document)==1
+    assert abs(document[0].rect.width-841.8898)<.1 and abs(document[0].rect.height-595.2756)<.1
     text=document[0].get_text()
     for expected in [catalog['title'],*catalog['members']]:
         assert expected in text,expected
@@ -36,11 +34,11 @@ for filename in ['FinSight-ER-Diagram.pdf','FinSight-Schema-Diagram.pdf']:
     for deferred in ['semantic_document','personal_data_redaction']:
         assert deferred not in text.lower(),deferred
     files.append({'file':str(path.relative_to(root)).replace('\\','/'),'sha256':hashlib.sha256(path.read_bytes()).hexdigest(),
-                  'pages':1,'widthPoints':document[0].rect.width,'heightPoints':document[0].rect.height})
+                  'pages':1,'paper':'A4 landscape','widthPoints':document[0].rect.width,'heightPoints':document[0].rect.height})
 manifest={'title':catalog['title'],'members':catalog['members'],'sourceCommit':catalog['sourceCommit'],
           'applicationTables':17,'toolingTables':1,'views':1,'sqlAttributes':sum(len(t['columns']) for t in catalog['tables']),
           'declaredSqlForeignKeys':sum(c['type']=='f' for t in catalog['tables'] for c in t['constraints']),
           'mongoCollection':catalog['mongo']['collection'],'migrationChecksumsMatch':True,
-          'catalogAttributeCoverage':'passed','deferredEntitiesExcluded':True,'files':files}
+          'catalogAttributeCoverage':'passed','deferredEntitiesExcluded':True,'paper':'A4 landscape','files':files}
 (root/'docs/printable/verification.json').write_text(json.dumps(manifest,indent=2)+'\n',encoding='utf-8')
 print(json.dumps(manifest,indent=2))

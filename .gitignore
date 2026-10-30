@@ -22,3 +22,6 @@ coverage/
 tmp/pdfs/
 data/local/
 docs/DBMS Level 3 Project Requirements.pdf
+
+# Python diagram renderer cache
+__pycache__/
