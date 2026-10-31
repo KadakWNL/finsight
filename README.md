@@ -183,5 +183,6 @@ For the compulsory demonstration hard copies, use the [current ER and relational
 | [Architecture assessment](docs/architecture-gaps.md) / [requirements](docs/requirements-traceability.md) | Design decisions, capability gates and academic mapping |
 | [Session cleanup contract](docs/session-cleanup-contract.md) | Scoped nonfinancial deletion and audit requirements |
 | [MongoDB telemetry](docs/mongo-telemetry.md) | Document model, validators, indexes, bounded aggregation and graceful degradation |
+| [Follow-up handoffs](docs/advanced-follow-up-handoffs.md) | Deferred capability register, implementation gates, and follow-up handoff specifications |
 
 Design documents retain proposed or historical sections. Executable migrations, source, API references and current check results establish implemented behavior.
