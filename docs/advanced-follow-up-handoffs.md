@@ -58,17 +58,17 @@ flowchart TD
         F5["Scoped Mongo Telemetry\n(device_telemetry, JSON Validator)"]
     end
 
-    subgraph Dependency group1["Dependency group 1: Investigation & Platform Governance"]
+    subgraph DependencyGroup1["Dependency group 1: Investigation & Platform Governance"]
         CapA["Capability A: MongoDB Analyst Notes\n(Outbox Intent, Confirmation, Recovery)"]
         CapD["Capability D: Admin Audit & Operator Lifecycle\n(admin_audit_log, Session Revocation)"]
     end
 
-    subgraph Dependency group2["Dependency group 2: Rule Evolution & Data Lifecycle"]
+    subgraph DependencyGroup2["Dependency group 2: Rule Evolution & Data Lifecycle"]
         CapC["Capability C: Immutable Risk-Rule Revisions\n(risk_rule_revision, Prospective Scoring)"]
         CapF["Capability F: Exports & Telemetry Retention\n(Streaming Export, Mongo Batch Cleanup)"]
     end
 
-    subgraph Dependency group3["Dependency group 3: Advanced Intelligence & Privacy"]
+    subgraph DependencyGroup3["Dependency group 3: Advanced Intelligence & Privacy"]
         CapB["Capability B: Semantic Retrieval\n(pgvector, Source Provenance, Pre-filtering)"]
         CapE["Capability E: Cross-Store Redaction\n(pii_redaction_request, Multi-Store Worker)"]
     end
@@ -453,7 +453,7 @@ Establish an audited, multi-store workflow to redact Personally Identifiable Inf
   - No team-approved policy exists for accidental PII in immutable narrative fields (`case_event.reason`, `transaction.description`).
 
 #### 3. Proposed Scope
-- **Proposed PII Scope ? unapproved:**
+- **Proposed PII Scope: unapproved:**
   - *PostgreSQL:* Review actual customer columns `full_name`, `email`, `phone`, and `date_of_birth`, and address columns `line1`, `city`, `state`, `postal_code`, `latitude`, and `longitude`. Select type-correct nulling/masking values and explicitly decide country-field retention. Columns such as `first_name`, `national_id`, and `line_2` do not exist. Current financial guards may reject these updates; any narrow redaction exception needs separately approved DDL and retention tests.
   - *MongoDB:* Review actual `payload.ip_routing_hash` and structured client-environment fields; no raw client-header field is currently modeled. Any future note-body handling must reconcile Capability A's append-only policy through an approved masking/tombstone protocol, not silently rewrite confirmed notes.
   - *Vector Store:* In `semantic_document` (Capability B), purge embeddings derived from redacted customer text and trigger re-indexing.
@@ -613,7 +613,7 @@ To preserve project velocity and prevent premature commitment of resources, the 
    - Future implementation issues must remain **explicitly unestimated** until each capability is split into its own independent ticket, reviewed, and sized.
    - Teammate capacity is bounded at 1–2 hours per day. Split and estimate future work against that capacity; this document sets no implementation schedule.
 3. **Scheduling Restrictions:**
-   - No target release dates, calendar deadlines, iterations, or dependency groups are assigned by this document.
+   - No target release dates, calendar deadlines, iterations, or milestones are assigned by this document.
    - These are planning and review gates; deferred capabilities have no runtime implementation or server-enforced activation controls yet. No capability may be enabled merely because an administrative session exists.
 4. **Activation Gate:**
    - `@KadakWNL` must review and confirm compatibility before any future dependent issue can transition to `Ready`.
