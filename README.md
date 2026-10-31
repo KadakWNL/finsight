@@ -13,7 +13,18 @@ FinSight helps an analyst find unusual transactions, inspect the recorded signal
   <img src="docs/screenshots/transactions-light.png" alt="FinSight transaction explorer showing masked synthetic activity, original and INR base amounts, risk signals and a square sidebar selection" width="1440">
 </picture>
 
-The captures show the running application with generated synthetic data. The workspace supports light/dark themes, a square sidebar selection and expandable typed identifiers that retain access to full UUIDs.
+Captured from the running application on October 31, 2026, using the eight canonical synthetic transactions. The workspace supports light/dark themes, a square sidebar selection and expandable typed identifiers that retain access to full UUIDs.
+
+<details>
+  <summary>Transaction detail and recorded risk evidence</summary>
+
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/transaction-detail-dark.png">
+    <img src="docs/screenshots/transaction-detail-light.png" alt="Synthetic USD 125 transaction with INR 10,000 base amount and two recorded rule signals contributing 40 and 25 points, totaling 65 points in the high band" width="1440">
+  </picture>
+
+  The detail view explains each recorded contribution and shows masked account, merchant and device context. MongoDB was offline for this capture; the telemetry panel reports its unavailability while financial facts and risk evidence remain visible.
+</details>
 
 ## Implemented features
 
