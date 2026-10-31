@@ -9,18 +9,18 @@ Financial transaction review and traceable investigation, built with Next.js and
 FinSight helps an analyst find unusual transactions, inspect the recorded signals behind a risk score, and open an investigation. Admins oversee case activity. Database constraints and guarded SQL commands preserve financial facts, enforce case transitions and retain an immutable decision history.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/transactions-dark.png">
-  <img src="docs/screenshots/transactions-light.png" alt="FinSight transaction explorer showing masked synthetic activity, original and INR base amounts, risk signals and a square sidebar selection" width="1920">
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/transactions-dark-1920x1080.png">
+  <img src="docs/screenshots/transactions-light-1920x1080.png" alt="FinSight transaction explorer showing masked synthetic activity, original and INR base amounts, risk signals and a square sidebar selection" width="1920">
 </picture>
 
-Captured at a 1920 ? 1080 desktop viewport from the running application on October 31, 2026, using the eight canonical synthetic transactions. The workspace supports light/dark themes, a square sidebar selection and expandable typed identifiers that retain access to full UUIDs.
+Captured at a 1920 x 1080 desktop viewport from the running application on October 31, 2026, using the eight canonical synthetic transactions. The workspace supports light/dark themes, a square sidebar selection and expandable typed identifiers that retain access to full UUIDs.
 
 <details>
   <summary>Transaction detail and recorded risk evidence</summary>
 
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/transaction-detail-dark.png">
-    <img src="docs/screenshots/transaction-detail-light.png" alt="Synthetic USD 125 transaction with INR 10,000 base amount and two recorded rule signals contributing 40 and 25 points, totaling 65 points in the high band" width="1920">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/transaction-detail-dark-1920x1080.png">
+    <img src="docs/screenshots/transaction-detail-light-1920x1080.png" alt="Synthetic USD 125 transaction with INR 10,000 base amount and two recorded rule signals contributing 40 and 25 points, totaling 65 points in the high band" width="1920">
   </picture>
 
   The detail view explains each recorded contribution and shows masked account, merchant and device context. MongoDB was offline for this capture; the telemetry panel reports its unavailability while financial facts and risk evidence remain visible.
