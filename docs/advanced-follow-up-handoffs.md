@@ -1,20 +1,20 @@
 # FinSight — Deferred Capability Register and Follow-up Handoffs
 
-**Document Version:** 1.0.0  
-**Status:** Reviewed Architectural Handoff Specification  
-**Issue Reference:** [Issue #20: Prepare gated follow-up handoffs after academic completion](https://github.com/KadakWNL/finsight/issues/20)  
-**Accountable Owner:** `@ShrikarDesai07`  
-**Cross-Reviewer:** `@KadakWNL`  
-**Planning Phase / Priority:** Advanced Features / P3  
-**Handoff Scope Estimate:** 1 relative point (applies exclusively to this handoff document; future implementation effort remains explicitly unestimated)  
-**Target Branch:** `main`  
+**Document Version:** 1.0.0
+**Status:** Proposed follow-up register; publication does not approve future contracts
+**Issue Reference:** [Issue #20: Prepare gated follow-up handoffs after academic completion](https://github.com/KadakWNL/finsight/issues/20)
+**Accountable Owner:** `@ShrikarDesai07`
+**Cross-Reviewer:** `@KadakWNL`
+**Planning Phase / Priority:** Advanced Features / P3
+**Handoff Scope Estimate:** 1 relative point (applies exclusively to this handoff document; future implementation effort remains explicitly unestimated)
+**Target Branch:** `main`
 **Prerequisites:** Issue #16 (MVP acceptance VS01–VS16, closed) and Issue #19 (Academic submission package, closed)
 
 ---
 
 ## 1. Executive Summary and Architectural Purpose
 
-FinSight's core architecture was intentionally partitioned into an **academic and MVP delivery core** and a **deferred capabilities portfolio**. The foundational release—delivered across seven PostgreSQL migrations (`010` through `060`), MongoDB `device_telemetry`, Next.js 16 App Router workspaces, and full acceptance suites (VS01–VS16)—establishes ACID financial accounting, deterministic explainable risk scoring, guarded single-active case state machines, immutable event sourcing, least-privilege role boundaries, and audited expired session deletion.
+FinSight's core architecture was intentionally partitioned into an **academic and MVP delivery core** and a **deferred capabilities portfolio**. The foundational release—delivered across seven PostgreSQL migrations (`010` through `060`), MongoDB `device_telemetry`, Next.js 16 App Router workspaces, and full acceptance suites (VS01–VS16)—establishes transactional financial record integrity, deterministic explainable risk scoring, guarded single-active case state machines, immutable case event history, least-privilege role boundaries, and audited expired session deletion.
 
 During architectural design ([`docs/architecture-gaps.md`](architecture-gaps.md)), six advanced capabilities were evaluated and deliberately deferred to protect foundational integrity, prevent premature dependency lock-in, and honor the academic submission timeline:
 
@@ -46,7 +46,7 @@ The following non-negotiable architectural rules govern all future work:
 
 ## 2. Dependency Overview and Implementation Order
 
-The six deferred capabilities have distinct technical dependencies. They must not be implemented arbitrarily or in parallel without respecting data model prerequisites. The diagram below illustrates the required sequence of implementation milestones:
+The six deferred capabilities have distinct technical dependencies. They must not be implemented arbitrarily or in parallel without respecting data model prerequisites. The diagram below shows proposed technical dependencies only; groups are not assigned milestones, iterations, or implementation commitments.
 
 ```mermaid
 flowchart TD
@@ -54,21 +54,21 @@ flowchart TD
         F1["PostgreSQL Relational Core\n(Migrations 010-060, Financial Tables, Triggers)"]
         F2["Deterministic Risk Engine\n(v_transaction_risk, score_transaction)"]
         F3["Guarded Case Management\n(execute_case_command, case_event)"]
-        F4["Auth.js & Persisted Sessions\n(app_user, app_session, cleanup)"]
+        F4["NextAuth & Persisted Sessions\n(app_user, app_session, cleanup)"]
         F5["Scoped Mongo Telemetry\n(device_telemetry, JSON Validator)"]
     end
 
-    subgraph Milestone1["Milestone 1: Investigation & Platform Governance"]
+    subgraph Dependency group1["Dependency group 1: Investigation & Platform Governance"]
         CapA["Capability A: MongoDB Analyst Notes\n(Outbox Intent, Confirmation, Recovery)"]
         CapD["Capability D: Admin Audit & Operator Lifecycle\n(admin_audit_log, Session Revocation)"]
     end
 
-    subgraph Milestone2["Milestone 2: Rule Evolution & Data Lifecycle"]
+    subgraph Dependency group2["Dependency group 2: Rule Evolution & Data Lifecycle"]
         CapC["Capability C: Immutable Risk-Rule Revisions\n(risk_rule_revision, Prospective Scoring)"]
         CapF["Capability F: Exports & Telemetry Retention\n(Streaming Export, Mongo Batch Cleanup)"]
     end
 
-    subgraph Milestone3["Milestone 3: Advanced Intelligence & Privacy"]
+    subgraph Dependency group3["Dependency group 3: Advanced Intelligence & Privacy"]
         CapB["Capability B: Semantic Retrieval\n(pgvector, Source Provenance, Pre-filtering)"]
         CapE["Capability E: Cross-Store Redaction\n(pii_redaction_request, Multi-Store Worker)"]
     end
@@ -84,16 +84,16 @@ flowchart TD
     CapB -.->|"Embedding Redaction Scope"| CapE
 ```
 
-### Milestone Sequencing Rationale
+### Technical Dependency Rationale
 
 1. **Foundational Baseline:** The application core is already fully implemented, tested, and verified on `main`.
-2. **Milestone 1 (Notes & Operator Audit):**
+2. **Dependency group 1 (Notes & Operator Audit):**
    - **Capability A (Notes)** expands investigation depth without altering relational financial tables. It requires MongoDB schema validation, SQL durable intent, and two-phase confirmation.
    - **Capability D (Operator Lifecycle & Admin Audit)** establishes `admin_audit_log`. This general audit infrastructure is a strict prerequisite for all subsequent administrative mutations (rule edits, redaction, and exports).
-3. **Milestone 2 (Rule Revisions & Lifecycle Services):**
+3. **Dependency group 2 (Rule Revisions & Lifecycle Services):**
    - **Capability C (Rule Revisions)** builds upon the general audit framework from Capability D to permit fraud administrators to draft prospective rule versions without modifying historical explanations.
    - **Capability F (Exports & Cleanup)** leverages the audit ledger from Capability D to log bulk export downloads and introduces administrative batch cleanup for aged MongoDB telemetry.
-4. **Milestone 3 (Semantic Search & Cross-Store Redaction):**
+4. **Dependency group 3 (Semantic Search & Cross-Store Redaction):**
    - **Capability B (Semantic Retrieval)** requires confirmed notes from Capability A and an independent model benchmarking study before activating vector tables.
    - **Capability E (Redaction)** is the most complex governance feature. It spans PostgreSQL, MongoDB telemetry, MongoDB notes, and vector embeddings. It requires Capabilities A, B, and D to be either fully implemented or explicitly scoped out.
 
@@ -110,11 +110,11 @@ Enable fraud investigators to attach free-form narratives, investigative hypothe
 
 #### 2. Current Repository State
 - **Implemented:**
-  - MongoDB 7 infrastructure in [`src/lib/mongo.ts`](file:///c:/Users/shrik/Finsight/finsight/src/lib/mongo.ts) managing connection pooling and timeouts.
-  - Telemetry document model in [`scripts/telemetry-schema.mjs`](file:///c:/Users/shrik/Finsight/finsight/scripts/telemetry-schema.mjs) (`device_telemetry` collection only).
-  - PostgreSQL investigation case state machine and atomic version increments in [`migrations/050_case_guards.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/050_case_guards.sql) and [`src/server/case-commands.ts`](file:///c:/Users/shrik/Finsight/finsight/src/server/case-commands.ts).
-  - Immutable event sourcing in `public.case_event` protected by trigger `trg_reject_case_event_mutation`.
-  - Partial unique index `idx_case_single_active` on `investigation_case(transaction_id)` restricting active cases.
+  - MongoDB 7 infrastructure in [`src/lib/mongo.ts`](../src/lib/mongo.ts) managing connection pooling and timeouts.
+  - Telemetry document model in [`scripts/telemetry-schema.mjs`](../scripts/telemetry-schema.mjs) (`device_telemetry` collection only).
+  - PostgreSQL investigation case state machine and atomic version increments in [`migrations/050_case_guards.sql`](../migrations/050_case_guards.sql) and [`src/server/case-commands.ts`](../src/server/case-commands.ts).
+  - Immutable case event history in `public.case_event` protected by triggers `case_event_immutable_row` and `case_event_immutable_stmt` using `reject_case_event_mutation`.
+  - Partial unique index `case_one_active_transaction` on `investigation_case(transaction_id)` restricting active cases.
 - **Missing / Unimplemented:**
   - The `analyst_notes` collection does **not** exist in MongoDB.
   - No MongoDB `$jsonSchema` validator or indexes exist for analyst notes.
@@ -143,7 +143,7 @@ Enable fraud investigators to attach free-form narratives, investigative hypothe
   2. *Document Write Phase (Mongo):* Idempotently insert document into `analyst_notes`.
   3. *Finalization Phase (SQL):* Call `execute_case_command('note_added', ...)` which re-checks case assignment and state under row lock, increments case `version`, marks intent `'confirmed'`, and emits a `note_added` event into `public.case_event` containing `note_id` and `content_hash` in `metadata`.
 - Partial Failure & Quarantine Handling:
-  - If Mongo succeeds but SQL finalization fails, note remains `'pending'` in SQL and is labelled *"Note awaiting confirmation"* in UI.
+  - If Mongo succeeds but SQL finalization fails, note remains `'pending'` in SQL and may expose only a content-free pending status to its authorized author; narrative text remains excluded from official evidence and search.
   - Background reconciliation worker retries finalization using `idempotency_key`.
   - If the case was closed or reassigned during the Mongo write, the note is moved to `'quarantined'` status and hidden from timeline and search.
 
@@ -165,13 +165,13 @@ Enable fraud investigators to attach free-form narratives, investigative hypothe
 - **Testing:** Integration tests for concurrent reassignment, idempotency replay, and MongoDB network outage simulation.
 
 #### 7. Dependencies
-- Dependent on existing Case Lifecycle ([`migrations/050_case_guards.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/050_case_guards.sql)) and MongoDB Connection ([`src/lib/mongo.ts`](file:///c:/Users/shrik/Finsight/finsight/src/lib/mongo.ts)).
+- Dependent on existing Case Lifecycle ([`migrations/050_case_guards.sql`](../migrations/050_case_guards.sql)) and MongoDB Connection ([`src/lib/mongo.ts`](../src/lib/mongo.ts)).
 
 #### 8. Risk and Recovery
 - *Risk:* Split-brain inconsistency where MongoDB holds narrative text that PostgreSQL never acknowledged, potentially leaking unverified allegations.
 - *Recovery:* Relational query filters join against `case_event` metadata. Any note in MongoDB lacking a confirmed `case_event` counterpart is ignored by the API and quarantined by the background reconciler.
 
-#### 9. Definition of Ready
+#### 9. Design Readiness and Later Acceptance
 - [ ] Schema validator JSON specification committed and reviewed.
 - [ ] Two-phase sequence diagram detailing SQL row-locking and failure branches approved.
 - [ ] API contract for `POST /api/v1/cases/[id]/notes` published.
@@ -190,8 +190,8 @@ Allow fraud investigators to search historical investigation cases, notes, and f
 
 #### 2. Current Repository State
 - **Implemented:**
-  - Full-text search on `transaction.description` using PostgreSQL GIN index on `to_tsvector('english', description)` in [`migrations/030_financial_guards.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/030_financial_guards.sql), verified in `docs/academic/2026-10-30-query-plans.json`.
-  - Synthetic fraud scenarios cataloged in `public.fraud_scenario` and `public.transaction_label` in [`migrations/020_operational_schema.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/020_operational_schema.sql).
+  - Full-text search on `transaction.description` using PostgreSQL GIN index on `to_tsvector('english', description)` in [`migrations/030_financial_guards.sql`](../migrations/030_financial_guards.sql), verified in `docs/academic/2026-10-30-query-plans.json`.
+  - Synthetic fraud scenarios cataloged in `public.fraud_scenario` and `public.transaction_label` in [`migrations/010_financial_baseline.sql`](../migrations/010_financial_baseline.sql).
 - **Missing / Unimplemented:**
   - `pgvector` extension is **not** enabled.
   - No `semantic_document` table or vector columns exist in any migration.
@@ -201,7 +201,7 @@ Allow fraud investigators to search historical investigation cases, notes, and f
 #### 3. Proposed Scope
 - **Post-Foundational Model Selection:**
   - Benchmark candidate open-weights models (e.g., `all-MiniLM-L6-v2` at 384 dimensions vs multilingual models at 768 dimensions) measuring inference latency, RAM footprint, and retrieval accuracy (MRR, Precision@K).
-  - Selected embedding dimension $N$ is locked only when retrieval milestone begins.
+  - Selected embedding dimension $N$ is locked only when retrieval dependency group begins.
 - **Relational Vector Storage (`semantic_document`):**
   - Enable `pgvector` inside PostgreSQL.
   - Table `public.semantic_document`:
@@ -228,7 +228,7 @@ Allow fraud investigators to search historical investigation cases, notes, and f
     ORDER BY s.embedding <=> $query_vec ASC
     LIMIT $limit;
     ```
-  - Unassigned or unauthorized cases are filtered out *before* calculating similarity or returning snippets. Raw global nearest-neighbor searches are strictly forbidden.
+  - Authorization must constrain the candidate corpus before ranking and snippet access. SQL text order alone does not guarantee physical pre-filtering; the future specification must choose and verify an authorized-candidate execution strategy, including query plans and isolation tests. The server derives actor identity/admin status from current session authority, never client parameters. Raw global nearest-neighbor searches followed by application filtering are forbidden.
 
 #### 4. Out of Scope
 - Selecting or downloading embedding models during foundational MVP setup.
@@ -240,7 +240,7 @@ Allow fraud investigators to search historical investigation cases, notes, and f
 - **Strict Architectural Invariant:** No embedding model selection or vector migration shall block the existing foundation.
 - **Gated:** Formal benchmark evaluation report comparing at least two embedding models on representative financial investigation text.
 - **Gated:** Completion of Capability A (Analyst Notes) if note embeddings are included in search corpus.
-- **Gated:** Security review verifying that relational pre-filters prevent cross-tenant data leakage.
+- **Gated:** Security review verifying that relational pre-filters prevent cross-case data leakage.
 
 #### 6. Missing Prerequisites
 - **Schema:** Migration enabling `CREATE EXTENSION IF NOT EXISTS vector;` and creating `public.semantic_document` with HNSW index.
@@ -256,10 +256,10 @@ Allow fraud investigators to search historical investigation cases, notes, and f
 - *Risk:* Vector drift after model upgrade; CPU/memory exhaustion during embedding generation; data leakage if pre-filtering is omitted.
 - *Recovery:* Model version column allows atomic background re-indexing without taking search offline. Hard limits on query text length and result limits prevent resource exhaustion.
 
-#### 9. Definition of Ready
+#### 9. Design Readiness and Later Acceptance
 - [ ] Embedding model evaluation report published with memory and latency benchmarks.
-- [ ] `semantic_document` DDL and HNSW index parameters verified on PostgreSQL 17 test instance.
-- [ ] Relational pre-filter query plan verified using `EXPLAIN (ANALYZE, BUFFERS)`.
+- [ ] Proposed semantic schema and candidate index strategy reviewed; PostgreSQL execution belongs to implementation acceptance.
+- [ ] Authorized-candidate plan verification specified using `EXPLAIN (ANALYZE, BUFFERS)`; physical-plan proof is required before activation.
 - [ ] Unestimated issue created and reviewed.
 
 #### 10. Suggested Future Issue
@@ -275,10 +275,10 @@ Allow fraud policy administrators to modify risk rules (e.g. adjust threshold va
 
 #### 2. Current Repository State
 - **Implemented:**
-  - Relational tables `risk_rule` and `risk_signal` in [`migrations/040_deterministic_risk.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/040_deterministic_risk.sql).
+  - Relational tables `risk_rule` and `risk_signal` in [`migrations/010_financial_baseline.sql`](../migrations/010_financial_baseline.sql); scoring is added by migration 040.
   - Stored function `score_transaction(subject uuid)` enforcing exactly the 2 approved deterministic rules: `AMOUNT_BASE_GTE` (weight 40, threshold 10,000.00 INR) and `MERCHANT_TIER_GTE` (weight 25, threshold tier 2).
   - Database trigger `risk_rule_frozen` on `public.risk_rule` preventing any `UPDATE`, `DELETE`, or `TRUNCATE`.
-  - Transaction detail workspace ([`src/components/workspace/transaction-detail.tsx`](file:///c:/Users/shrik/Finsight/finsight/src/components/workspace/transaction-detail.tsx)) displaying transparent signal breakdown and observed values against thresholds.
+  - Transaction detail workspace ([`src/components/workspace/transaction-detail.tsx`](../src/components/workspace/transaction-detail.tsx)) displaying transparent signal breakdown and observed values against thresholds.
 - **Missing / Unimplemented:**
   - No revision history table exists (`risk_rule_revision` does not exist).
   - `score_transaction()` rejects any rule count other than exactly 2.
@@ -296,20 +296,20 @@ Allow fraud policy administrators to modify risk rules (e.g. adjust threshold va
     - `threshold_value`: Numeric(20,4) (numerical boundary).
     - `threshold_unit`: String (`'INR'`, `'tier_code'`).
     - `effective_from`: TIMESTAMPTZ (activation timestamp).
-    - `effective_to`: TIMESTAMPTZ (nullable; NULL indicates currently active revision).
+    - `effective_to`: Not stored on immutable revision rows in this proposal. A separate guarded activation record selects the current revision; activation history must be retained.
     - `created_by_user_id`: UUID foreign key to `public.app_user`.
     - `audit_rationale`: Text (mandatory explanation of threshold adjustment).
     - `created_at`: TIMESTAMPTZ.
-  - Partial unique index: `idx_rule_active_revision` on `(rule_id) WHERE effective_to IS NULL` ensuring at most one active revision per rule.
+  - A separate `risk_rule_activation` design must select one revision per rule atomically without updating immutable revisions; its DDL and concurrency policy require review.
 - **Historical Immutability & Provenance Invariant:**
   - **Core Rule:** Modifying a rule must NEVER rewrite or recalculate the historical explanation, score, or observed values of previously scored transactions.
   - Update `public.risk_signal` to include `revision_id` foreign key.
   - Signal records retain an immutable complete firing snapshot: `observed_value`, `score_contribution`, `threshold_value`, and generated `evidence` string.
 - **Prospective Evaluation Semantics:**
-  - `score_transaction()` queries the active revision effective at the time of transaction scoring:
+  - `score_transaction()` resolves the active revision through the guarded activation record at scoring time (illustrative lookup after resolution):
     ```sql
     SELECT * FROM public.risk_rule_revision
-    WHERE rule_id = r.rule_id AND effective_to IS NULL;
+    WHERE revision_id = $authorized_active_revision_id;
     ```
   - Past transactions retain their existing `risk_signal` rows permanently.
 - **Administrative Mutation Guard:**
@@ -329,22 +329,22 @@ Allow fraud policy administrators to modify risk rules (e.g. adjust threshold va
 - **Gated:** Regression test proving historical transactions 100–107 retain identical scores and explanation strings after a new revision is activated.
 
 #### 6. Missing Prerequisites
-- **Schema:** Migration creating `risk_rule_revision` table, adding `revision_id` to `risk_signal`, updating `score_transaction()`, and modifying `risk_rule_frozen` to permit revision inserts while still blocking in-place updates.
+- **Schema:** Migration creating `risk_rule_revision` table, adding `revision_id` to `risk_signal`, updating `score_transaction()`, and adding separate activation guards while retaining existing rule/revision immutability; inserting into a new revision table does not require weakening the existing rule trigger.
 - **API:** `GET /api/v1/admin/rules` (lists rules and active revisions) and `POST /api/v1/admin/rules/[id]/revisions` (creates prospective revision).
 - **Authorization:** Strict `admin` role requirement in `src/server/authorization.ts`.
 - **Testing:** Concurrency tests for simultaneous revision publishing; validation tests rejecting weights outside [0, 100] or negative thresholds.
 
 #### 7. Dependencies
-- Dependent on Deterministic Risk Engine ([`migrations/040_deterministic_risk.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/040_deterministic_risk.sql)).
+- Dependent on Deterministic Risk Engine ([`migrations/040_deterministic_risk.sql`](../migrations/040_deterministic_risk.sql)).
 - Coordinated with General Administrator Audit (Capability D).
 
 #### 8. Risk and Recovery
 - *Risk:* Inadvertent recalculation of historical scores; conflicting rule revisions published concurrently.
 - *Recovery:* Optimistic revision locking prevents collision. If a flawed revision is published, it cannot be modified or deleted; the administrator must publish a compensating new revision with updated parameters.
 
-#### 9. Definition of Ready
-- [ ] DDL for `risk_rule_revision` and updated `score_transaction()` verified on disposable test database.
-- [ ] Automated regression test verifying historical signals immutability passing.
+#### 9. Design Readiness and Later Acceptance
+- [ ] Proposed revision/activation DDL and scoring contract reviewed; disposable-database verification is later implementation acceptance.
+- [ ] Historical-signal immutability regression scenarios specified; passing execution is later implementation acceptance.
 - [ ] Validation schema for rule thresholds and units defined.
 - [ ] Unestimated issue created and reviewed.
 
@@ -361,15 +361,15 @@ Provide a secure administrative workspace for managing operator identities (anal
 
 #### 2. Current Repository State
 - **Implemented:**
-  - Identity model `public.app_user` in [`migrations/055_auth_session_validation.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/055_auth_session_validation.sql) (`user_id`, `email`, `password_hash`, `display_name`, `role`, `is_active`).
+  - Identity model `public.app_user` in [`migrations/020_operational_schema.sql`](../migrations/020_operational_schema.sql) (`user_id`, `email`, `password_hash`, `display_name`, `role`, `is_active`).
   - Session storage in `public.app_session` with idle and absolute expiry.
-  - Static identity provisioning via CLI script [`scripts/provision-identities.mjs`](file:///c:/Users/shrik/Finsight/finsight/scripts/provision-identities.mjs).
-  - Domain-specific case investigation audit in `public.case_event` ([`migrations/050_case_guards.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/050_case_guards.sql)).
-  - Domain-specific session cleanup audit in `public.app_session_cleanup` ([`migrations/060_session_cleanup.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/060_session_cleanup.sql)).
+  - Static identity provisioning via CLI script [`scripts/provision-identities.mjs`](../scripts/provision-identities.mjs).
+  - Domain-specific case investigation audit in `public.case_event` ([`migrations/050_case_guards.sql`](../migrations/050_case_guards.sql)).
+  - Domain-specific session cleanup audit in `public.app_session_cleanup` ([`migrations/060_session_cleanup.sql`](../migrations/060_session_cleanup.sql)).
 - **Missing / Unimplemented:**
   - No general administrator audit table exists. (Neither `case_event` nor `app_session_cleanup` can or should be used for general operator audits).
   - No in-app operator management UI or API exists.
-  - No mechanism exists to invalidate active sessions when an operator's role is modified or deactivated.
+  - Current session validation checks active status and current role on each request; an audited operator-mutation workflow with atomic persisted-session revocation is missing.
   - No last-admin safeguard exists in database triggers or backend logic.
 
 #### 3. Proposed Scope
@@ -392,12 +392,7 @@ Provide a secure administrative workspace for managing operator identities (anal
   - Role Change: Promote analyst to admin, or demote admin to analyst.
   - Deactivate Operator: Soft-deactivate via `is_active = false` (hard deletion is forbidden to preserve foreign key integrity).
 - **Security & Consistency Invariants:**
-  1. *Last-Admin Safeguard:* Database stored function or transaction check enforcing:
-     ```sql
-     IF (SELECT count(*) FROM public.app_user WHERE role = 'admin' AND is_active = true) <= 1 THEN
-         RAISE EXCEPTION 'Cannot deactivate or demote the last remaining active administrator' USING ERRCODE = '55000';
-     END IF;
-     ```
+  1. *Last-Admin Safeguard:* All admin membership/activation mutations must serialize through the same transaction-level advisory lock or guarded singleton row before reading the active-admin set. Under that lock, reauthorize the actor and reject a change only when its target is an active admin being removed and no other active admin would remain. A count without shared serialization is unsafe: two concurrent demotions could both pass. Test concurrent demotion, deactivation, actor authority loss, and non-admin updates.
   2. *Immediate Session Authority Revocation:* Modifying an operator's role or deactivating their account atomically revokes all their active sessions:
      ```sql
      UPDATE public.app_session
@@ -424,16 +419,16 @@ Provide a secure administrative workspace for managing operator identities (anal
 - **Testing:** Last-admin race condition tests; session revocation integration tests; permission denial tests (analysts cannot access operator endpoints).
 
 #### 7. Dependencies
-- Dependent on Authentication and Session Foundation ([`migrations/055_auth_session_validation.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/055_auth_session_validation.sql)).
+- Dependent on Authentication and Session Foundation ([`migrations/055_auth_session_validation.sql`](../migrations/055_auth_session_validation.sql)).
 
 #### 8. Risk and Recovery
 - *Risk:* Accidental lockout if the last admin is demoted; privilege persistence if a demoted admin continues using an old session cookie.
 - *Recovery:* Database-level last-admin check prevents lockout. Atomic session revocation ensures subsequent requests with the old cookie are rejected with HTTP 401.
 
-#### 9. Definition of Ready
-- [ ] DDL for `admin_audit_log` and immutability trigger tested on test database.
-- [ ] Atomic session revocation handler implemented in `src/server/auth.ts`.
-- [ ] Concurrency test for last-admin safeguard passing.
+#### 9. Design Readiness and Later Acceptance
+- [ ] Proposed audit DDL, immutability contract, and concurrency test plan reviewed; execution is later implementation acceptance.
+- [ ] Atomic revocation interface and owning server module agreed; implementation is not a design-readiness prerequisite.
+- [ ] Last-admin concurrent mutation scenarios specified; passing tests are required before activation.
 - [ ] Unestimated issue created and reviewed.
 
 #### 10. Suggested Future Issue
@@ -449,8 +444,8 @@ Establish an audited, multi-store workflow to redact Personally Identifiable Inf
 
 #### 2. Current Repository State
 - **Implemented:**
-  - Customer and address models in [`migrations/010_financial_baseline.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/010_financial_baseline.sql).
-  - Financial retention triggers in [`migrations/030_financial_guards.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/030_financial_guards.sql) rejecting `DELETE` on financial records.
+  - Customer and address models in [`migrations/010_financial_baseline.sql`](../migrations/010_financial_baseline.sql).
+  - Financial retention triggers in [`migrations/030_financial_guards.sql`](../migrations/030_financial_guards.sql) rejecting `DELETE` on financial records.
   - Masked customer display (`**** 4321`) in discovery workspace and transaction details.
 - **Missing / Unimplemented:**
   - No redaction request table or workflow exists.
@@ -458,9 +453,9 @@ Establish an audited, multi-store workflow to redact Personally Identifiable Inf
   - No team-approved policy exists for accidental PII in immutable narrative fields (`case_event.reason`, `transaction.description`).
 
 #### 3. Proposed Scope
-- **Approved PII Scope:**
-  - *PostgreSQL:* In `public.customer`, overwrite `first_name`, `last_name`, `email`, `phone`, `national_id`, and `date_of_birth` with deterministic anonymized tokens (e.g. `'REDACTED-CUST-' || substring(customer_id::text, 1, 8)`). In `public.address`, overwrite `line_1`, `line_2`, `postal_code`, and precise coordinates with generic country-level placeholders.
-  - *MongoDB:* In `device_telemetry`, sanitize `ip_routing_hash` and client environment headers associated with the customer's devices. In `analyst_notes` (Capability A), scrub direct customer identifiers from note bodies.
+- **Proposed PII Scope ? unapproved:**
+  - *PostgreSQL:* Review actual customer columns `full_name`, `email`, `phone`, and `date_of_birth`, and address columns `line1`, `city`, `state`, `postal_code`, `latitude`, and `longitude`. Select type-correct nulling/masking values and explicitly decide country-field retention. Columns such as `first_name`, `national_id`, and `line_2` do not exist. Current financial guards may reject these updates; any narrow redaction exception needs separately approved DDL and retention tests.
+  - *MongoDB:* Review actual `payload.ip_routing_hash` and structured client-environment fields; no raw client-header field is currently modeled. Any future note-body handling must reconcile Capability A's append-only policy through an approved masking/tombstone protocol, not silently rewrite confirmed notes.
   - *Vector Store:* In `semantic_document` (Capability B), purge embeddings derived from redacted customer text and trigger re-indexing.
 - **Durable Progress Tracking Table (`pii_redaction_request`):**
   - Table `public.pii_redaction_request`:
@@ -500,13 +495,13 @@ Establish an audited, multi-store workflow to redact Personally Identifiable Inf
 
 #### 7. Dependencies
 - Dependent on General Administrator Audit (Capability D).
-- Coordinated with MongoDB Telemetry ([`src/server/telemetry.ts`](file:///c:/Users/shrik/Finsight/finsight/src/server/telemetry.ts)) and Notes (Capability A).
+- Coordinated with MongoDB Telemetry ([`src/server/telemetry.ts`](../src/server/telemetry.ts)) and Notes (Capability A).
 
 #### 8. Risk and Recovery
 - *Risk:* Incomplete cross-store redaction (e.g. PostgreSQL is scrubbed, but MongoDB or vector search retains PII); active fraud alerts obstructed by premature redaction.
 - *Recovery:* Durable per-store completion timestamps (`sql_redacted_at`, `mongo_redacted_at`, `vector_redacted_at`) enable idempotent retries of failed steps. Active investigation check prevents redaction while cases are pending.
 
-#### 9. Definition of Ready
+#### 9. Design Readiness and Later Acceptance
 - [ ] PII field allowlist and narrative masking policy approved by both teammates.
 - [ ] DDL for `pii_redaction_request` reviewed.
 - [ ] Multi-store saga/orchestration worker designed.
@@ -525,8 +520,8 @@ Provide secure facilities for exporting filtered investigation and transaction d
 
 #### 2. Current Repository State
 - **Implemented:**
-  - Audited 7-day expired PostgreSQL session cleanup in [`migrations/060_session_cleanup.sql`](file:///c:/Users/shrik/Finsight/finsight/migrations/060_session_cleanup.sql) and [`src/server/session-cleanup.ts`](file:///c:/Users/shrik/Finsight/finsight/src/server/session-cleanup.ts) (Issue #23 / PR #41).
-  - MongoDB `device_telemetry` collection has `retention_eligible` boolean flag and sparse compound index `{ retention_eligible: 1, captured_at: 1 }` in [`scripts/mongo-telemetry-setup.mjs`](file:///c:/Users/shrik/Finsight/finsight/scripts/mongo-telemetry-setup.mjs).
+  - Audited 7-day expired PostgreSQL session cleanup in [`migrations/060_session_cleanup.sql`](../migrations/060_session_cleanup.sql) and [`src/server/session-cleanup.ts`](../src/server/session-cleanup.ts) (Issue #23 / PR #41).
+  - MongoDB `device_telemetry` collection has `retention_eligible` boolean flag and compound index `{ retention_eligible: 1, captured_at: 1 }` in [`scripts/mongo-telemetry-setup.mjs`](../scripts/mongo-telemetry-setup.mjs).
 - **Missing / Unimplemented:**
   - No data export API or UI exists (no streaming CSV/JSON export handlers).
   - No export audit log exists.
@@ -569,14 +564,14 @@ Provide secure facilities for exporting filtered investigation and transaction d
 - **Testing:** Export size bounding tests; PII masking validation tests; telemetry preview/confirm isolation tests.
 
 #### 7. Dependencies
-- Dependent on MongoDB Telemetry Foundation ([`scripts/mongo-telemetry-setup.mjs`](file:///c:/Users/shrik/Finsight/finsight/scripts/mongo-telemetry-setup.mjs), [`src/server/telemetry.ts`](file:///c:/Users/shrik/Finsight/finsight/src/server/telemetry.ts)).
+- Dependent on MongoDB Telemetry Foundation ([`scripts/mongo-telemetry-setup.mjs`](../scripts/mongo-telemetry-setup.mjs), [`src/server/telemetry.ts`](../src/server/telemetry.ts)).
 - Dependent on General Administrator Audit (Capability D).
 
 #### 8. Risk and Recovery
 - *Risk:* Memory exhaustion from oversized exports; accidental deletion of recent telemetry needed for active fraud investigations; unmonitored data exfiltration.
 - *Recovery:* Hard row caps and streaming responses protect server memory. Two-phase preview with captured candidate IDs prevents deleting fresh telemetry. Audit logging ensures complete forensic visibility.
 
-#### 9. Definition of Ready
+#### 9. Design Readiness and Later Acceptance
 - [ ] Export data dictionary and masking rules documented.
 - [ ] Telemetry retention policy parameters (cutoff duration and batch limit) approved.
 - [ ] DDL for `mongo_telemetry_cleanup` audit table reviewed.
@@ -592,14 +587,14 @@ Provide secure facilities for exporting filtered investigation and transaction d
 
 The matrix below summarizes the operational status and requirements across all six capabilities:
 
-| Capability | Current State | Target Milestone | Primary Storage Engine | Primary Risk / Invariant | Implementation Gate Status |
+| Capability | Current State | Dependency Group (unscheduled) | Primary Storage Engine | Primary Risk / Invariant | Implementation Gate Status |
 | :--- | :---: | :---: | :---: | :--- | :---: |
-| **A. MongoDB Notes & Recovery** | `[Missing]` | Milestone 1 | MongoDB + SQL Outbox | Unconfirmed notes must never leak into official case evidence. | `[Gated]` (Awaiting outbox DDL review) |
-| **B. Semantic Retrieval & Provenance** | `[Missing]` | Milestone 3 | PostgreSQL (`pgvector`) | Model selection must not block foundation; relational pre-filter mandatory. | `[Gated]` (Awaiting model benchmark report) |
-| **C. Risk-Rule Revisions & Editing** | `[Missing]` | Milestone 2 | PostgreSQL | Modifying a rule must never rewrite historical firing explanations. | `[Gated]` (Awaiting revision schema review) |
-| **D. Admin Audit & Operator Mutations** | `[Missing]` | Milestone 1 | PostgreSQL | Last-admin safeguard; immediate session revocation on role change. | `[Gated]` (Awaiting audit DDL review) |
-| **E. Cross-Store Redaction** | `[Missing]` | Milestone 3 | PostgreSQL + MongoDB | Financial facts and case events are permanently retained; PII masked. | `[Unresolved]` (Awaiting PII policy consensus) |
-| **F. Exports & Telemetry Cleanup** | `[Missing]`* | Milestone 2 | Streaming API + MongoDB | Bounded exports; two-phase telemetry deletion distinct from SQL sessions. | `[Gated]` (Awaiting export allowlist approval) |
+| **A. MongoDB Notes & Recovery** | `[Missing]` | Dependency group 1 | MongoDB + SQL Outbox | Unconfirmed notes must never leak into official case evidence. | `[Gated]` (Awaiting outbox DDL review) |
+| **B. Semantic Retrieval & Provenance** | `[Missing]` | Dependency group 3 | PostgreSQL (`pgvector`) | Model selection must not block foundation; relational pre-filter mandatory. | `[Gated]` (Awaiting model benchmark report) |
+| **C. Risk-Rule Revisions & Editing** | `[Missing]` | Dependency group 2 | PostgreSQL | Modifying a rule must never rewrite historical firing explanations. | `[Gated]` (Awaiting revision schema review) |
+| **D. Admin Audit & Operator Mutations** | `[Missing]` | Dependency group 1 | PostgreSQL | Last-admin safeguard; immediate session revocation on role change. | `[Gated]` (Awaiting audit DDL review) |
+| **E. Cross-Store Redaction** | `[Missing]` | Dependency group 3 | PostgreSQL + MongoDB | Financial facts and case events are permanently retained; PII masked. | `[Unresolved]` (Awaiting PII policy consensus) |
+| **F. Exports & Telemetry Cleanup** | `[Missing]`* | Dependency group 2 | Streaming API + MongoDB | Bounded exports; two-phase telemetry deletion distinct from SQL sessions. | `[Gated]` (Awaiting export allowlist approval) |
 
 *\*Note: Expired PostgreSQL session cleanup is fully `[Implemented]` in Issue #23. Capability F addresses MongoDB telemetry cleanup and data exports.*
 
@@ -616,10 +611,10 @@ To preserve project velocity and prevent premature commitment of resources, the 
 2. **Estimation Rules:**
    - The **1 relative point** estimate for Issue #20 covers **only** this architectural handoff register.
    - Future implementation issues must remain **explicitly unestimated** until each capability is split into its own independent ticket, reviewed, and sized.
-   - Teammate capacity is bounded at 1–2 hours per day. No multi-day or marathon implementation sprints are permitted.
+   - Teammate capacity is bounded at 1–2 hours per day. Split and estimate future work against that capacity; this document sets no implementation schedule.
 3. **Scheduling Restrictions:**
-   - No target release dates, calendar deadlines, iterations, or milestones are assigned by this document.
-   - Capability gates are server-enforced and contractually binding. No capability may be enabled merely because an administrative session exists.
+   - No target release dates, calendar deadlines, iterations, or dependency groups are assigned by this document.
+   - These are planning and review gates; deferred capabilities have no runtime implementation or server-enforced activation controls yet. No capability may be enabled merely because an administrative session exists.
 4. **Activation Gate:**
    - `@KadakWNL` must review and confirm compatibility before any future dependent issue can transition to `Ready`.
    - Publication of this document does **not** constitute contract approval or permission to start coding.
@@ -628,7 +623,7 @@ To preserve project velocity and prevent premature commitment of resources, the 
 
 ## 6. Verification and Document Quality Assurance
 
-The technical claims made in this specification were verified against the actual FinSight repository:
+The following records the original author-reported checks. It is historical evidence, not proof of the corrected document or future designs. Current PR CI must pass separately:
 
 ```powershell
 # 1. Verify clean git working tree and current branch
