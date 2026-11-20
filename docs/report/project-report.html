@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>FinSight Project Report</title>
+<meta name="author" content="Shrikar Desai (PES1UG24CS916) and Shreyas P Kulkarni (PES1UG24CS444)">
+<meta name="description" content="DBMS Level 3 project report for FinSight, a transaction review application built on PostgreSQL 17 and MongoDB 8.">
+<style>
+  @page { size: A4 portrait; margin: 0; }
+  @page land { size: A4 landscape; margin: 0; }
+
+  :root {
+    --ink: #0f0f0f;
+    --paper: #ffffff;
+    --mist: #f2f2f2;
+    --line: #dedede;
+    --grey: #555555;
+    --subtle: #858585;
+    --violet: #7c3aed;
+    --violet-dark: #5b21b6;
+    --violet-pale: #f5f3ff;
+    --amber: #963b17;
+    --amber-bg: #fff4e5;
+    --green: #166534;
+    --green-bg: #ecfdf3;
+    --red: #991b1b;
+    --red-bg: #fef2f2;
+    --code-bg: #141414;
+    --code-fg: #e9e9e9;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #d9d9d9; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    color: var(--ink);
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .page {
+    width: 210mm;
+    height: 297mm;
+    background: var(--paper);
+    position: relative;
+    overflow: hidden;
+    padding: 14mm 16mm 14mm;
+    page-break-after: always;
+    break-after: page;
+  }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+  .page.land {
+    page: land;
+    width: 297mm;
+    height: 210mm;
+    padding: 7mm 14mm 8mm;
+  }
+  .page.dark { background: var(--ink); color: var(--paper); }
+
+  .runhead {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1.8mm;
+    margin-bottom: 5.5mm;
+    font-size: 6.6pt;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    color: var(--grey);
+    font-weight: 700;
+  }
+  .runhead .left { display: flex; align-items: center; gap: 2mm; }
+  .runhead .sq { width: 2.4mm; height: 2.4mm; background: var(--violet); display: inline-block; }
+  .runhead .right { color: var(--subtle); font-weight: 400; letter-spacing: .05em; }
+  .runfoot {
+    position: absolute;
+    left: 16mm;
+    right: 16mm;
+    bottom: 6.5mm;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-top: 1px solid var(--line);
+    padding-top: 1.6mm;
+    font-size: 6.4pt;
+    color: var(--subtle);
+  }
+  .page.land .runfoot { left: 14mm; right: 14mm; bottom: 5mm; }
+  .pno { font-weight: 700; color: var(--grey); }
+
+  .kicker {
+    color: var(--violet);
+    font-size: 7.2pt;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    margin-bottom: 1.6mm;
+  }
+  h1, h2, h3, h4 { margin: 0; font-weight: 700; }
+  h2 { font-size: 22pt; line-height: 1.03; letter-spacing: -.02em; margin-bottom: 2.8mm; }
+  h3 { font-size: 9.4pt; letter-spacing: .07em; text-transform: uppercase; margin: 4.1mm 0 1.5mm; }
+  .lede { font-size: 9.6pt; line-height: 1.42; color: var(--grey); max-width: 170mm; margin-bottom: 3.6mm; }
+  p { font-size: 8.8pt; line-height: 1.46; margin: 0 0 1.8mm; }
+  ul, ol { font-size: 8.8pt; line-height: 1.42; margin: 0 0 2.2mm 4.2mm; padding: 0; }
+  li { margin-bottom: .6mm; }
+  b, strong { font-weight: 700; }
+  .small { font-size: 7.8pt; line-height: 1.4; color: var(--grey); }
+  .tiny { font-size: 6.9pt; line-height: 1.36; color: var(--grey); }
+  .mono { font-family: "Courier New", monospace; }
+  .violet { color: var(--violet); }
+
+  .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 5mm; }
+  .cols2-wide { display: grid; grid-template-columns: 1.3fr 1fr; gap: 6mm; }
+  .rule { height: 1px; background: var(--line); margin: 3mm 0; }
+
+  .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2.5mm; margin: 3mm 0 0; }
+  .stat-strip .box { border-top: 2px solid var(--violet); padding-top: 1.8mm; }
+  .stat-strip .box span { display: block; font-size: 6.1pt; letter-spacing: .09em; text-transform: uppercase; color: var(--subtle); margin-bottom: .8mm; }
+  .stat-strip .box b { font-size: 7.8pt; line-height: 1.3; }
+
+  .note {
+    background: var(--violet-pale);
+    border-left: 2px solid var(--violet);
+    padding: 2.4mm 3mm;
+    font-size: 7.8pt;
+    line-height: 1.42;
+    margin: 2.6mm 0;
+  }
+  .note.warn { background: var(--amber-bg); border-left-color: var(--amber); color: #4a2410; }
+  .note.ok { background: var(--green-bg); border-left-color: var(--green); color: #123d22; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 7.2pt; line-height: 1.3; margin: 0 0 2.6mm; }
+  th {
+    background: var(--ink);
+    color: var(--paper);
+    text-align: left;
+    padding: 1.3mm 1.6mm;
+    font-size: 6.3pt;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    vertical-align: bottom;
+  }
+  td { border-bottom: 1px solid #e8e8e8; padding: 1.15mm 1.6mm; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: #fafafa; }
+  td.k { font-weight: 700; white-space: nowrap; }
+  td.mono, th.mono { font-family: "Courier New", monospace; font-size: 6.9pt; }
+  table.tight { font-size: 6.9pt; }
+  table.tight th { padding: 1.1mm 1.4mm; font-size: 6.1pt; }
+  table.tight td { padding: 1mm 1.4mm; }
+  table.xs { font-size: 6.5pt; }
+  table.xs td { padding: .8mm 1.2mm; }
+  table.xs th { padding: 1mm 1.2mm; font-size: 5.9pt; }
+
+  .tag {
+    display: inline-block;
+    font-size: 5.9pt;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    padding: .6mm 1.2mm;
+    background: var(--mist);
+    color: var(--grey);
+    white-space: nowrap;
+  }
+  .tag.ok { background: var(--green-bg); color: var(--green); }
+  .tag.partial { background: var(--amber-bg); color: var(--amber); }
+  .tag.deferred { background: var(--red-bg); color: var(--red); }
+  .tag.violet { background: var(--violet-pale); color: var(--violet-dark); }
+
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    font-family: "Courier New", monospace;
+    font-size: 6.3pt;
+    line-height: 1.4;
+    padding: 3mm 3.4mm;
+    margin: 0 0 2.6mm;
+    white-space: pre-wrap;
+    overflow: hidden;
+  }
+  pre .c { color: #9ca3af; }
+  pre .k { color: #c4b5fd; }
+  pre .s { color: #a7f3d0; }
+  code { font-family: "Courier New", monospace; font-size: .94em; background: var(--mist); padding: 0 .5mm; }
+  pre code { background: none; padding: 0; }
+
+  figure { margin: 0 0 2.6mm; }
+  figure img { display: block; width: 100%; }
+  figcaption {
+    font-size: 6.8pt;
+    line-height: 1.38;
+    color: var(--grey);
+    margin-top: 1.4mm;
+    padding-left: 2.2mm;
+    border-left: 2px solid var(--violet);
+  }
+  .shot { border: 1px solid var(--line); background: #fff; overflow: hidden; }
+  .shot img { display: block; width: 100%; }
+
+  .arch { margin: 1mm 0 2.6mm; }
+  .arch-row { display: flex; gap: 3mm; justify-content: center; }
+  .arch-node { border: 1px solid var(--line); background: #fff; padding: 2.4mm 3mm; flex: 1; }
+  .arch-node b { display: block; font-size: 8pt; margin-bottom: .8mm; }
+  .arch-node span { display: block; font-size: 6.9pt; color: var(--grey); line-height: 1.35; }
+  .arch-node.pg { border-color: var(--violet); border-width: 1.4px; }
+  .arch-node.mongo { border-color: #a78bfa; }
+  .arch-link { width: 1px; height: 4mm; background: var(--violet); margin: 0 auto; position: relative; }
+  .arch-link::after {
+    content: ""; position: absolute; bottom: -1px; left: -2px;
+    border-left: 2.5px solid transparent; border-right: 2.5px solid transparent;
+    border-top: 3.5px solid var(--violet);
+  }
+  .arch-label { font-size: 6.2pt; color: var(--subtle); text-align: center; margin: .8mm 0; }
+
+  .flow { counter-reset: step; display: grid; gap: 1.7mm; }
+  .flow .step { display: grid; grid-template-columns: 7mm 1fr; gap: 2mm; align-items: start; }
+  .flow .step::before {
+    counter-increment: step; content: counter(step, decimal-leading-zero);
+    color: var(--violet); font-size: 8pt; font-weight: 700;
+  }
+  .flow .step p { margin: 0; font-size: 8.4pt; line-height: 1.4; }
+
+  .cover { padding: 22mm 24mm; }
+  .cover .brand { display: flex; align-items: center; gap: 3mm; font-size: 8pt; font-weight: 700; letter-spacing: .16em; color: #fff; }
+  .cover .brand .sq { width: 4mm; height: 4mm; background: var(--violet); }
+  .cover-main { margin-top: 54mm; }
+  .cover .kicker { color: #c4b5fd; }
+  .cover h1 { font-size: 64pt; line-height: .95; letter-spacing: -.04em; color: #fff; margin: 2mm 0 4mm; }
+  .cover .sub { font-size: 18pt; line-height: 1.28; color: #e8e8e8; margin: 0 0 4mm; }
+  .cover .desc { font-size: 10pt; line-height: 1.5; color: #b8b8b8; max-width: 124mm; }
+  .cover .cover-rule { width: 92mm; height: 1px; background: #3a3a3a; margin: 8mm 0 4.5mm; }
+  .cover-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm 6mm; font-size: 8.2pt; line-height: 1.45; color: #d8d8d8; }
+  .cover-meta span { display: block; font-size: 6.3pt; letter-spacing: .11em; text-transform: uppercase; color: #8f8f8f; margin-bottom: .3mm; }
+  .cover-repo {
+    position: absolute; right: 24mm; bottom: 22mm;
+    font-size: 7.2pt; color: #d8d8d8; text-align: right;
+  }
+  .cover-repo span {
+    display: block; font-size: 6.1pt; letter-spacing: .11em;
+    text-transform: uppercase; color: #8f8f8f; margin-bottom: .8mm;
+  }
+  .cover a { color: #c4b5fd; text-decoration: none; }
+  .cover-foot { position: absolute; left: 24mm; bottom: 15mm; font-size: 6.8pt; color: #8f8f8f; letter-spacing: .05em; }
+
+  .toc-row { display: flex; align-items: baseline; gap: 1.8mm; font-size: 8pt; padding: 1.05mm 0; border-bottom: 1px solid #efefef; }
+  .toc-row .t { font-weight: 700; }
+  .toc-row .d { flex: 1; border-bottom: 1px dotted #cfcfcf; transform: translateY(-1px); }
+  .toc-row .p { color: var(--grey); font-size: 7.4pt; }
+
+  .land-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--line); padding-bottom: 1.6mm; margin-bottom: 2.4mm; }
+  .land-head .left { display: flex; align-items: center; gap: 2mm; font-size: 6.5pt; font-weight: 700; letter-spacing: .11em; text-transform: uppercase; color: var(--grey); }
+  .land-head .left .sq { width: 2.4mm; height: 2.4mm; background: var(--violet); }
+  .land-head .right { font-size: 6.5pt; color: var(--subtle); }
+  .er-crop { width: 245mm; height: 160mm; margin: 0 auto; overflow: hidden; border: 1px solid var(--line); }
+  .er-crop img { width: 245mm; margin-top: -15.3mm; display: block; }
+  .land-caption { display: grid; grid-template-columns: 1fr 60mm; gap: 5mm; margin-top: 1.4mm; }
+  .land-caption p { font-size: 6.8pt; line-height: 1.38; margin: 0; color: var(--grey); }
+
+  .member { border: 1px solid var(--line); padding: 3mm 3.4mm; }
+  .member .name { font-size: 11pt; font-weight: 700; margin-bottom: .4mm; }
+  .member .srn { font-family: "Courier New", monospace; font-size: 7.2pt; color: var(--violet-dark); margin-bottom: 2mm; }
+  .member p { font-size: 7.6pt; line-height: 1.38; margin-bottom: 1.4mm; }
+
+  .refs { font-size: 7pt; line-height: 1.35; margin: 0 0 0 4mm; padding: 0; }
+  .refs li { margin-bottom: .8mm; }
+  .refs .n { color: var(--violet); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- 01 COVER -->
+<section class="page dark cover">
+  <div class="brand"><span class="sq"></span> FINSIGHT</div>
+  <div class="cover-main">
+    <div class="kicker">DBMS Level 3 Project Report</div>
+    <h1>FinSight</h1>
+    <p class="sub">Transaction review with explainable risk and auditable case records</p>
+    <p class="desc">A Next.js application using PostgreSQL 17 as the system of record and MongoDB 8 for read-only device telemetry. All demonstration data is synthetic.</p>
+    <div class="cover-rule"></div>
+    <div class="cover-meta">
+      <div><span>Submitted by</span>Shrikar Desai<br>PES1UG24CS916<br><a href="https://github.com/ShrikarDesai07">github.com/ShrikarDesai07</a></div>
+      <div><span>Submitted by</span>Shreyas P Kulkarni<br>PES1UG24CS444<br><a href="https://github.com/KadakWNL">github.com/KadakWNL</a></div>
+    </div>
+  </div>
+  <div class="cover-repo"><span>Repository</span><a href="https://github.com/KadakWNL/finsight">github.com/KadakWNL/finsight</a></div>
+  <div class="cover-foot">Department of Computer Science and Engineering</div>
+</section>
+
+<!-- 02 ABSTRACT AND CONTENTS -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> Abstract</div>
+    <div class="right">FinSight project report</div>
+  </div>
+
+  <h2>Abstract</h2>
+  <p>This report describes FinSight, a transaction review application built for the DBMS Level 3 project. PostgreSQL 17 is the primary database and stores customer, account, transaction, risk, identity, session and case data in 18 application tables. Two deterministic rules score synthetic transactions, and each stored signal records the observation, threshold and point contribution behind the score. Case changes are made through database functions that check the actor, ownership, expected version and idempotency key. Case events and administrative audit rows reject updates and deletes. MongoDB 8 stores device telemetry that does not fit the relational model; it is read-only and bounded to the latest 100 observations.</p>
+  <p>The Next.js interface supports analyst and administrator roles. Verification includes 104 unit tests, 95 API tests, 24 database tests and 17 browser tests, the VS01 to VS16 acceptance matrix, five indexed query plans and six passing continuous integration workflows. The report also records the limits of the implementation: two risk rules with a 65 point maximum, read-only telemetry, in-process login throttling and no fraud prediction.</p>
+
+  <div class="rule"></div>
+  <div class="cols2">
+    <div>
+      <h3 style="margin-top:0">Contents</h3>
+      <div class="toc">
+        <div class="toc-row"><span class="t">1</span><span class="t">Introduction</span><span class="d"></span><span class="p">03</span></div>
+        <div class="toc-row"><span class="t">2</span><span class="t">Requirements</span><span class="d"></span><span class="p">04</span></div>
+        <div class="toc-row"><span class="t">3</span><span class="t">System architecture</span><span class="d"></span><span class="p">05</span></div>
+        <div class="toc-row"><span class="t">4</span><span class="t">Entity relationship model</span><span class="d"></span><span class="p">06</span></div>
+        <div class="toc-row"><span class="t">5</span><span class="t">Relational schema and data dictionary</span><span class="d"></span><span class="p">07</span></div>
+        <div class="toc-row"><span class="t">6</span><span class="t">SQL implementation</span><span class="d"></span><span class="p">08</span></div>
+        <div class="toc-row"><span class="t">7</span><span class="t">Queries and MongoDB</span><span class="d"></span><span class="p">09</span></div>
+        <div class="toc-row"><span class="t">8</span><span class="t">Application</span><span class="d"></span><span class="p">10</span></div>
+        <div class="toc-row"><span class="t">9</span><span class="t">Security and testing</span><span class="d"></span><span class="p">11</span></div>
+        <div class="toc-row"><span class="t">10</span><span class="t">Contributions, limitations and conclusion</span><span class="d"></span><span class="p">12</span></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-top:0">Document details</h3>
+      <table class="tight">
+        <tr><td class="k">Course</td><td>DBMS UE24CS351A, Semester 5</td></tr>
+        <tr><td class="k">Team</td><td>Shrikar Desai (PES1UG24CS916)<br>Shreyas P Kulkarni (PES1UG24CS444)</td></tr>
+        <tr><td class="k">Databases</td><td>PostgreSQL 17, MongoDB 8</td></tr>
+        <tr><td class="k">Data</td><td>Synthetic only</td></tr>
+      </table>
+      <h3>Keywords</h3>
+      <p class="tiny">PostgreSQL, MongoDB, relational design, SQL functions, triggers, transactions, optimistic concurrency, idempotency, Argon2id, Next.js, database security.</p>
+      <div class="note">
+        FinSight is not a fraud detection model. It applies two fixed rules and supports a human review process. No accuracy or ground-truth claim is made.
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-strip">
+    <div class="box"><span>Application tables</span><b>18</b></div>
+    <div class="box"><span>Declared foreign keys</span><b>22</b></div>
+    <div class="box"><span>Maximum score</span><b>65 points</b></div>
+    <div class="box"><span>Session limits</span><b>30 min / 8 h</b></div>
+  </div>
+
+  <h3>System modules</h3>
+  <table class="tight">
+    <thead><tr><th style="width:22%">Module</th><th style="width:40%">Main routes</th><th>Tables used</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Authentication</td><td><span class="mono">/sign-in</span>, <span class="mono">/api/auth/*</span></td><td>app_user, app_session</td></tr>
+      <tr><td class="k">Discovery</td><td><span class="mono">/overview</span>, <span class="mono">/transactions</span>, <span class="mono">/api/v1/transactions</span></td><td>transaction, account, customer, merchant, v_transaction_risk</td></tr>
+      <tr><td class="k">Evidence</td><td><span class="mono">/transactions/[id]</span></td><td>risk_signal, risk_rule, device_fingerprint, telemetry collection</td></tr>
+      <tr><td class="k">Cases</td><td><span class="mono">/cases</span>, <span class="mono">/cases/[id]</span>, <span class="mono">/api/v1/cases/*</span></td><td>investigation_case, case_event, case_command_receipt</td></tr>
+      <tr><td class="k">Administration</td><td><span class="mono">/admin</span>, <span class="mono">/admin/users</span>, <span class="mono">/api/v1/users</span></td><td>app_session_cleanup, admin_audit_event, app_user</td></tr>
+    </tbody>
+  </table>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">02</span></div>
+</section>
+
+<!-- 03 INTRODUCTION -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 1. Introduction</div>
+    <div class="right">Problem, objectives and scope</div>
+  </div>
+
+  <h2>1. Introduction</h2>
+  <p class="lede">The application stores the observations behind each score and keeps an append-only history for each investigation.</p>
+
+  <h3 style="margin-top:2mm">1.1 Context</h3>
+  <p>FinSight is a web application for reviewing synthetic card transactions. An analyst searches transactions, inspects the recorded risk evidence and opens a case when a transaction needs investigation. An administrator oversees all cases, returns escalated work, reopens closed cases, manages analyst accounts and cleans up expired sessions. PostgreSQL stores the financial facts, risk data, identities, sessions and case history. MongoDB stores supplementary device telemetry that contains several document shapes.</p>
+  <p>The project uses a seeded dataset with fixed identifiers and historical exchange rates. It does not connect to a bank, a payment network or a real customer record. The workflow is enforced by the database, but the data and the two scoring rules are academic fixtures.</p>
+
+  <h3>1.2 Problem</h3>
+  <p>The project addresses four problems found in simple review tools:</p>
+  <ul>
+    <li><b>Score without evidence.</b> A risk value is shown without the rule, threshold, observation or contribution that produced it.</li>
+    <li><b>Changeable case records.</b> Case rows or history can be edited or deleted, so the record cannot support an audit.</li>
+    <li><b>Unsafe concurrent writes.</b> Two reviewers create duplicate cases, or a stale form overwrites a newer decision.</li>
+    <li><b>Telemetry shape.</b> Device observations do not fit a fixed relational table and are not part of the financial record.</li>
+  </ul>
+
+  <h3>1.3 Objectives</h3>
+  <ol>
+    <li>Design a normalised schema for banking facts, risk evidence, identities and cases.</li>
+    <li>Enforce case rules and retention rules inside PostgreSQL.</li>
+    <li>Store enough information to explain every recorded score.</li>
+    <li>Use MongoDB only for read-only telemetry with a strict document validator.</li>
+    <li>Provide a role-aware Next.js interface and verify it with automated tests.</li>
+  </ol>
+
+  <h3>1.4 Scope</h3>
+  <table class="tight">
+    <thead><tr><th style="width:34%">Included</th><th>Not included</th></tr></thead>
+    <tbody>
+      <tr><td>Analyst and administrator roles, with a reserved service identity that cannot sign in</td><td>Fraud prediction, model training, accuracy measurement or ground-truth labels</td></tr>
+      <tr><td>Two deterministic rules (amount and merchant tier), stored signals and a risk view</td><td>Rule editing, rescoring, additional rule dimensions or time-window rules</td></tr>
+      <tr><td>Transaction discovery, evidence review, case creation and a guarded lifecycle</td><td>Analyst notes, vector search, reassignment, priority changes or export</td></tr>
+      <tr><td>Audited session cleanup and administrator-managed analyst accounts</td><td>Row-level security, CSP/HSTS, shared rate limiting or central observability</td></tr>
+      <tr><td>Read-only MongoDB telemetry with graceful degradation</td><td>Telemetry write endpoints or automated retention processing</td></tr>
+    </tbody>
+  </table>
+
+  <h3>1.5 Review workflow</h3>
+  <div class="arch-row" style="gap:2mm">
+    <div class="arch-node" style="padding:2mm;text-align:center"><b>Sign in</b><span>session and role</span></div>
+    <div class="arch-node" style="padding:2mm;text-align:center"><b>Find</b><span>filters and search</span></div>
+    <div class="arch-node" style="padding:2mm;text-align:center"><b>Inspect</b><span>amounts and signals</span></div>
+    <div class="arch-node" style="padding:2mm;text-align:center"><b>Open case</b><span>priority and reason</span></div>
+    <div class="arch-node" style="padding:2mm;text-align:center"><b>Resolve</b><span>typed history</span></div>
+  </div>
+  <p class="tiny">Discovery is organisation-wide. Case detail is restricted to the assigned analyst or an administrator; a peer case appears only as a restricted indicator.</p>
+
+  <h3>1.6 Data set</h3>
+  <p>The seed contains eight linked card transactions in INR and USD, two approved rules and one administrator and analyst pair. Identifiers are fixed so tests and demonstrations repeat the same rows. Historical exchange rates are stored with each transaction, and the INR base is checked at insert time.</p>
+
+  <div class="note">
+    The analyst account module adds the <span class="mono">admin_audit_event</span> table and four account functions. It is included in the 18-table count used throughout this report.
+  </div>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">03</span></div>
+</section>
+
+<!-- 04 REQUIREMENTS -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 2. Requirements</div>
+    <div class="right">Functions, roles and quality attributes</div>
+  </div>
+
+  <h2>2. Requirements</h2>
+
+  <h3 style="margin-top:0">2.1 Functional requirements</h3>
+  <table class="tight">
+    <thead><tr><th style="width:7%">ID</th><th style="width:29%">Requirement</th><th>Implementation</th></tr></thead>
+    <tbody>
+      <tr><td class="k">FR1</td><td>Authenticate provisioned operators</td><td>Argon2id password check, encrypted cookie, PostgreSQL session row and sign-out revocation</td></tr>
+      <tr><td class="k">FR2</td><td>Search and filter transactions</td><td>Description or exact ID search, date, status, risk, entity and amount filters, signed keyset paging</td></tr>
+      <tr><td class="k">FR3</td><td>Show the evidence behind a score</td><td>Stored observation, threshold, contribution and evidence text for each signal</td></tr>
+      <tr><td class="k">FR4</td><td>Show related device telemetry</td><td>Bounded MongoDB read after PostgreSQL resolves the transaction and device</td></tr>
+      <tr><td class="k">FR5</td><td>Create an investigation case</td><td>Atomic create, one active case per transaction, analyst assignment and typed creation event</td></tr>
+      <tr><td class="k">FR6</td><td>Run the case lifecycle</td><td>Start review, escalate, return, resolve, dismiss and reopen with role, ownership and version checks</td></tr>
+      <tr><td class="k">FR7</td><td>Let administrators oversee cases</td><td>All-case queue, return and reopen actions, and access to any case detail</td></tr>
+      <tr><td class="k">FR8</td><td>Clean up expired sessions</td><td>Preview, 10 minute confirmation window, bounded delete and immutable cleanup audit</td></tr>
+      <tr><td class="k">FR9</td><td>Manage analyst accounts</td><td>Create, deactivate, reactivate and reset passwords; revoke sessions and unassign active cases</td></tr>
+      <tr><td class="k">FR10</td><td>Record an audit trail</td><td>Immutable case events, command receipts, cleanup rows and administrative audit rows</td></tr>
+    </tbody>
+  </table>
+
+  <h3>2.2 Roles and permissions</h3>
+  <div class="cols2">
+    <div>
+      <table class="tight">
+        <thead><tr><th>Action</th><th>Analyst</th><th>Admin</th><th>System</th></tr></thead>
+        <tbody>
+          <tr><td>Sign in</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Read transactions</td><td>Masked</td><td>Masked</td><td>No</td></tr>
+          <tr><td>Read risk evidence</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Create a case</td><td>For self</td><td>Any subject</td><td>No</td></tr>
+          <tr><td>Read case detail</td><td>Owned only</td><td>All</td><td>No</td></tr>
+          <tr><td>Progress a case</td><td>Owned only</td><td>All</td><td>No</td></tr>
+          <tr><td>Manage sessions</td><td>No</td><td>Yes</td><td>No</td></tr>
+          <tr><td>Manage analysts</td><td>No</td><td>Yes</td><td>No</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <p class="small">The system identity has no password and cannot authenticate. It exists so future automated actions can be attributed without adding a fourth interactive role.</p>
+      <h3 style="margin-top:3mm">2.3 Non-functional requirements</h3>
+      <ul style="font-size:8pt">
+        <li><b>Integrity:</b> primary and foreign keys, check constraints, partial unique indexes and retained financial rows.</li>
+        <li><b>Security:</b> least-privilege runtime login, parameterised SQL, generic authentication errors and secrets outside source.</li>
+        <li><b>Concurrency:</b> expected version, row locks, idempotency receipts and deterministic conflict responses.</li>
+        <li><b>Performance:</b> keyset paging, targeted indexes and a two second cap on MongoDB aggregation.</li>
+        <li><b>Usability:</b> responsive layout, light and dark themes, keyboard labels and explicit empty or unavailable states.</li>
+        <li><b>Reproducibility:</b> checksummed migrations, seeded data and command-line verification.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>2.4 Acceptance rule</h3>
+  <p>A requirement is treated as implemented only when a route or database object exists, the interface can reach it and an automated test exercises it. The test suite runs against a disposable PostgreSQL 17 database and a fresh MongoDB fixture. Design documents and columns alone are not counted as features.</p>
+
+  <h3>2.5 Course requirement coverage</h3>
+  <table class="tight">
+    <thead><tr><th style="width:22%">Course item</th><th style="width:40%">Requirement</th><th>Evidence in this report</th></tr></thead>
+    <tbody>
+      <tr><td class="k">1, 17</td><td>Problem beyond CRUD</td><td>Sections 1, 8 and 10: guarded cases, concurrency and immutable history</td></tr>
+      <tr><td class="k">2, 14</td><td>Two-member team and Git</td><td>Section 10 and the pull request history</td></tr>
+      <tr><td class="k">3, 4</td><td>SQL plus NoSQL; ER and schema</td><td>Sections 4 and 5, plus the MongoDB model in Section 7</td></tr>
+      <tr><td class="k">5, 6</td><td>DDL, DML and queries</td><td>Sections 6 and 7</td></tr>
+      <tr><td class="k">7</td><td>Four SQL advanced features and one NoSQL feature</td><td>Transactions, view, functions, triggers, indexes, full-text search and aggregation</td></tr>
+      <tr><td class="k">9 to 12</td><td>Next.js, integration, roles and validation</td><td>Sections 3, 8 and 9</td></tr>
+      <tr><td class="k">13</td><td>Documentation</td><td>This report and the repository contracts</td></tr>
+      <tr><td class="k">15, 16</td><td>Demonstration, tests and originality</td><td>Section 9 and the project-specific schema and guards</td></tr>
+    </tbody>
+  </table>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">04</span></div>
+</section>
+
+<!-- 05 ARCHITECTURE -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 3. System architecture</div>
+    <div class="right">Components, request path and technology</div>
+  </div>
+
+  <h2>3. System architecture</h2>
+
+  <div class="arch">
+    <div class="arch-row">
+      <div class="arch-node">
+        <b>Browser</b>
+        <span>Next.js App Router pages and client components for discovery, evidence, cases, administration and settings.</span>
+      </div>
+    </div>
+    <div class="arch-link"></div>
+    <div class="arch-label">HTTPS / encrypted session cookie</div>
+    <div class="arch-row">
+      <div class="arch-node">
+        <b>Next.js 16 server</b>
+        <span>Server Components, Route Handlers and Server Actions. Authentication, authorisation, input validation and response shaping. Hand-written SQL, no ORM.</span>
+      </div>
+    </div>
+    <div class="arch-link"></div>
+    <div class="arch-label">separate application logins</div>
+    <div class="arch-row">
+      <div class="arch-node pg">
+        <b>PostgreSQL 17</b>
+        <span>System of record for financial facts, risk signals, identities, sessions, cases and audit. The runtime role cannot write protected tables directly.</span>
+      </div>
+      <div class="arch-node mongo">
+        <b>MongoDB 8</b>
+        <span>Read-only device telemetry. Strict validator, three indexes and a bounded aggregation. Failure affects only the telemetry panel.</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="cols2">
+    <div>
+      <h3 style="margin-top:0">3.1 Request path</h3>
+      <div class="flow">
+        <div class="step"><p>The browser sends an encrypted JWT that contains the subject and session identifier.</p></div>
+        <div class="step"><p><span class="mono">validate_app_session</span> locks the session and user rows, checks expiry and refreshes the idle deadline.</p></div>
+        <div class="step"><p>The route re-reads the current role and ownership from PostgreSQL. JWT claims are not used for authority.</p></div>
+        <div class="step"><p>Parameters are typed and bounded before binding. Invalid input is rejected at the route.</p></div>
+        <div class="step"><p>A parameterised query or guarded function runs in one transaction. Case commands also write a receipt and events.</p></div>
+        <div class="step"><p>The response contains a masked projection. Credentials, tokens and raw telemetry are excluded.</p></div>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-top:0">3.2 Technology</h3>
+      <table class="tight">
+        <thead><tr><th style="width:34%">Layer</th><th>Choice</th></tr></thead>
+        <tbody>
+          <tr><td class="k">Runtime</td><td>Node.js 24</td></tr>
+          <tr><td class="k">Framework</td><td>Next.js 16.4.6, React 19.3</td></tr>
+          <tr><td class="k">Language</td><td>TypeScript 6</td></tr>
+          <tr><td class="k">Primary database</td><td>PostgreSQL 17</td></tr>
+          <tr><td class="k">Document database</td><td>MongoDB 8</td></tr>
+          <tr><td class="k">Authentication</td><td>Auth.js 4, Argon2id</td></tr>
+          <tr><td class="k">Tests</td><td>Vitest 5, Playwright 1.64</td></tr>
+          <tr><td class="k">Styling</td><td>Tailwind CSS 4</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h3>3.3 Database responsibilities</h3>
+  <table class="tight">
+    <thead><tr><th style="width:30%">Data</th><th style="width:18%">Store</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td>Customers, accounts, merchants, transactions</td><td>PostgreSQL</td><td>Related facts with exact amounts and declared keys</td></tr>
+      <tr><td>Rules, signals and the derived risk view</td><td>PostgreSQL</td><td>Evidence must be stored, immutable and joined to transactions</td></tr>
+      <tr><td>Users, sessions, cases, events and receipts</td><td>PostgreSQL</td><td>State changes and audit need transactions and constraints</td></tr>
+      <tr><td>Device and client telemetry</td><td>MongoDB</td><td>Two document shapes read as a bounded context panel</td></tr>
+      <tr><td>Telemetry writes and retention</td><td>Not implemented</td><td>No application write path or retention worker</td></tr>
+    </tbody>
+  </table>
+
+  <p>Schema changes use a migration-owner connection. Application requests use a separate non-owner login with execute permission on guarded functions. Test tooling uses a disposable database and does not redirect the running application.</p>
+
+  <h3>3.4 Environments and database roles</h3>
+  <table class="tight">
+    <thead><tr><th style="width:20%">Environment</th><th style="width:28%">Database</th><th>Role and purpose</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Development</td><td>Local PostgreSQL 17 and MongoDB 8</td><td>Migration owner, runtime login, seeded synthetic data</td></tr>
+      <tr><td class="k">Automated test</td><td>Disposable database ending in <span class="mono">_test</span></td><td>Non-owner test owner and runtime login; fixtures are removed after the run</td></tr>
+      <tr><td class="k">CI</td><td>Fresh PostgreSQL 17 service and MongoDB fixture</td><td>Same migration and runtime split as development</td></tr>
+      <tr><td class="k">Demonstration</td><td>Dedicated <span class="mono">finsight_demo</span> database</td><td>Seeded accounts and transactions; no test fixtures</td></tr>
+    </tbody>
+  </table>
+  <p class="small">The application never connects with the migration owner. Secrets are held in ignored environment files, and the runtime login has no membership in the owner role. This separation is tested by a direct-write probe that expects SQLSTATE 42501.</p>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">05</span></div>
+</section>
+
+<!-- 06 ER LANDSCAPE -->
+<section class="page land">
+  <div class="land-head">
+    <div class="left"><span class="sq"></span> 4. Entity relationship model</div>
+    <div class="right">A4 landscape</div>
+  </div>
+
+  <h2 style="font-size:18pt;margin-bottom:2mm">4. Entity relationship model</h2>
+  <div class="er-crop">
+    <img src="assets/er-full.png" alt="FinSight entity relationship diagram">
+  </div>
+  <div class="land-caption">
+    <div>
+      <p><b>Figure 4.1.</b> Attribute-level ER diagram for the 17 application tables in migrations 010 to 060, reproduced from the verified A4 master. Underlined attributes are primary keys. Migration 070 adds <span class="mono">admin_audit_event</span>, which has two foreign keys to <span class="mono">app_user</span> and brings the current tree to 18 tables. Section 5 lists the keys and main columns of all 18 tables.</p>
+    </div>
+    <div>
+      <span class="tag violet">18 tables in current tree</span>
+      <p>22 declared SQL foreign keys. The migration ledger, the risk view and the MongoDB collection are not business entities.</p>
+    </div>
+  </div>
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">06</span></div>
+</section>
+
+<!-- 07 SCHEMA AND DICTIONARY -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 5. Schema and data dictionary</div>
+    <div class="right">Keys, columns and normalisation</div>
+  </div>
+
+  <h2>5. Relational schema and data dictionary</h2>
+  <p class="small">Table 5.1 lists each relation with its primary key, foreign keys and main columns. Constraint expressions are in the migration files; this table is a reading guide, not a replacement for the DDL.</p>
+
+  <table class="xs">
+    <thead><tr><th style="width:17%">Relation</th><th style="width:13%">Primary key</th><th style="width:21%">Foreign keys</th><th>Main columns and constraints</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">app_user</td><td class="mono">user_id</td><td>None</td><td>email unique and lower-case, password_hash, display_name, role in analyst/admin/system, is_active</td></tr>
+      <tr><td class="mono">customer</td><td class="mono">customer_id</td><td>user_id to app_user</td><td>full_name, date_of_birth, email, phone, country_code, status, kyc_verified_on</td></tr>
+      <tr><td class="mono">address</td><td class="mono">address_id</td><td>customer_id to customer</td><td>line1, city, state, postal_code, country_code, latitude, longitude, is_primary; one primary per customer</td></tr>
+      <tr><td class="mono">account</td><td class="mono">account_id</td><td>customer_id to customer</td><td>account_number unique, account_type, currency_code, balance, status; unique (account_id, currency_code)</td></tr>
+      <tr><td class="mono">payment_method</td><td class="mono">method_id</td><td>account_id to account</td><td>method_type, token, last4, expiry_date, status; unique (method_id, account_id)</td></tr>
+      <tr><td class="mono">merchant</td><td class="mono">merchant_id</td><td>None</td><td>merchant_name, category_code, country_code, city, risk_tier, is_watchlisted; tier updates blocked</td></tr>
+      <tr><td class="mono">device_fingerprint</td><td class="mono">device_id</td><td>None</td><td>device_hash unique, os_family, first_seen_country, first_seen_at</td></tr>
+      <tr><td class="mono">transaction</td><td class="mono">transaction_id</td><td>account, payment method, merchant, device</td><td>amount, currency_code, exchange_rate, amount_base, direction, type, status, occurred_at, description, search_vector</td></tr>
+      <tr><td class="mono">risk_rule</td><td class="mono">rule_id</td><td>None</td><td>rule_code unique, name, dimension, weight, threshold_value, is_active, version; rows frozen</td></tr>
+      <tr><td class="mono">risk_signal</td><td class="mono">signal_id</td><td>transaction_id, rule_id</td><td>observed_value, score_contribution, evidence, triggered_at; unique (transaction_id, rule_id)</td></tr>
+      <tr><td class="mono">fraud_scenario</td><td class="mono">scenario_id</td><td>None</td><td>scenario_code unique, scenario_name, description</td></tr>
+      <tr><td class="mono">transaction_label</td><td class="mono">transaction_id</td><td>transaction_id, scenario_id</td><td>is_suspicious; one fixture label per transaction</td></tr>
+      <tr><td class="mono">app_session</td><td class="mono">session_id</td><td>user_id to app_user</td><td>created_at, last_seen_at, idle_expires_at, absolute_expires_at, revoked_at, revocation_reason</td></tr>
+      <tr><td class="mono">app_session_cleanup</td><td class="mono">operation_id</td><td>admin_id to app_user</td><td>preview_at, cutoff_at, expires_at, candidate_session_ids, candidate_count, status, deleted_count</td></tr>
+      <tr><td class="mono">investigation_case</td><td class="mono">case_id</td><td>transaction_id, assigned_to_user_id</td><td>case_ref unique, status, priority, resolution_code, resolution_notes, opened_at, closed_at, version</td></tr>
+      <tr><td class="mono">case_event</td><td class="mono">event_id</td><td>case_id, actor_user_id</td><td>event_type, from_state, to_state, reason, metadata, operation_id, event_ordinal, occurred_at</td></tr>
+      <tr><td class="mono">case_command_receipt</td><td class="mono">operation_id</td><td>actor_user_id, case_id</td><td>idempotency_key, command_type, request_hash, response_status, completed_at</td></tr>
+      <tr><td class="mono">admin_audit_event</td><td class="mono">event_id</td><td>actor_user_id, target_user_id</td><td>operation_id, action, details, occurred_at; rejects update, delete and truncate</td></tr>
+    </tbody>
+  </table>
+
+  <h3>5.1 Normalisation</h3>
+  <p>Customer, address, account, payment method, merchant and device are separate relations with declared keys. A transaction references them instead of repeating their attributes. Risk signals resolve the many-to-many relationship between transactions and rules and have a unique pair constraint. Case events are a dependent history of the case and are ordered by an operation ordinal. The financial relations are in third normal form.</p>
+  <p>Three exceptions are deliberate. <span class="mono">amount_base</span> is stored and checked against <span class="mono">round(amount * exchange_rate, 2)</span> so the reporting value used at review time is preserved. Case events store before and after snapshots in JSONB, validated by <span class="mono">valid_case_event</span>. The transaction description is indexed through a generated <span class="mono">tsvector</span>. None of these replaces a normalised relation; they support audit or search.</p>
+
+  <h3>5.2 Administrative audit extension</h3>
+  <p>Migration 070 adds <span class="mono">admin_audit_event</span> with seven columns and two foreign keys to <span class="mono">app_user</span>. It records account creation, deactivation, reactivation and password reset. The table is append-only. Administrators are not created, deactivated or deleted through this module, and analyst accounts are never removed.</p>
+
+  <h3>5.3 Column detail for the two central tables</h3>
+  <table class="tight">
+    <thead><tr><th style="width:24%">Column</th><th style="width:24%">Type</th><th>Constraint or meaning</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">transaction.exchange_rate</td><td class="mono">numeric(20,8)</td><td>Stored historical rate; INR is exactly 1</td></tr>
+      <tr><td class="mono">transaction.amount_base</td><td class="mono">numeric(20,2)</td><td>Checked against round(amount * exchange_rate, 2)</td></tr>
+      <tr><td class="mono">investigation_case.status</td><td class="mono">varchar(16)</td><td>open, in_review, escalated, closed, dismissed</td></tr>
+      <tr><td class="mono">investigation_case.version</td><td class="mono">bigint</td><td>Positive optimistic concurrency token</td></tr>
+    </tbody>
+  </table>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">07</span></div>
+</section>
+
+<!-- 08 SQL IMPLEMENTATION -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 6. SQL implementation</div>
+    <div class="right">DDL, constraints and database objects</div>
+  </div>
+
+  <h2>6. SQL implementation</h2>
+
+  <h3 style="margin-top:0">6.1 Migration sequence</h3>
+  <table class="tight">
+    <thead><tr><th style="width:11%">File</th><th style="width:25%">Scope</th><th>Main objects</th></tr></thead>
+    <tbody>
+      <tr><td class="mono">010</td><td>Financial baseline</td><td>customer, address, account, payment_method, merchant, device_fingerprint, transaction, risk_rule, risk_signal, fraud_scenario, transaction_label</td></tr>
+      <tr><td class="mono">020</td><td>Operational schema</td><td>app_user, investigation_case, app_session, case_command_receipt, case_event; one-active-case index</td></tr>
+      <tr><td class="mono">030</td><td>Financial guards</td><td>Retention triggers, activity indexes, primary-address index, GIN search index</td></tr>
+      <tr><td class="mono">040</td><td>Risk</td><td>Rule freeze, merchant tier freeze, risk_band, score_transaction, v_transaction_risk</td></tr>
+      <tr><td class="mono">050</td><td>Case guards</td><td>Immutable event and receipt triggers, execute_case_command, runtime grants</td></tr>
+      <tr><td class="mono">055</td><td>Session validation</td><td>validate_app_session and the auth grant procedure</td></tr>
+      <tr><td class="mono">060</td><td>Session cleanup</td><td>app_session_cleanup, preview and confirm functions, cleanup audit</td></tr>
+      <tr><td class="mono">070</td><td>Analyst administration</td><td>admin_audit_event, create, deactivate, reactivate and password reset functions</td></tr>
+    </tbody>
+  </table>
+
+  <div class="cols2">
+    <div>
+      <h3 style="margin-top:0">6.2 Constraints and indexes</h3>
+      <table class="tight">
+        <thead><tr><th style="width:47%">Object</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">case_one_active_transaction</td><td>One active case per transaction</td></tr>
+          <tr><td class="mono">case_outcome</td><td>Ties status, code, notes and closed time</td></tr>
+          <tr><td class="mono">session clock checks</td><td>30 minute idle, 8 hour absolute, ordered times</td></tr>
+          <tr><td class="mono">risk rule checks</td><td>Two approved codes and integer weights 0 to 100</td></tr>
+          <tr><td class="mono">transaction_cursor</td><td>Stable keyset paging by time and ID</td></tr>
+          <tr><td class="mono">transaction_description_search</td><td>GIN full-text search on the generated vector</td></tr>
+          <tr><td class="mono">session_cleanup_order</td><td>Expiry order for bounded cleanup</td></tr>
+          <tr><td class="mono">admin_audit_target_time</td><td>Audit trail for one managed account</td></tr>
+          <tr><td class="mono">admin_audit_actor_time</td><td>Audit trail for one administrator</td></tr>
+        </tbody>
+      </table>
+      <p class="tiny">Fourteen explicit indexes plus primary-key and unique-constraint indexes. Five planner-selected plans were recorded in the academic run.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">6.3 Functions and triggers</h3>
+      <table class="tight">
+        <thead><tr><th style="width:47%">Object</th><th>Role</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">score_transaction</td><td>Locks inputs and inserts rule signals in one transaction</td></tr>
+          <tr><td class="mono">execute_case_command</td><td>Checks actor, ownership, transition, version and idempotency</td></tr>
+          <tr><td class="mono">validate_app_session</td><td>Locks session and user, checks expiry, refreshes idle time</td></tr>
+          <tr><td class="mono">preview / confirm cleanup</td><td>Builds and deletes a bounded expired-session set</td></tr>
+          <tr><td class="mono">analyst account functions</td><td>Create, deactivate, reactivate and reset with audit</td></tr>
+          <tr><td class="mono">*_immutable triggers</td><td>Reject update, delete and truncate on audit tables</td></tr>
+          <tr><td class="mono">*_retained triggers</td><td>Reject changes to financial facts and signals</td></tr>
+          <tr><td class="mono">*_frozen triggers</td><td>Block rule and merchant tier changes</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <h3>6.4 Index and trigger examples</h3>
+  <div class="cols2">
+    <div>
+      <pre><code><span class="c">-- 020_operational_schema.sql</span>
+<span class="k">CREATE UNIQUE INDEX</span> case_one_active_transaction
+  <span class="k">ON</span> public.investigation_case (transaction_id)
+  <span class="k">WHERE</span> status <span class="k">IN</span> (<span class="s">'open'</span>,<span class="s">'in_review'</span>,<span class="s">'escalated'</span>);</code></pre>
+    </div>
+    <div>
+      <pre><code><span class="c">-- 050_case_guards.sql</span>
+<span class="k">CREATE TRIGGER</span> case_event_immutable_stmt
+  <span class="k">BEFORE DELETE OR TRUNCATE ON</span> public.case_event
+  <span class="k">FOR EACH STATEMENT EXECUTE FUNCTION</span>
+    public.reject_case_event_mutation();</code></pre>
+    </div>
+  </div>
+
+  <h3>6.5 Privileges</h3>
+  <p>The migration owner revokes public access and grants the runtime login only the reads and function executions each workflow needs. The runtime role cannot update <span class="mono">transaction</span>, <span class="mono">risk_signal</span>, <span class="mono">investigation_case</span>, <span class="mono">case_event</span> or <span class="mono">case_command_receipt</span> directly. A direct write fails with SQLSTATE 42501. Guarded functions run as <span class="mono">SECURITY DEFINER</span> with a fixed search path and re-check the acting user, so execute permission does not bypass the case rules. A direct event update fails with SQLSTATE 55000, including for the privileged fixture owner.</p>
+
+  <div class="note">
+    The migration runner stores each file name and SHA-256 checksum in <span class="mono">schema_migrations</span>, applies files in order and rejects a changed checksum. The academic suite also creates, alters and drops a temporary table to demonstrate DDL and checks that the object is gone.
+  </div>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">08</span></div>
+</section>
+
+<!-- 09 QUERIES AND MONGODB -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 7. Queries and MongoDB</div>
+    <div class="right">Data access and the document store</div>
+  </div>
+
+  <h2>7. Queries and MongoDB</h2>
+
+  <div class="cols2">
+    <div>
+      <h3 style="margin-top:0">7.1 Transaction discovery</h3>
+      <pre style="font-size:5.9pt"><code><span class="k">SELECT</span> t.transaction_id, t.amount, t.amount_base,
+       t.status, t.occurred_at, r.risk_score, r.risk_band,
+       coalesce((<span class="k">SELECT CASE WHEN</span> $2::text = <span class="s">'admin'</span>
+                    <span class="k">OR</span> ic.assigned_to_user_id = $3::uuid
+                 <span class="k">THEN</span> jsonb_build_object(<span class="s">'access'</span>,<span class="s">'permitted'</span>)
+                 <span class="k">ELSE</span> jsonb_build_object(<span class="s">'access'</span>,<span class="s">'restricted'</span>) <span class="k">END</span>
+        <span class="k">FROM</span> public.investigation_case ic
+        <span class="k">WHERE</span> ic.transaction_id = t.transaction_id
+          <span class="k">AND</span> ic.status <span class="k">IN</span> (<span class="s">'open'</span>,<span class="s">'in_review'</span>,<span class="s">'escalated'</span>)
+        <span class="k">LIMIT</span> 1), jsonb_build_object(<span class="s">'access'</span>,<span class="s">'none'</span>)) <span class="k">AS</span> active_case
+<span class="k">FROM</span> public.transaction t
+<span class="k">JOIN</span> public.account a <span class="k">USING</span> (account_id)
+<span class="k">JOIN</span> public.customer c <span class="k">USING</span> (customer_id)
+<span class="k">JOIN</span> public.merchant m <span class="k">USING</span> (merchant_id)
+<span class="k">JOIN</span> public.device_fingerprint d <span class="k">USING</span> (device_id)
+<span class="k">JOIN</span> public.v_transaction_risk r <span class="k">USING</span> (transaction_id)
+<span class="k">WHERE</span> t.search_vector @@ plainto_tsquery(<span class="s">'english'</span>, $1)
+  <span class="k">AND</span> ($4::text <span class="k">IS NULL OR</span> r.risk_band = $4)
+<span class="k">ORDER BY</span> t.occurred_at <span class="k">DESC</span>, t.transaction_id <span class="k">DESC</span>
+<span class="k">LIMIT</span> $5;</code></pre>
+
+      <h3>7.2 Merchant aggregate</h3>
+      <pre style="font-size:5.9pt"><code><span class="k">SELECT</span> m.merchant_name, count(*)::integer <span class="k">AS</span> txns,
+       sum(r.risk_score) <span class="k">AS</span> recorded_points
+<span class="k">FROM</span> public.merchant m
+<span class="k">JOIN</span> public.transaction t <span class="k">USING</span> (merchant_id)
+<span class="k">JOIN</span> public.v_transaction_risk r <span class="k">USING</span> (transaction_id)
+<span class="k">GROUP BY</span> m.merchant_id, m.merchant_name
+<span class="k">HAVING</span> count(*) <span class="k">FILTER</span> (<span class="k">WHERE</span> r.signal_count &gt; 0) &gt;= $1
+<span class="k">ORDER BY</span> recorded_points <span class="k">DESC</span>, m.merchant_id;</code></pre>
+      <p class="tiny">The discovery query uses joins, a correlated case check and full-text search. The aggregate uses GROUP BY, HAVING, FILTER and ORDER BY. Keyset paging compares the pair (occurred_at, transaction_id) with a signed cursor, so a copied cursor cannot widen the result set.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">7.3 MongoDB collection</h3>
+      <p class="small">Collection <span class="mono">device_telemetry</span> stores two shapes under a shared envelope. The validator uses <span class="mono">validationLevel: strict</span>, <span class="mono">validationAction: error</span> and rejects unknown payload fields.</p>
+      <table class="tight">
+        <thead><tr><th style="width:36%">Field</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td class="mono">_id, device_id</td><td>UUID document and device identity</td></tr>
+          <tr><td class="mono">transaction_id</td><td>Optional UUID, checked against SQL</td></tr>
+          <tr><td class="mono">captured_at</td><td>BSON date, bounded by transaction time</td></tr>
+          <tr><td class="mono">shape_type</td><td>connection_telemetry or client_environment</td></tr>
+          <tr><td class="mono">schema_version</td><td>Integer, currently 1</td></tr>
+          <tr><td class="mono">payload</td><td>Shape-specific object with allowlisted fields</td></tr>
+        </tbody>
+      </table>
+
+      <h3>7.4 Read path and pipeline</h3>
+      <p class="small">PostgreSQL resolves the transaction, device and occurrence time first. MongoDB receives the device, a bounded candidate list and an upper time bound. The pipeline reads at most 100 documents, then aggregates summaries and five recent samples in one <span class="mono">$facet</span>.</p>
+      <pre style="font-size:5.7pt"><code>[ { $match: { device_id: d, _id: { $in: ids },
+             captured_at: { $lte: maxDate } } },
+  { $sort: { captured_at: -1 } }, { $limit: 100 },
+  { $facet: {
+      total_count: [ { $count: <span class="s">"count"</span> } ],
+      connection_summary: [
+        { $match: { shape_type: <span class="s">"connection_telemetry"</span> } },
+        { $group: { _id: null, count: { $sum: 1 },
+            vpn: { $sum: { $cond: [<span class="s">"$payload.vpn_detected"</span>, 1, 0] } },
+            avg_latency: { $avg: <span class="s">"$payload.latency_ms"</span> } } } ],
+      recent_samples: [ { $limit: 5 }, { $project: { _id: 0,
+            shape_type: 1, captured_at: 1, latency_ms: <span class="s">"$payload.latency_ms"</span> } } ] } } ]</code></pre>
+      <p class="tiny">Indexes: <span class="mono">(device_id, captured_at desc)</span>, sparse <span class="mono">(transaction_id)</span> and <span class="mono">(retention_eligible, captured_at)</span>. Server selection and connect timeouts are 2 seconds; the aggregation limit is 2 seconds. If MongoDB is unavailable, the financial record still renders and the telemetry panel reports an unavailable state.</p>
+    </div>
+  </div>
+
+  <h3>7.5 Case command and cleanup calls</h3>
+  <div class="cols2">
+    <div>
+      <pre style="font-size:6pt"><code><span class="k">SELECT</span> *
+<span class="k">FROM</span> public.execute_case_command(
+  <span class="s">'start_review'</span>, $1::uuid, $2::uuid, $3, $4::bigint,
+  $5::uuid, <span class="k">NULL</span>, <span class="k">NULL</span>, <span class="s">'Review started'</span>,
+  <span class="k">NULL</span>, <span class="k">NULL</span>, <span class="k">NULL</span>);</code></pre>
+      <p class="tiny">The function returns the operation ID, case reference, new status, version, response status and a replay flag. The caller cannot choose the next state directly.</p>
+    </div>
+    <div>
+      <pre style="font-size:6pt"><code><span class="k">SELECT</span> *
+<span class="k">FROM</span> public.preview_app_session_cleanup($1::uuid);
+<span class="c">-- then, after administrator confirmation</span>
+<span class="k">SELECT</span> *
+<span class="k">FROM</span> public.confirm_app_session_cleanup(
+  $2::uuid, $1::uuid, $3::uuid, $4);</code></pre>
+      <p class="tiny">Confirmation rechecks the administrator, request hash and 10 minute window, deletes only the stored candidates and returns the deleted count or the original replay.</p>
+    </div>
+  </div>
+
+  <h3>7.6 SQL features demonstrated</h3>
+  <table class="tight">
+    <thead><tr><th style="width:24%">Feature</th><th>Where it is used</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Transactions</td><td>Case command, scoring and cleanup writes</td></tr>
+      <tr><td class="k">View</td><td><span class="mono">v_transaction_risk</span> for score, signal count and band</td></tr>
+      <tr><td class="k">Functions</td><td>Scoring, case commands, session validation, cleanup and analyst administration</td></tr>
+      <tr><td class="k">Triggers</td><td>Retention, immutability and frozen rule or merchant configuration</td></tr>
+      <tr><td class="k">Indexes and search</td><td>Keyset paging, entity timelines, audit lookup and <span class="mono">plainto_tsquery</span></td></tr>
+      <tr><td class="k">NoSQL aggregation</td><td>Bounded <span class="mono">$facet</span> over device telemetry</td></tr>
+    </tbody>
+  </table>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">09</span></div>
+</section>
+
+<!-- 10 APPLICATION -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 8. Application</div>
+    <div class="right">Interface and workflow</div>
+  </div>
+
+  <h2>8. Application</h2>
+
+  <div class="cols2-wide">
+    <div>
+      <figure>
+        <div class="shot"><img src="assets/discovery.png" alt="Transaction discovery screen with filters and masked rows"></div>
+        <figcaption><b>Figure 8.1.</b> Transaction discovery as an analyst. Filters are stored in the URL, identifiers are masked and each row shows the recorded score, band and case indicator.</figcaption>
+      </figure>
+    </div>
+    <div>
+      <h3 style="margin-top:0">8.1 Sign-in and discovery</h3>
+      <p>An operator signs in with email and password. The server verifies an Argon2id hash, creates a session row and issues an encrypted cookie that points to it. Analysts land on their overview; administrators land on team oversight. Sign-out revokes the session before clearing the cookie.</p>
+      <p>Discovery supports description search, exact transaction ID, risk band, status, date, account, merchant, device and amount filters. Paging uses a signed cursor bound to the actor and filters. Masking is applied in the server projection rather than in the browser alone.</p>
+      <p>An analyst can open a transaction, read the original and INR amounts, inspect each stored signal and view bounded device telemetry. A transaction with no signals is labelled "No recorded signals", not as safe.</p>
+    </div>
+  </div>
+
+  <div class="cols2-wide">
+    <div>
+      <h3 style="margin-top:0">8.2 Case lifecycle</h3>
+      <p>A case starts in <span class="mono">open</span>, assigned to the analyst who created it. The analyst can start review, escalate with a reason, or resolve and dismiss with a resolution code and notes. An administrator can progress any case, return an escalated case to review and reopen a terminal case. Reopening requires a reason and increments the version.</p>
+      <p>Every existing-case command sends an expected version and an idempotency key. A stale version returns 409 without a state change. A replay with the same key and request returns the original receipt. A replay with the same key and a different request is rejected. The SQL function, not the dialog, owns the transition rules.</p>
+      <p>Commands write the case change, typed events and a receipt in one transaction. Events carry before and after snapshots, an actor, a reason, an operation ID and an ordinal. Event and receipt rows reject update, delete and truncate.</p>
+    </div>
+    <div>
+      <figure>
+        <div class="shot"><img src="assets/admin-accounts.png" alt="Administrator screen for analyst accounts"></div>
+        <figcaption><b>Figure 8.2.</b> Analyst account administration. Status, active case count and creation time are shown for each account. Administrators are not managed here and accounts are not deleted.</figcaption>
+      </figure>
+    </div>
+  </div>
+
+  <div class="note">
+    Administrators can also preview and confirm cleanup of expired sessions. The preview stores at most 100 candidate session IDs, a cutoff, a 10 minute expiry and a request hash. Confirmation deletes only those candidates and writes one immutable audit row. A retry returns the original deleted count.
+  </div>
+
+  <h3>8.3 Interface states</h3>
+  <table class="tight">
+    <thead><tr><th style="width:26%">State</th><th>What the user sees</th></tr></thead>
+    <tbody>
+      <tr><td class="k">No recorded signals</td><td>"No recorded signals", with a note that this is not a safe verdict</td></tr>
+      <tr><td class="k">Peer-owned case</td><td>Case existence is shown; details and transitions are restricted</td></tr>
+      <tr><td class="k">Version conflict</td><td>409 message, preserved draft and a request to reload the current case</td></tr>
+      <tr><td class="k">Duplicate case</td><td>Existing-case check before save and a restricted indicator after creation</td></tr>
+      <tr><td class="k">Telemetry unavailable</td><td>Financial facts remain visible; the telemetry panel shows a warning</td></tr>
+    </tbody>
+  </table>
+
+  <h3>8.4 Settings and accessibility</h3>
+  <p>The workspace includes a collapsible sidebar, a mobile navigation drawer, visible focus styles and light and dark themes. Settings preserve the return path, synchronize appearance controls and allow UTC or local time and original or INR amounts. Browser tests cover keyboard labels, the mobile drawer, sidebar collapse and theme persistence.</p>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">10</span></div>
+</section>
+
+<!-- 11 SECURITY AND TESTING -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 9. Security and testing</div>
+    <div class="right">Controls and executed evidence</div>
+  </div>
+
+  <h2>9. Security and testing</h2>
+
+  <div class="cols2">
+    <div>
+      <h3 style="margin-top:0">9.1 Authentication and sessions</h3>
+      <p>Passwords use salted Argon2id at 19,456 KiB memory, two iterations and one lane. A wrong password, unknown account and throttled attempt return the same generic failure. Login is limited to five attempts per account per 15 minutes and 100 attempts per minute per process. The limiter stores HMAC digests, not email addresses or passwords.</p>
+      <p>The cookie is an encrypted JWT that points to a PostgreSQL session. It is HttpOnly, Secure in production, SameSite Lax and Path=/ with no Domain. The database enforces a 30 minute idle limit and an 8 hour absolute limit. Validation locks the session and user rows, checks expiry after the lock and refreshes the idle deadline only for a valid, active session.</p>
+
+      <h3>9.2 Authorisation and database access</h3>
+      <table class="tight">
+        <thead><tr><th style="width:42%">Control</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>Current role from app_user</td><td>JWT role claims are ignored</td></tr>
+          <tr><td>Ownership predicate</td><td>Analysts read only owned case detail</td></tr>
+          <tr><td>Concealed responses</td><td>Peer cases show existence without detail</td></tr>
+          <tr><td>Non-owner runtime login</td><td>No direct write to protected tables</td></tr>
+          <tr><td>SECURITY DEFINER functions</td><td>Fixed search path and actor re-check</td></tr>
+          <tr><td>Parameterised SQL</td><td>No string-built values</td></tr>
+        </tbody>
+      </table>
+      <p class="tiny">Residual risks: in-process throttling needs a shared store for multiple replicas. CSP, HSTS, row-level security and centralized logs are not configured. These are documented boundaries.</p>
+    </div>
+    <div>
+      <h3 style="margin-top:0">9.3 Test results</h3>
+      <table class="tight">
+        <thead><tr><th style="width:42%">Suite</th><th>Result</th></tr></thead>
+        <tbody>
+          <tr><td>Unit</td><td><b>104 passed</b></td></tr>
+          <tr><td>API</td><td><b>95 passed</b></td></tr>
+          <tr><td>Database</td><td><b>24 passed</b></td></tr>
+          <tr><td>Browser</td><td><b>16 passed, 1 skipped</b></td></tr>
+          <tr><td>Academic SQL and Mongo</td><td><b>Passed</b></td></tr>
+          <tr><td>MVP acceptance</td><td><b>VS01 to VS16 passed</b></td></tr>
+        </tbody>
+      </table>
+
+      <h3>9.4 Continuous integration</h3>
+      <table class="tight">
+        <thead><tr><th>Workflow</th><th>Scope</th></tr></thead>
+        <tbody>
+          <tr><td class="k">checks</td><td>Lint, typecheck, unit, API, DB, build and browser</td></tr>
+          <tr><td class="k">acceptance</td><td>Academic checks and VS01 to VS16</td></tr>
+          <tr><td class="k">deterministic-risk</td><td>Rules, bands, evidence and plans</td></tr>
+          <tr><td class="k">financial-baseline</td><td>Financial schema integrity</td></tr>
+          <tr><td class="k">financial-guards</td><td>Retention and immutability</td></tr>
+          <tr><td class="k">operational-schema</td><td>Sessions, receipts and case tables</td></tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+
+  <h3>9.5 Behaviour confirmed by the tests</h3>
+  <div class="cols2">
+    <ul style="font-size:7.8pt;margin-top:0">
+      <li>A stale version is rejected without a state change.</li>
+      <li>A command replay returns the stored receipt and status.</li>
+      <li>The owner cannot update a case event (SQLSTATE 55000).</li>
+      <li>The runtime role cannot delete a case event (SQLSTATE 42501).</li>
+    </ul>
+    <ul style="font-size:7.8pt;margin-top:0">
+      <li>An expired cleanup preview is rejected while waiting on a lock.</li>
+      <li>A rolled-back cleanup leaves sessions and audit unchanged.</li>
+      <li>MongoDB rejects an empty payload with code 121.</li>
+      <li>The risk view returns the canonical 65 point combined case.</li>
+    </ul>
+  </div>
+
+  <h3>9.6 Security checks</h3>
+  <table class="tight">
+    <thead><tr><th style="width:32%">Check</th><th>Expected result</th></tr></thead>
+    <tbody>
+      <tr><td>Wrong password and unknown account</td><td>Same generic failure response</td></tr>
+      <tr><td>Foreign-origin logout</td><td>Rejected without revoking the session</td></tr>
+      <tr><td>JWT subject and session binding</td><td>Mismatch is rejected</td></tr>
+      <tr><td>Session revoked in PostgreSQL</td><td>Next request is denied</td></tr>
+      <tr><td>Direct runtime write</td><td>SQLSTATE 42501</td></tr>
+      <tr><td>Direct event update</td><td>SQLSTATE 55000</td></tr>
+    </tbody>
+  </table>
+
+  <h3>9.7 Reproduction</h3>
+  <pre style="font-size:6.2pt"><code>npm ci
+npm run db:migrate:test
+npm run lint &amp;&amp; npm run typecheck
+npm run test:unit &amp;&amp; npm run test:api &amp;&amp; npm run test:db
+npx playwright install chromium &amp;&amp; npm run test:e2e
+npm run test:academic</code></pre>
+  <p class="tiny">The commands require Node.js 24, a disposable PostgreSQL 17 database, a local MongoDB fixture and the environment values in the README. Test tooling refuses a database not marked as disposable.</p>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">11</span></div>
+</section>
+
+<!-- 12 CONTRIBUTIONS AND CONCLUSION -->
+<section class="page">
+  <div class="runhead">
+    <div class="left"><span class="sq"></span> 10. Contributions and conclusion</div>
+    <div class="right">Ownership, limits and conclusion</div>
+  </div>
+
+  <h2>10. Contributions, limitations and conclusion</h2>
+
+  <div class="cols2">
+    <div class="member">
+      <div class="name">Shrikar Desai</div>
+      <div class="srn">PES1UG24CS916</div>
+      <p>Authentication and sessions, case guards and lifecycle APIs, case queue and history interface, MongoDB telemetry, audited session cleanup and submission documentation.</p>
+    </div>
+    <div class="member">
+      <div class="name">Shreyas P Kulkarni</div>
+      <div class="srn">PES1UG24CS444</div>
+      <p>Next.js scaffold, financial baseline and guards, operational schema, deterministic risk, discovery interface, acceptance matrix, print masters and analyst administration.</p>
+    </div>
+  </div>
+
+  <h3>10.1 Limitations</h3>
+  <table class="tight">
+    <thead><tr><th style="width:22%">Area</th><th style="width:13%">Status</th><th>Boundary</th></tr></thead>
+    <tbody>
+      <tr><td class="k">Risk coverage</td><td><span class="tag partial">Partial</span></td><td>Two rules only; 65 point maximum; critical band cannot be reached</td></tr>
+      <tr><td class="k">Device telemetry</td><td><span class="tag partial">Partial</span></td><td>Read-only, latest 100 observations, no write API or retention worker</td></tr>
+      <tr><td class="k">Login throttling</td><td><span class="tag partial">Partial</span></td><td>In-process only; multiple replicas need a shared store</td></tr>
+      <tr><td class="k">Analyst notes and vectors</td><td><span class="tag deferred">Deferred</span></td><td>No notes panel, embedding model or vector table</td></tr>
+      <tr><td class="k">Rule editing and reassignment</td><td><span class="tag deferred">Deferred</span></td><td>No callable mutation for either</td></tr>
+      <tr><td class="k">RLS, CSP, HSTS and logs</td><td><span class="tag deferred">Deferred</span></td><td>Documented security and operations work</td></tr>
+    </tbody>
+  </table>
+
+  <h3>10.2 Conclusion</h3>
+  <p>FinSight implements the database design as a working review process. The ER model is implemented as a constrained schema, and guarded functions and triggers enforce the workflow. Case creation, lifecycle changes and cleanup are atomic, versioned and idempotent, and the history cannot be edited through the application or a direct SQL session.</p>
+  <p>The implementation is limited to academic fixtures. It does not include fraud prediction or production deployment, but it does provide explainable risk evidence, traceable investigations and a justified second database for telemetry.</p>
+
+  <h3>10.3 Future work</h3>
+  <p>The next additions should follow the existing database boundaries. A shared rate-limit store is required before running more than one application replica. A rule revision table would allow configuration changes without rewriting stored evidence. Analyst notes would need the same immutability and ownership rules as case events. Central logs and metrics, row-level security and CSP/HSTS remain deployment work. Vector search is not justified until the project has a text corpus and a retrieval requirement.</p>
+
+  <div class="runfoot"><span>FinSight project report / DBMS UE24CS351A</span><span class="pno">12</span></div>
+</section>
+</body>
+</html>
