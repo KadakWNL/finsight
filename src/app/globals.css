@@ -224,6 +224,11 @@ body { font-family: var(--font-plex), 'Segoe UI', system-ui, sans-serif; }
 
 .priority-badge { display: inline-flex; align-items: center; border-radius: 4px; font-size: 11px; font-weight: 600; padding: 2px 6px; text-transform: uppercase; letter-spacing: 0.04em; }
 .priority-low { background: var(--surface-muted); color: var(--secondary-text); }
+.account-active { background: #d1fae5; color: #065f46; }
+.account-inactive { background: var(--surface-muted); color: var(--secondary-text); }
+:root[data-theme=dark] .account-active { background: #133c2e; color: #a7f3d0; }
+.account-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.account-actions button { min-height: 36px; padding: 6px 12px; }
 .priority-medium { background: #fff4d6; color: #865516; }
 .priority-high { background: #fee2e2; color: #991b1b; }
 :root[data-theme=dark] .priority-medium { background: #433820; color: #efd18a; }

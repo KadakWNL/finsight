@@ -8,7 +8,10 @@ test('recovery destinations keep only local workspace routes and preserve filter
   expect(landingPath('analyst','/settings')).toBe('/settings');
   expect(landingPath('admin','/settings')).toBe('/settings');
   expect(safeWorkspacePath('/cases/40000000-0000-0000-0000-000000000100')).toBe('/cases/40000000-0000-0000-0000-000000000100');
-  for(const value of ['https://example.com','//example.com','/\\example.com','/%2f%2fexample.com','/api/auth/logout','/transactions\n','/transactions/../../admin/users']) expect(safeWorkspacePath(value)).toBe('/transactions');
+  expect(safeWorkspacePath('/admin/users')).toBe('/admin/users');
+  expect(landingPath('admin','/admin/users')).toBe('/admin/users');
+  expect(landingPath('analyst','/admin/users')).toBe('/overview');
+  for(const value of ['https://example.com','//example.com','/\\example.com','/%2f%2fexample.com','/api/auth/logout','/transactions\n','/transactions/../../admin/users','/admin/users/extra']) expect(safeWorkspacePath(value)).toBe('/transactions');
   expect(landingPath('admin','/overview')).toBe('/admin');
   expect(landingPath('analyst','/admin')).toBe('/overview');
   expect(landingPath('analyst','/transactions?risk=high')).toBe('/transactions?risk=high');

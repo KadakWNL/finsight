@@ -7,16 +7,19 @@ export function compactRecordId(kind:RecordKind,id:string) {
 export function roleHome(role: HumanRole) { return role === 'admin' ? '/admin' : '/overview'; }
 export function safeWorkspacePath(value: string | null | undefined, fallback = '/transactions') {
   if (!value || !value.startsWith('/') || value.startsWith('//') || value.includes('\\') || [...value].some(c=>c.charCodeAt(0)<32||c.charCodeAt(0)===127)) return fallback;
+  const pathname = value.split('?')[0].split('#')[0];
+  if (pathname.split('/').some(segment => segment === '..' || segment === '.')) return fallback;
   try {
     const url = new URL(value,'https://workspace.invalid');
-    if (url.origin !== 'https://workspace.invalid' || !/^\/(overview|admin|settings|access-denied|transactions(?:\/[0-9a-f-]{36})?|cases(?:\/[0-9a-f-]{36})?)$/i.test(url.pathname)) return fallback;
+    if (url.origin !== 'https://workspace.invalid' || !/^\/(overview|admin(?:\/users)?|settings|access-denied|transactions(?:\/[0-9a-f-]{36})?|cases(?:\/[0-9a-f-]{36})?)$/i.test(url.pathname)) return fallback;
     return url.pathname + url.search;
   } catch { return fallback; }
 }
 export function landingPath(role: HumanRole, next?: string | null) {
   const home = roleHome(role);
   const path = safeWorkspacePath(next,home);
-  if ((role === 'analyst' && path.split('?')[0] === '/admin') || (role === 'admin' && path.split('?')[0] === '/overview')) return home;
+  const target = path.split('?')[0];
+  if ((role === 'analyst' && target.startsWith('/admin')) || (role === 'admin' && target === '/overview')) return home;
   return path;
 }
 export function formatMoney(value: string, currency: string) {
