@@ -1,6 +1,6 @@
 # Information architecture
 
-FinSight navigation follows discovery, investigation, and oversight tasks. All routes below are proposed; no Next.js routes exist. [Product workflows](product-workflows.md#permission-contract) owns permissions, and [architecture gaps](architecture-gaps.md) owns implementation status.
+FinSight navigation follows discovery, investigation, and oversight tasks. The route inventory below is the original target. Implemented routes are `/overview`, `/admin`, `/admin/users`, `/transactions`, `/transactions/[id]`, `/cases`, `/cases/[id]`, `/settings`, `/sign-in` and `/access-denied`. [Product workflows](product-workflows.md#permission-contract) owns permissions; current feature behavior is documented in [Discovery workspace](discovery-ui.md), [Case workspace](case-ui.md) and [Analyst administration](analyst-administration.md).
 
 ## Role-specific navigation
 
@@ -11,11 +11,11 @@ FinSight navigation follows discovery, investigation, and oversight tasks. All r
 | Account menu | Display name, role, sign out | Display name, role, sign out |
 | Contextual links | Owned case history; rule explanation from a signal | All case history; rule catalog and governance links |
 
-The service actor has no interactive navigation. Entities is a typed explorer, not a separate database entity. Risk rules is initially read-only. User mutations and redaction processing are visible as proposed implementation targets and must remain unavailable until audit/recovery prerequisites exist.
+The service actor has no interactive navigation. Entities is a typed explorer, not a separate database entity. Risk rules is initially read-only. Analyst account management is implemented at `/admin/users`; role editing, redaction processing and governance catalogs remain proposed implementation targets and must remain unavailable until their recovery and audit prerequisites exist.
 
 The [first vertical slice](requirements-traceability.md#first-vertical-slice-and-acceptance-tests) delivers analyst Overview, Transactions, and Cases, plus admin case oversight through Overview and Cases. Entity pages and administrative catalogs enter only when their data contracts are delivered. Omit navigation to unimplemented screens rather than presenting functional-looking links. Keep the full role navigation above as the target architecture.
 
-Admin resolution/return/reopen on case detail belongs to the guarded case lifecycle. Operator account changes, rule edits, and redaction belong to separate [capability gates](architecture-gaps.md#capability-gates). A working admin overview grants no implicit access to those mutation workflows.
+Admin resolution/return/reopen on case detail belongs to the guarded case lifecycle. Administrator role changes, rule edits, and redaction belong to separate [capability gates](architecture-gaps.md#capability-gates); analyst account changes are implemented at `/admin/users`. A working admin overview grants no implicit access to the remaining mutation workflows.
 
 Desktop navigation uses a left rail with a clear active item. Admin entries form a labeled secondary group. Compact layouts use a menu drawer, preserve the active page title, and return focus to the menu trigger when closed. Deep links receive the same server authorization as in-app navigation.
 

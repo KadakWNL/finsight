@@ -52,7 +52,7 @@ Every row has `active_case`:
 | `{"exists":true,"access":"restricted"}` | Analyst viewing another owner's or unassigned case | Display only "Existing case"; no case ID/reference/status/owner is disclosed |
 | exists true, access permitted, case_id/case_ref/status | Owning analyst or admin | Permitted existing-case link |
 
-Detail includes recorded signal evidence/observations/contributions/times and labels joined rule settings as current. It does not invent a firing-time rule revision. Score/count/band, signal rows, context and case indicator are read in one SQL snapshot. Disabled current configuration does not hide an existing signal. This API does not claim that case-command HTTP routes or entity administration are implemented.
+Detail includes recorded signal evidence/observations/contributions/times and labels joined rule settings as current. It does not invent a firing-time rule revision. Score/count/band, signal rows, context and case indicator are read in one SQL snapshot. Disabled current configuration does not hide an existing signal. This API does not claim that entity read APIs, semantic search or administrator role management are implemented.
 
 ## Errors and frontend handoff
 

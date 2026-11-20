@@ -1,5 +1,7 @@
 # Current demonstration diagrams
 
+> Freshness: these masters and the catalog were generated from migrations through `060_session_cleanup.sql`. They do not include `admin_audit_event` from migration 070. Regenerate both before final submission.
+
 Use these two print masters for the demonstration:
 
 - [ER diagram](../../output/pdf/FinSight-ER-A4-Revised.pdf): Chen notation with entity rectangles, attribute ellipses, relationship diamonds, cardinalities and underlined primary keys. The master is one A4 landscape page.
@@ -9,7 +11,7 @@ Both print **FinSight**, **Shrikar Desai**, and **Shreyas P Kulkarni**. Both are
 
 ## Verified scope
 
-The catalog was extracted from PostgreSQL 17.11 after applying all seven current migrations through `060_session_cleanup.sql`, matching main revision `843f0af9597439cafefe35c62dea8b9be29540bb`. The diagrams show all 17 implemented application tables, the migration-runner bookkeeping table, the derived risk view and the Mongo telemetry collection. There are 161 SQL columns across those tables/view and 20 declared SQL foreign keys. The Mongo base fields and both shape-specific payloads come from the executable validator.
+The catalog was extracted from PostgreSQL 17.11 after applying all migrations through `060_session_cleanup.sql`, matching main revision `843f0af9597439cafefe35c62dea8b9be29540bb`. Migration 070 adds `admin_audit_event` with seven columns and two foreign keys after these artifacts were generated. The diagrams show the 17 application tables present at generation time, the migration-runner bookkeeping table, the derived risk view and the Mongo telemetry collection. There are 161 SQL columns across those tables/view and 20 declared SQL foreign keys. The Mongo base fields and both shape-specific payloads come from the executable validator.
 
 Bookkeeping, the derived view and Mongo documents are visibly distinguished. Mongo UUID references are application-validated, not SQL foreign keys. `candidate_session_ids` is a retained UUID-array snapshot, not an FK. `case_event.operation_id` is provenance, not a declared FK to a receipt. Both composite transaction FKs explicitly name the exact source and referenced column tuples. No connection is inferred from a shared route or bus. The diagrams do not claim that generated fields or document structures are normalized 3NF relations.
 

@@ -6,21 +6,21 @@ Repository: [KadakWNL/finsight](https://github.com/KadakWNL/finsight)
 
 ## Purpose and architecture
 
-FinSight supports synthetic financial transaction review and traceable investigation. Analysts discover transactions, inspect recorded risk signals and device telemetry, and manage cases with retained history. Administrators preview and confirm bounded deletion of old unusable sessions.
+FinSight supports synthetic financial transaction review and traceable investigation. Analysts discover transactions, inspect recorded risk signals and device telemetry, and manage cases with retained history. Administrators manage analyst credentials, preview and confirm bounded deletion of old unusable sessions, and retain an immutable administrative audit.
 
 Next.js App Router, React and TypeScript provide pages, route handlers and server actions. PostgreSQL 17 stores financial facts, rules/signals, users/sessions, cases/events and cleanup audits. MongoDB stores heterogeneous telemetry. NextAuth Credentials authentication uses Argon2id passwords and encrypted cookie tokens linked to persisted PostgreSQL sessions. Runtime authority is separate from the migration owner. Exact dependency versions are pinned in `package-lock.json`.
 
-All demonstration data is synthetic. This project does not establish fraud-detection accuracy, production banking readiness or load performance. Vector retrieval, Mongo notes/recovery, rule editing and redaction remain deferred.
+All demonstration data is synthetic. This project does not establish fraud-detection accuracy, production banking readiness or load performance. Vector retrieval, Mongo notes/recovery, rule editing, administrator role management and redaction remain deferred.
 
 ## Implemented relational inventory and diagrams
 
-The [schema catalog](../printable/schema-catalog.json) and seven migrations define 17 application tables:
+The [schema catalog](../printable/schema-catalog.json) and eight migrations define the application tables. The catalog was generated through migration 060; migration 070 adds `admin_audit_event`.
 
-`customer`, `address`, `account`, `payment_method`, `merchant`, `device_fingerprint`, `transaction`, `risk_rule`, `risk_signal`, `fraud_scenario`, `transaction_label`, `app_user`, `investigation_case`, `app_session`, `case_command_receipt`, `case_event`, `app_session_cleanup`.
+`customer`, `address`, `account`, `payment_method`, `merchant`, `device_fingerprint`, `transaction`, `risk_rule`, `risk_signal`, `fraud_scenario`, `transaction_label`, `app_user`, `investigation_case`, `app_session`, `case_command_receipt`, `case_event`, `app_session_cleanup`, `admin_audit_event`.
 
-`schema_migrations` is tooling metadata and `v_transaction_risk` is a derived view. The catalog contains 161 SQL attributes across these 19 objects and 20 declared foreign keys. `app_session_cleanup.candidate_session_ids` is an audit UUID-array snapshot, not an FK. Cross-database UUID references are application-validated.
+`schema_migrations` is tooling metadata and `v_transaction_risk` is a derived view. The catalog contains 161 SQL attributes across 19 objects and 20 declared foreign keys as generated through migration 060. Migration 070 adds seven attributes and two foreign keys. `app_session_cleanup.candidate_session_ids` is an audit UUID-array snapshot, not an FK. Cross-database UUID references are application-validated.
 
-Use the [current print masters](../printable/README.md). Both are single-page A4 landscape, titled FinSight, with Shrikar Desai and Shreyas P Kulkarni. This documentation change alters no schema or telemetry properties. Regenerate and visually inspect diagrams if the model changes before demonstration.
+Use the [current print masters](../printable/README.md). Both are single-page A4 landscape, titled FinSight, with Shrikar Desai and Shreyas P Kulkarni. These masters were generated through migration 060; regenerate them to include `admin_audit_event` before final submission. This documentation change alters no schema or telemetry properties. Regenerate and visually inspect diagrams if the model changes before demonstration.
 
 ## Application workflows
 
@@ -30,7 +30,7 @@ Use the [current print masters](../printable/README.md). Both are single-page A4
 | Discovery | Risk/status/time/amount/context filters, sorting, signed cursors | [Discovery UI](../discovery-ui.md) |
 | Transaction detail | Original/base amounts, signal evidence, masked context and device telemetry | [Transaction API](../transaction-api.md) |
 | Investigation | Creation, assignment, guarded lifecycle, version conflicts and typed history | [Case UI](../case-ui.md) |
-| Administration | Audited bounded deletion of old unusable sessions | [Cleanup contract](../session-cleanup-contract.md) |
+| Administration | Analyst account creation, deactivation, reactivation and password reset with session revocation and case unassignment; audited bounded deletion of old unusable sessions | [Analyst administration](../analyst-administration.md), [Cleanup contract](../session-cleanup-contract.md) |
 
 ### Risk scoring
 
@@ -45,7 +45,7 @@ There are two seeded rules, defined in `scripts/financial-seed.mjs`:
 
 ### Case and retention guards
 
-`execute_case_command` checks authority, ownership, transition, expected version and idempotency. `case_one_active_transaction` enforces one active case per transaction. `case_event` stores types including `created`, `assigned` and `status_change`. Migration 050 implements `case_event_immutable_row` and `case_event_immutable_stmt` using `reject_case_event_mutation`. Retained evidence records owner event UPDATE rejection (55000) and runtime DELETE rejection (42501).
+`execute_case_command` checks authority, ownership, transition, expected version and idempotency. `case_one_active_transaction` enforces one active case per transaction. `case_event` stores types including `created`, `assigned` and `status_change`. Migration 050 implements `case_event_immutable_row` and `case_event_immutable_stmt` using `reject_case_event_mutation`. Migration 070 uses the same `assigned` event when an administrator deactivates an analyst, clearing each active assignment, incrementing the case version and writing an immutable `admin_audit_event`. Retained evidence records owner event UPDATE rejection (55000) and runtime DELETE rejection (42501).
 
 ### Application SQL DELETE
 

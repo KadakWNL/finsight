@@ -1,6 +1,6 @@
 # Product workflows
 
-FinSight helps internal operators investigate suspicious synthetic financial transactions using explainable signals and traceable cases. Every workflow here is a proposed contract; the repository contains design artifacts only. [Architecture assessment](architecture-gaps.md#evidence-and-inspection-boundary) owns the evidence and implementation status.
+FinSight helps internal operators investigate suspicious synthetic financial transactions using explainable signals and traceable cases. This document retains the proposed workflow contract; implemented behavior is owned by the README and the current feature and API documents. [Architecture assessment](architecture-gaps.md#evidence-and-inspection-boundary) owns the design-phase evidence.
 
 ## Scope and user decisions
 
@@ -39,7 +39,7 @@ This balances discovery with confidentiality. The schema has no case membership 
 | Reopen | No | Terminal case only | No | Reason; uniqueness checked; `status_change` |
 | View rules | Read firing explanations/current rules | All rules | Evaluate active rules | Current rule config is labeled current |
 | Create/update/enable/disable/version rules | No | Proposed, gated | No | Immutable revisions, validation, and general audit required |
-| Create/update operator accounts and roles | No | Proposed, gated | No interactive administration | Audit prerequisite; protected system identity/last admin |
+| Create/update operator accounts and roles | No | Analyst accounts only: create, deactivate, reactivate and reset password; administrators are not managed | No interactive administration | Audit event per action; protected system identity; accounts are never deleted |
 | Delete operator accounts | No | No, deactivate instead | No | Preserve actor references and history |
 | View audit/redaction | Own case history only | Case history and redaction requests | Recovery scope | General audit view is proposed |
 | Submit/process/reject redaction | No | Proposed, gated | Approved durable steps only | Allowlisted fields, cross-store confirmation, audit |
@@ -47,7 +47,7 @@ This balances discovery with confidentiality. The schema has no case membership 
 | Export records | No first-release export | Deferred capability | No | Field policy and audit unresolved |
 | Delete/update financial transaction facts, events, signals | No | No | Controlled ingestion only; no history deletion | Integrity privileges and guards apply to admin too |
 
-Operator creation accepts human roles only. Service identities are provisioned by protected setup, have no credential sign-in, and cannot be selected as case owners. Admin account edits must preserve at least one active admin and must reassign/unassign active cases before disabling or changing an analyst's role.
+Analyst creation accepts the analyst role only; administrators remain bootstrap-provisioned and are not creatable, deactivatable or deletable through the API. Deactivating an analyst revokes sessions and unassigns active cases. Administrator role changes and last-admin safeguards remain deferred.
 
 ## Authentication and onboarding journey
 

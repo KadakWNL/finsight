@@ -1,6 +1,6 @@
 # Authentication, Session, and Case-Command Contract
 
-- **Status:** Proposed for cross-review — not approved and not implemented.
+- **Status:** Contract text retained for provenance. Authentication, sessions and case commands are implemented in migrations 020-060 and the server modules; see the README and current API documents for implemented behavior.
 - **Related work:** [Issue #3](https://github.com/KadakWNL/finsight/issues/3)
 - **Decision owner:** ShrikarDesai07 · **Cross-review:** KadakWNL
 - **Prepared:** 2026-10-13

@@ -91,13 +91,13 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 
 ### Step 4: Apply Schema Migrations
 
-Apply all ordered migrations through `060_session_cleanup.sql`:
+Apply all ordered migrations through `070_analyst_administration.sql`:
 
 ```powershell
 npm run db:migrate
 ```
 
-The runner applies the seven migration files in order and records checksums in `schema_migrations`. Migration 010 creates financial tables, 020 creates users/sessions/cases/events/receipts, 030 adds financial guards, 040 implements deterministic scoring and its view, 050 guards case commands, 055 adds protected session validation, and 060 adds audited session cleanup. Existing `finsight_runtime` receives grants from migrations 050, 055 and 060. It must not inherit the owner role.
+The runner applies the eight migration files in order and records checksums in `schema_migrations`. Migration 010 creates financial tables, 020 creates users/sessions/cases/events/receipts, 030 adds financial guards, 040 implements deterministic scoring and its view, 050 guards case commands, 055 adds protected session validation, 060 adds audited session cleanup, and 070 adds analyst account administration and its audit log. Existing `finsight_runtime` receives grants from migrations 050, 055, 060 and 070. It must not inherit the owner role.
 
 Seed the eight canonical financial scenarios before telemetry and the live demonstration:
 
@@ -120,6 +120,8 @@ npm run auth:provision -- --demo
 Provisioned accounts:
 - **Analyst:** `analyst_a@finsight.local`
 - **Administrator:** `admin@finsight.local`
+
+After signing in as the administrator, open `/admin/users` to create additional analyst accounts, deactivate access or reset passwords. See [analyst administration](analyst-administration.md).
 
 *(Alternatively, use `npm run auth:provision -- --bootstrap-admin` with `BOOTSTRAP_ADMIN_EMAIL` and `BOOTSTRAP_ADMIN_PASSWORD` to create a custom administrative user).*
 

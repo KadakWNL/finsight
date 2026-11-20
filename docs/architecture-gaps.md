@@ -1,6 +1,8 @@
 # Architecture assessment and decisions
 
-FinSight has database design artifacts and no executable application. This document records evidence, implementation gaps, and recommended decisions for review before coding.
+> Historical design-phase assessment. It records the repository before implementation. Current behavior is owned by the README, migrations, source and API references; statements below that describe missing application code are not current.
+
+FinSight had database design artifacts and no executable application when this assessment was written. This document records that design-phase evidence, implementation gaps, and recommended decisions from before coding.
 
 ## Evidence and inspection boundary
 

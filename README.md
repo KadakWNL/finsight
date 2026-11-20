@@ -31,6 +31,7 @@ Captured at a 1920 x 1080 desktop viewport from the running application on Octob
 | Area | Available behavior |
 |---|---|
 | Authentication | Provisioned analyst/admin identities, Argon2id passwords, encrypted cookies, PostgreSQL-backed session expiry and sign-out |
+| Analyst administration | Admin-only account creation, deactivation/reactivation, password reset, session revocation, automatic case unassignment and immutable administrative audit |
 | Discovery | Role overview, description/exact-ID search, date/status/risk/entity/amount filters, stable signed cursor paging |
 | Transaction evidence | Masked customer/account context, original currency and INR base amounts, recorded contributions, rule context, scoped MongoDB device telemetry, and completeness caveats |
 | Investigation | Case creation, scoped queue/detail/history, and role-aware lifecycle dialogs backed by guarded APIs |
@@ -38,7 +39,7 @@ Captured at a 1920 x 1080 desktop viewport from the running application on Octob
 | Demo data | Reproducible linked activity, saved historical FX observations, conflict-safe import and offline replay |
 | Integrity | PK/FK/check constraints, retained financial facts, unique active cases, version conflicts, idempotent commands and immutable events |
 
-The [case screens](docs/case-ui.md) support investigation and lifecycle review. Scoped [MongoDB device telemetry](docs/mongo-telemetry.md) reads and bounded aggregation are demonstrated under transaction evidence. Analyst notes, general administration and semantic search are not exposed as working features. A recorded risk score supports review; it is not a fraud verdict.
+The [case screens](docs/case-ui.md) support investigation and lifecycle review. Scoped [MongoDB device telemetry](docs/mongo-telemetry.md) reads and bounded aggregation are demonstrated under transaction evidence. Analyst notes, rule editing and semantic search are not exposed as working features. A recorded risk score supports review; it is not a fraud verdict.
 
 ## Get started
 
@@ -71,7 +72,7 @@ Synthetic tooling requires a local database name ending in `_demo` or `_test`. [
 npm run db:migrate
 ```
 
-Migrations through 060 supply financial/operational tables, guarded writes, protected session validation, and audited session cleanup. Existing standard role names receive runtime grants automatically. For custom role names, the migration owner must call both runtime and authentication grant procedures described in [authentication setup](docs/authentication.md#configure-and-provision).
+Migrations through 070 supply financial/operational tables, guarded writes, protected session validation, audited session cleanup, and analyst account administration. Existing standard role names receive runtime grants automatically. For custom role names, the migration owner must call the runtime, authentication, cleanup and analyst-administration grant procedures described in [authentication setup](docs/authentication.md#configure-and-provision).
 
 Set `DEMO_ANALYST_PASSWORD` and `DEMO_ADMIN_PASSWORD` in ignored local configuration, then run:
 
@@ -185,6 +186,7 @@ For the compulsory demonstration hard copies, use the [current ER and relational
 | [Academic verification](docs/academic-verification.md) | Course requirement-to-command matrix, SQL/Mongo outputs, contribution evidence and pending sign-offs |
 | [MVP acceptance](docs/mvp-acceptance.md) | Fresh database requirements, VS01-VS16 evidence, recordings and human review gates |
 | [Authentication](docs/authentication.md) | Provisioning, cookies, sessions, grants and role checks |
+| [Analyst administration](docs/analyst-administration.md) | Account creation, deactivation, reactivation, password reset, case unassignment and audit |
 | [Transaction API](docs/transaction-api.md) / [Case API](docs/case-api.md) | Request validation, scoping, pagination and guarded commands |
 | [Demo dataset](docs/demo-dataset.md) / [deterministic risk](docs/deterministic-risk.md) | Generated activity, historical conversion and exact regression fixtures |
 | [ER mapping](docs/er-diagram.md) / [financial baseline](docs/financial-baseline.md) / [operational schema](docs/operational-schema.md) | Relational model, dictionaries and implemented storage boundaries |

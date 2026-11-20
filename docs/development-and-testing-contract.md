@@ -2,12 +2,12 @@
 
 > Current DELETE acceptance gate: the [2026-10-30 project-owner decision](academic/delete-scope-decision.md) supersedes earlier instructor-confirmation references in this contract. Real execution/retention evidence and teammate review remain required.
 
-- **Status:** Proposed for cross-review — not approved and not implemented.
+- **Status:** Planning contract retained. The toolchain, scripts and CI it describes are implemented; current commands and results are in the README and [development setup](development-setup.md).
 - **Related work:** [Issue #4](https://github.com/KadakWNL/finsight/issues/4)
 - **Decision owner:** ShrikarDesai07 · **Cross-review:** KadakWNL
 - **Prepared:** 2026-10-13
 
-This is the proposed team contract for repeatable local development and safe parallel work. The commands below are planned interfaces; they cannot run until issue #5 creates the package scripts and test harness.
+This is the team contract for repeatable local development and safe parallel work. The package scripts, migration runner and test harness are implemented; see [development setup](development-setup.md) for current commands.
 
 ## 1. Shared toolchain
 
@@ -41,6 +41,8 @@ Migration filenames use a fixed three-digit sequence and lowercase descriptive n
 | `050` | Protected case commands with guarded `expected_version` checks and atomic version increments, active-assignee/current-actor guards, command/event atomicity, immutability trigger, runtime/service/migrator privileges | ShrikarDesai07 | 020, 030, and 040 applied and cross-reviewed |
 
 No two people edit the same migration concurrently. Before work starts, the owner posts intended files, constraints/functions, and public interfaces in the issue. If a change touches another owner's migration, agree a separate migration or revise the ownership manifest first.
+
+Migrations 055, 060 and 070 were added after this planning table. The current sequence, descriptions and grants are recorded in [development setup](development-setup.md) and the migration files.
 
 ### Runner behavior
 

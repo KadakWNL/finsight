@@ -1,6 +1,6 @@
 # Minimum deterministic risk contract
 
-Status: proposed for review by @KadakWNL and @ShrikarDesai07. Neither approval is recorded. [Issue #2](https://github.com/KadakWNL/finsight/issues/2) requires both approvals before scoring implementation starts.
+Status: implemented in [`migrations/040_deterministic_risk.sql`](../migrations/040_deterministic_risk.sql) and verified by the deterministic risk tests. The text below records the accepted formula contract.
 
 This proposal defines two deterministic rules for synthetic card-payment fixtures using the existing `RISK_RULE` and `RISK_SIGNAL` fields. The formulas and numeric settings below are proposed academic fixture choices. They have no production calibration or fraud-probability interpretation.
 
@@ -17,7 +17,7 @@ For an active rule with valid inputs, evaluate its predicate once per transactio
 
 Use `version = 1` and `is_active = true` for these proposed fixtures. Rule codes identify fixed semantics, including the merchant mapping; the `dimension` alone does not define a formula. Merchant tier codes are ordinal categories, with no distance or probability meaning.
 
-Weights must be finite integer points in `[0,100]`; a zero weight is allowed and a matching rule still records one signal. Amount thresholds must be finite, positive INR decimals with at most two fractional digits within `numeric(20,2)`. Merchant thresholds must be integers in `{0,1,2}`. Reject unknown dimensions/codes, invalid tier values, negative/nonfinite weights and excessive precision before evaluation. These are proposed validation obligations, not existing database constraints.
+Weights must be finite integer points in `[0,100]`; a zero weight is allowed and a matching rule still records one signal. Amount thresholds must be finite, positive INR decimals with at most two fractional digits within `numeric(20,2)`. Merchant thresholds must be integers in `{0,1,2}`. Reject unknown dimensions/codes, invalid tier values, negative/nonfinite weights and excessive precision before evaluation. These validation obligations are enforced by `score_transaction` and the rule constraints.
 
 Freeze rule configuration and merchant tiers for the fixture dataset before emitting signals. The current schema has no immutable rule revision or merchant-tier snapshot. Persist the observed tier and its mapping in signal evidence; changing a merchant must never rewrite existing evidence. Rule editing, rescoring and version replay require a separate approved design.
 

@@ -4,7 +4,7 @@ The commands in `scripts/demo-cli.mjs` add bounded synthetic activity using save
 
 ## Run the import
 
-Configure the local database using [development setup](development-setup.md). Apply migrations through 055 and use a non-superuser migrator connection to a local database ending in `_demo` or `_test`. Set `ALLOW_SYNTHETIC_SEED=true` explicitly.
+Configure the local database using [development setup](development-setup.md). Apply migrations through 070 and use a non-superuser migrator connection to a local database ending in `_demo` or `_test`. Set `ALLOW_SYNTHETIC_SEED=true` explicitly.
 
 ```powershell
 npm run demo:fx -- --out=data/local/fx-2026-q1.json
