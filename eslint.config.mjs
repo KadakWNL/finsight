@@ -5,5 +5,5 @@ import tseslint from 'typescript-eslint';
 export default defineConfig([
   js.configs.recommended, ...tseslint.configs.recommended,
   { files: ['**/*.mjs'], languageOptions: { globals: { process: 'readonly', console: 'readonly', URL: 'readonly' } } },
-  globalIgnores(['.next/**', 'out/**', 'next-env.d.ts', 'playwright-report/**', 'test-results/**']),
+  globalIgnores(['.next/**', 'out/**', '.agents/**', 'output/**', 'next-env.d.ts', 'playwright-report/**', 'test-results/**']),
 ]);

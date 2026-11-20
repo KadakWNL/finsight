@@ -25,3 +25,13 @@ docs/DBMS Level 3 Project Requirements.pdf
 
 # Python diagram renderer cache
 __pycache__/
+
+# Local presentation, agent skills and viva material
+.agents/
+docs/demo-commands.md
+docs/demo-runbook.md
+output/deck/
+output/deck-src/
+output/theory/
+output/theory-src/
+output/pdf/*Viva*
