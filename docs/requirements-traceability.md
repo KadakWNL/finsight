@@ -1,6 +1,6 @@
 # Requirements traceability
 
-This document defines proposed requirements, backend contracts, database operations, and acceptance evidence. None of the APIs or enforcement described here exists yet. [Architecture assessment](architecture-gaps.md) owns repository evidence; [product workflows](product-workflows.md) owns authorization and transitions; [screen inventory](information-architecture.md#page-inventory) defines screen IDs.
+This document records proposed requirements, backend contracts, database operations and acceptance mapping. Statements that describe APIs or enforcement as absent reflect the original proposal; current implementation is established by the migrations, source and README. [Architecture assessment](architecture-gaps.md) owns design-phase evidence; [product workflows](product-workflows.md) owns authorization and transitions; [screen inventory](information-architecture.md#page-inventory) defines screen IDs.
 
 ## Functional requirements
 
@@ -16,7 +16,7 @@ This document defines proposed requirements, backend contracts, database operati
 | F08 | Required traceable case history | Investigation / S06,S12 | Protected function emits typed events; immutability trigger blocks history mutation | Dedicated `reason`/`metadata`/`operation_id`; truthful state diffs, server actor, unique command events; application cannot update/delete/insert arbitrary events |
 | F09 | Required Mongo note workflow, documented workload | Investigation / S06 | Proposed operation intent, note write, event finalization | Idempotent retry produces one confirmed note/event; Mongo failure preserves draft and eventual recovery |
 | F10 | Required rule catalog; editing proposed and gated | Rules / S04,S11 | Rule reads; future revision mutation | Existing signals remain readable when current rule is disabled; edits unavailable until immutable provenance/audit is tested |
-| F11 | Required operator management for oversight; mutation audit proposed | Governance / S10 | User read/create/update | Only admin changes human roles; last admin and active analyst assignment safeguards survive concurrent requests |
+| F11 | Analyst account management implemented; administrator mutation proposed | Governance / S10 | Analyst read/create/update; administrator roles remain bootstrap-only | Only an active admin manages analyst accounts; deactivation revokes sessions and unassigns active cases with audit |
 | F12 | Documented redaction entity; completion proposed and gated | Governance / S12 | Request read/create/update plus durable steps | Allowlisted PII removed across approved stores before completion; transaction/case facts retained; failure stays pending |
 | F13 | Required full-text search; vector retrieval documented but gated | Discovery / S03,S06 | SQL FTS; authorized semantic search | Keyword matching uses stored description vector; semantic notes reveal only owned/admin-visible confirmed content |
 | F14 | Required synthetic risk/evaluation demonstration | Service / S04; evaluator report | Idempotent scoring; joins to labels | Known scenario seeds produce explainable signals; precision/recall use explicit eligibility/threshold and remain separate from investigator verdicts |
@@ -73,7 +73,7 @@ Use Next.js Route Handlers or equivalent server functions with one shared author
 | `GET /api/v1/operations/{id}` | Actor-permitted note/redaction/cleanup progress, proposed storage | S06,S12 | Creator/admin scope plus current resource permission; no other actor intent or sensitive payload disclosure |
 | `POST /api/v1/search` | Protected semantic query, or sensitive keyword query transport | S03 | Query length/model checks; source permission; bounded results; no sensitive URL logging |
 | `GET /api/v1/rules` and `/{id}` | Admin catalog; analyst firing-context projection | S04,S11 | Role/context restrictions; no mutation endpoint in first release |
-| `GET /api/v1/users`; proposed `POST`, `PATCH /{id}` | Operator administration | S10 | Admin, last-admin/assignment locks, immutable system identities, audit transaction |
+| `GET/POST /api/v1/users`; `PATCH /api/v1/users/{id}` | Analyst account administration | S10 | Admin caller, analyst-only target, immutable audit transaction |
 | `GET /api/v1/governance/events` | Case event oversight | S12 | Admin; bounded queries; general admin audit separate when implemented |
 | `GET/POST /api/v1/redactions`; proposed `PATCH /{id}` | Read/request/decision/processing intent | S12 | Admin, allowlisted fields, guarded status, cross-store recovery gate |
 | Proposed `GET /api/v1/health` | Coarse read-only dependency checks | S09 | Admin, short timeout, safe result |

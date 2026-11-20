@@ -74,4 +74,4 @@ The pinned transcript's two merchant groups come from its isolated eight-fixture
 
 Show [contributions.json](contributions.json), its PRs, merge commits and source paths. Each member explains their own database and application work. Show the [measured results](2026-10-30-verification.md), identifying them as a pinned execution rather than coverage percentages. Explain that PR #42's later approval and the DELETE scope decision supersede the raw report's historical pending gates. Do not rewrite the raw report or treat those flags as the upcoming course defense.
 
-State deferred features: vector retrieval, Mongo notes/recovery, rule editing and redaction. Leave time for individual questions. Submit the soft copy and GitHub link only after the demonstration, as required by the announcement.
+State deferred features: vector retrieval, Mongo notes/recovery, rule editing, administrator role management and redaction. Analyst account administration is implemented at `/admin/users`. Leave time for individual questions. Submit the soft copy and GitHub link only after the demonstration, as required by the announcement.

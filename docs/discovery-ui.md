@@ -8,6 +8,7 @@ The routes in `src/app/(workspace)` provide transaction discovery over the Postg
 | `/login` | Public | Compatibility redirect to sign-in |
 | `/overview` | Analyst | Assigned active work and recent high/critical transactions |
 | `/admin` | Admin | Active team work and recent high/critical transactions |
+| `/admin/users` | Admin | Analyst account creation, deactivation, reactivation and password reset; see [analyst administration](analyst-administration.md) |
 | `/transactions` | Active human | URL-backed filters, signed cursor paging and masked transaction rows |
 | `/transactions/[id]` | Active human | Original/base amounts, masked context, stored signals and subject-bound analyst creation |
 | `/cases`, `/cases/[id]` | Analyst, Admin | Scoped queue, detail, history and lifecycle dialogs; see [case UI](case-ui.md) |

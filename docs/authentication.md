@@ -1,6 +1,6 @@
 # Authentication and session setup
 
-The Auth.js Credentials provider and JSON login endpoint use the same encrypted JWT cookie and PostgreSQL session record. [`authentication.ts`](../src/server/authentication.ts) supplies request authentication; [`auth-config.ts`](../src/server/auth-config.ts) validates current PostgreSQL authority when Auth.js constructs a session. The [approved session contract](case-auth-contracts.md#2-session-design) owns idle and absolute timeout policy. Sign-in pages and feature screens remain separate UI work.
+The Auth.js Credentials provider and JSON login endpoint use the same encrypted JWT cookie and PostgreSQL session record. [`authentication.ts`](../src/server/authentication.ts) supplies request authentication; [`auth-config.ts`](../src/server/auth-config.ts) validates current PostgreSQL authority when Auth.js constructs a session. The [approved session contract](case-auth-contracts.md#2-session-design) owns idle and absolute timeout policy. The sign-in page and workspace screens are implemented.
 
 ## Configure and provision
 
@@ -8,13 +8,13 @@ Set `AUTH_SECRET` to a locally generated random value of at least 32 characters 
 
 Use `MIGRATOR_DATABASE_URL` for schema/provisioning and a distinct nonowner `DATABASE_URL` for application requests. `TEST_DATABASE_URL` is selected only inside the test runner and requires the local isolated-database opt-in. Enabling test tooling does not redirect the running application to the test owner.
 
-Apply migrations through 055:
+Apply migrations through 070:
 
 ```powershell
 npm run db:migrate
 ```
 
-For the runtime role, the migration owner calls both `public.grant_runtime_privileges(role::regrole)` and `public.grant_auth_privileges(role::regrole)`. Migrations automatically provision their grants for existing `finsight_runtime`, `finsight_app` and `finsight_test` roles; custom role names require explicit owner calls. The auth grant permits schema lookup and execution of the protected validation function, without granting operator-table updates.
+For the runtime role, the migration owner calls `public.grant_runtime_privileges(role::regrole)` and `public.grant_auth_privileges(role::regrole)`, plus the cleanup and analyst-administration grant procedures. Migrations automatically provision their grants for existing `finsight_runtime`, `finsight_app` and `finsight_test` roles; custom role names require explicit owner calls. The auth grant permits schema lookup and execution of the protected validation function, without granting operator-table updates.
 
 To bootstrap the first admin, set `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD` and optional `BOOTSTRAP_ADMIN_NAME` through local environment configuration, then run:
 
@@ -31,6 +31,12 @@ npm run auth:provision -- --demo
 ```
 
 Demo provisioning requires an explicitly permitted local `_demo`/`_test` migrator target, or the explicitly permitted test connection when no migrator URL is set. It provisions analyst A/B, admin, inactive analyst and system fixtures. There are no default passwords. The system identity has no password and cannot sign in. Demo retries preserve pre-existing accounts.
+
+## Analyst account administration
+
+After bootstrap, an active administrator manages analyst accounts at `/admin/users`. The page and `/api/v1/users` routes are admin-only. Creating an account uses the same Argon2id settings as sign-in; deactivation revokes every session and unassigns active cases, and reactivation requires a new password. Administrators are not created, deactivated or deleted through this feature, and accounts are never deleted.
+
+The [analyst administration contract](analyst-administration.md) owns validation, case unassignment, session revocation, audit behavior and the error matrix.
 
 ## Request boundary
 
