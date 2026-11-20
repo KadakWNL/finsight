@@ -175,7 +175,7 @@ test('VS16: admin mutation gates reject direct HTTP requests without data change
   await expect(page.getByRole('heading', { name: 'Team overview' })).toBeVisible();
   const before = await immutableDigest();
   const paths = [
-    '/api/v1/users', '/api/v1/users/' + analyst, '/api/v1/operators/' + analyst,
+    '/api/v1/operators/' + analyst,
     '/api/v1/rules', '/api/v1/rules/' + syntheticId(50), '/api/v1/risk-rules/' + syntheticId(50),
     '/api/v1/redactions', '/api/v1/redaction-requests', '/api/v1/cleanup', '/api/v1/session-cleanup',
     '/api/v1/telemetry-cleanups',
@@ -190,7 +190,8 @@ test('VS16: admin mutation gates reject direct HTTP requests without data change
   }
   expect(await immutableDigest()).toEqual(before);
   const nav = page.getByRole('navigation', { name: 'Primary navigation' });
-  await expect(nav.getByRole('link')).toHaveCount(3);
+  await expect(nav.getByRole('link')).toHaveCount(4);
+  await expect(nav.getByRole('link', { name: 'Analyst accounts' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Manage users|Edit rules|Redact|Cleanup|Telemetry|Add note/ })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Manage users|Edit rules|Redact|Cleanup|Add note/ })).toHaveCount(0);
 });

@@ -76,7 +76,14 @@ describe('Issue #9 Case Guards and Concurrency Integration Tests', () => {
   afterAll(async () => {
     try {
       await client.query(`
+        DROP FUNCTION IF EXISTS public.create_analyst_account(uuid, text, text, text) CASCADE;
+        DROP FUNCTION IF EXISTS public.deactivate_analyst_account(uuid, uuid, text) CASCADE;
+        DROP FUNCTION IF EXISTS public.reactivate_analyst_account(uuid, uuid, text) CASCADE;
+        DROP FUNCTION IF EXISTS public.reset_analyst_password(uuid, uuid, text) CASCADE;
+        DROP PROCEDURE IF EXISTS public.grant_analyst_admin_privileges(regrole) CASCADE;
+        DROP FUNCTION IF EXISTS public.reject_admin_audit_mutation() CASCADE;
         DROP TABLE IF EXISTS
+          public.admin_audit_event,
           public.app_session_cleanup,
           public.case_command_receipt,
           public.case_event,
